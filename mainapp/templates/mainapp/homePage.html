@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<title>{{track_name}}</title>
+<script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
+<script src="{% static 'mainapp/js/audio.js' %}"></script>
 </head>
 <body>
 
+<div id="topbar">
+    <a id="sitename" href="/">NubasMusicTopKodingProMegaSite</a>
+    <a id="login" href="/login/">Войти</a>
+    <a id="register" href="/register/">Регистрация</a>
+</div>
+
+<div id="player">
+    <div class="Player" id="playerBackground"></div>
+    <div id="playerContainer">
+        <img class="Button Player" id="logo" src="{% static 'mainapp/images/Cover.jpg' %}" draggable="false" />
+        <h1 class="Player" id="trackname">{{performer_name}} - {{track_name}} </h1>
+        <img class="Button  Player" id="nextlogo" src="{% static 'mainapp/images/Cover.jpg' %}" draggable="false" />
+        <audio id="audio" src="{% static file_link %}"></audio>
+        <img class="Button Player" id="playButton" src="{% static 'mainapp/images/playButton.png' %}" draggable="false" />
+        <img class="Button Player" id="nextButton" src="{% static 'mainapp/images/nextButton.png' %}"  draggable="false"/>
+        <img class="Button Player" id="previousButton" src="{% static 'mainapp/images/previousButton.png' %}" draggable="false" />
+    </div>
+</div>
 </body>
 </html>
