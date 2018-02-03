@@ -1,0 +1,123 @@
+.Button {
+	/*width: 128px;
+	height: 128px;*/
+	cursor: pointer;
+	width: 14%;
+	height: 14%;
+}
+
+.Player {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
+}
+
+body {
+
+}
+
+a {
+    text-decoration: none;
+    font: 20px Arial,Helvetica,sans-serif;
+    color: #e8e8e8;
+    margin: auto;
+    align: right;
+    position: inherit;
+    opacity: 1.0;
+    vertical-align: center;
+}
+
+#login {
+    right: 30px;
+    top: 15px;
+}
+
+#register {
+    right: 110px;
+    top: 15px;
+}
+
+#topbar {
+    top: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    height: 50px;
+	background-color: black;
+}
+
+#playerContainer {
+	width: 600px;
+	height: 600px;
+    right: 0;
+    position:absolute;
+    left: 0;
+    margin: auto;
+}
+#player {
+    right: 0;
+    position:absolute;
+    left: 0;
+    margin: auto;
+    top: 50px;
+    height: 530px;
+}
+
+#playerBackground {
+    width: auto;
+    background-color: #3b3b3b;
+    position: absolute;
+}
+#playButton {
+	top: 45%;
+}
+#logo {
+	top: -50%;
+	width: 40%;
+	height: 40%;
+	border-radius: 10px;
+	box-shadow: 1px 5px 28px #64bdf5;
+}
+#logo:hover {
+	box-shadow: 1px 5px 28px #ff3079;
+}
+
+#nextlogo {
+	top: -50%;
+    left: 90%;
+	opacity: 0.3;
+	width: 25%;
+	height: 25%;
+}
+
+#nextButton {
+    top: 45%;
+    right: -60%;
+}
+#previousButton {
+    top: 45%;
+    left: -60%;
+}
+#trackname {
+	font: 20px Arial,Helvetica,sans-serif;
+	color: #e8e8e8;
+	text-align:center;
+	top: 50%;
+}
+
+#sitename {
+    font: 30px Arial,Helvetica,sans-serif;
+    color: #e8e8e8;
+    top: 8px;
+    left: 15px;
+    margin: auto;
+    position: absolute;
+    opacity: 1.0;
+    vertical-align: center;
+    width:auto;
+    height:auto;
+}
