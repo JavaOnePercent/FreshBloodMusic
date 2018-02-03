@@ -17,10 +17,17 @@
 <div id="player">
     <div class="Player" id="playerBackground"></div>
     <div id="playerContainer">
-        <img class="Button Player" id="logo" src="{% static 'mainapp/images/Cover.jpg' %}" draggable="false" />
+        <img class="Button Player" id="logo" src="{% static 'mainapp/images/Cover0.jpg' %}" draggable="false">
+        <img id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/> </img>
+
         <h1 class="Player" id="trackname">{{performer_name}} - {{track_name}} </h1>
-        <img class="Button  Player" id="nextlogo" src="{% static 'mainapp/images/Cover.jpg' %}" draggable="false" />
+
+        <img class="Button Player" id="prevlogo" src="{% static 'mainapp/images/Cover0.jpg' %}" draggable="false" />
+
+        <img class="Button Player" id="nextlogo" src="{% static 'mainapp/images/Cover1.jpg' %}" draggable="false" />
+
         <audio id="audio" src="{% static file_link %}"></audio>
+
         <img class="Button Player" id="playButton" src="{% static 'mainapp/images/playButton.png' %}" draggable="false" />
         <img class="Button Player" id="nextButton" src="{% static 'mainapp/images/nextButton.png' %}"  draggable="false"/>
         <img class="Button Player" id="previousButton" src="{% static 'mainapp/images/previousButton.png' %}" draggable="false" />

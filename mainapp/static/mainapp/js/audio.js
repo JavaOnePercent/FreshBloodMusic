@@ -17,59 +17,38 @@ $(function() {
 			//$("#playButton").fadeToggle(500);
 		}
 	});
-});
 
-$(function() {
 	$("#playButton").mouseenter(function(){
 		$("#playButton").animate({width: '+=7px', height: '+=7px'}, 50);
 	});
-});
-
-$(function() {
 	$("#playButton").mouseleave(function(){
 		$("#playButton").animate({width: '-=7px', height: '-=7px'}, 50);
 	});
-});
-
-$(function() {
 	$("#nextButton").mouseenter(function(){
 		$("#nextButton").animate({width: '+=7px', height: '+=7px'}, 50);
 	});
-});
-
-$(function() {
 	$("#nextButton").mouseleave(function(){
 		$("#nextButton").animate({width: '-=7px', height: '-=7px'}, 50);
 	});
-});
-
-$(function() {
 	$("#previousButton").mouseenter(function(){
 		$("#previousButton").animate({width: '+=7px', height: '+=7px'}, 50);
 	});
-});
-
-$(function() {
 	$("#previousButton").mouseleave(function(){
 		$("#previousButton").animate({width: '-=7px', height: '-=7px'}, 50);
 	});
-});
-
-$(function() {
 	$("#logo").mouseenter(function(){
 		$("#logo").animate({width: '+=10px', height: '+=10px'}, 100);
-		
-	});
-});
+		$("#like").css('visibility', 'visible');
 
-$(function() {
+	});
 	$("#logo").mouseleave(function(){
 		$("#logo").animate({width: '-=10px', height: '-=10px'}, 100);
+		$("#like").css('visibility', 'hidden');
 	});
-});
 
-$(function() {
 	$("#nextButton").click(function(){
+        nextTrackAnimation();
+
 		var trackName = document.getElementById("trackname").innerHTML.split(" - ");
 		var performerName = trackName[0];
 		trackName = trackName[1];
@@ -102,14 +81,26 @@ $(function() {
 			}
 		});
 		//alert(jqxhr.responseText);
-	});
-});
 
-$(function() {
+
+	});
+
 	$("#previousButton").click(function(){
 		
 	});
 });
+
+
+function nextTrackAnimation() {
+      $("#logo").css('visibility', 'hidden');  //главный вырубаем
+	  $("#nextlogo").animate({width: '40%', height: '40%', left: '0', right: '0', opacity: '1'}, 400); //следующий двигается на место главного
+	  $("#prevlogo").css('visibility', 'visible');  //врубаем предыдущий
+      $("#prevlogo").animate({width: '25%', height: '25%', left: '-100%', right: '0', opacity: '0.3'}, 400); //предыдущий двигается с главного назад
+      $("#logo").attr("src", "/static/mainapp/images/Cover1.jpg");   //меняем картинку на главном
+      setTimeout("$('#logo').css('visibility', 'visible');", 400); //главный врубаем
+      $("#nextlogo").animate({width: '25%', height: '25%', left: '', right: '-100%', opacity: '0.3'}, 0); //следующий прыгает на свое место
+       setTimeout('$("#nextlogo").attr("src", "/static/mainapp/images/Cover2.jpg")', 400); //меняем картинку на следующем
+}
 
 // using jQuery
 function getCookie(name) {

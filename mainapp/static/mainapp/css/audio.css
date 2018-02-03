@@ -80,7 +80,10 @@ a {
 	width: 40%;
 	height: 40%;
 	border-radius: 10px;
-	box-shadow: 1px 5px 28px #64bdf5;
+	box-shadow: 1px 5px 28px black/*#64bdf5;*/;
+	z-index:0;
+
+
 }
 #logo:hover {
 	box-shadow: 1px 5px 28px #ff3079;
@@ -88,16 +91,25 @@ a {
 
 #nextlogo {
 	top: -50%;
-    left: 90%;
+    right: -100%;
 	opacity: 0.3;
 	width: 25%;
 	height: 25%;
+}
+
+#prevlogo {
+	top: -50%;
+	width: 40%;
+	height: 40%;
+	z-index:0;
+    visibility: hidden;
 }
 
 #nextButton {
     top: 45%;
     right: -60%;
 }
+
 #previousButton {
     top: 45%;
     left: -60%;
@@ -120,4 +132,18 @@ a {
     vertical-align: center;
     width:auto;
     height:auto;
+}
+
+#like {
+    z-index: 10;
+    opacity: 0.8;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: -50%;
+    bottom: 0;
+    width: 20%;
+    height:20%;
+    position: inherit;
+    visibility: hidden;
 }
