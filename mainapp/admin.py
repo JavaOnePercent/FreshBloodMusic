@@ -1,7 +1,6 @@
 from django.contrib import admin
-from mainapp.models import User, Performer, Genre, Album, Track, LikedTrack
+from mainapp.models import Performer, Genre, Album, Track, LikedTrack
 
-admin.site.register(User)
 admin.site.register(Performer)
 admin.site.register(Genre)
 admin.site.register(Album)
