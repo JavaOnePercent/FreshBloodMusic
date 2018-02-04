@@ -1,17 +1,9 @@
 from django.db import models
-
-class User(models.Model):
-    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    username = models.CharField(max_length=40)
-    password = models.CharField(max_length=30)
-    mail = models.CharField(max_length=40)
-
-    def __str__(self):
-        return self.username
+#from django.contrib import auth
 
 class Performer(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userperformer')
+    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userperformer')
     name_per = models.CharField(max_length=30)
     rating_per = models.IntegerField()
     image_per = models.CharField(max_length=50)
@@ -55,7 +47,7 @@ class Track(models.Model):
 
 class LikedTrack(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userliked')
+    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userliked')
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackliked')
 
     def __str__(self):

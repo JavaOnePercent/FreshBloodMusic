@@ -1,17 +1,21 @@
 <html>
-{% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
 <head>
-<title>{{track_name}}</title>
-<script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-<script src="{% static 'mainapp/js/audio.js' %}"></script>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}">
+    <title>{{track_name}}</title>
+    <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
+    <script src="{% static 'mainapp/js/audio.js' %}"></script>
 </head>
 <body>
 
 <div id="topbar">
     <a id="sitename" href="/">NubasMusicTopKodingProMegaSite</a>
-    <a id="login" href="/login/">Войти</a>
-    <a id="register" href="/register/">Регистрация</a>
+    {% if username %}
+    <a id="logout" href="auth/logout/">Выйти ({{ username }})</a>
+    {% else %}
+    <a id="login" href="auth/login/">Войти</a>
+    {% endif %}
+
 </div>
 
 <div id="player">
