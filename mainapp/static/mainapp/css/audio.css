@@ -13,10 +13,14 @@
     left: 0;
     margin: auto;
 	position: absolute;
+
+    -moz-user-select:none;
+    -webkit-user-select:none;
+
 }
 
 body {
-
+    background-color: #5e5e5e;
 }
 
 a {
@@ -30,7 +34,7 @@ a {
     vertical-align: center;
 }
 
-#login {
+.login {
     right: 30px;
     top: 15px;
 }
@@ -51,8 +55,8 @@ a {
 }
 
 #playerContainer {
-	width: 600px;
-	height: 600px;
+	width: 450px;
+	height: 450px;
     right: 0;
     position:absolute;
     left: 0;
@@ -64,7 +68,7 @@ a {
     left: 0;
     margin: auto;
     top: 50px;
-    height: 530px;
+    height: 450px;
 }
 
 #playerBackground {
@@ -73,19 +77,25 @@ a {
     position: absolute;
 }
 #playButton {
-	top: 45%;
+	top: 40%;
+}
+
+#mainlogo {
+    top: -50%;
+    width: 40%;
+	height: 40%;
+	box-shadow: 0px 4px 28px black/*#64bdf5;*/;
 }
 #logo {
-	top: -50%;
-	width: 40%;
-	height: 40%;
-	border-radius: 10px;
-	box-shadow: 1px 5px 28px black/*#64bdf5;*/;
+    width: 100%;
+	height: 100%;
+
+
 	z-index:0;
 
 
 }
-#logo:hover {
+#mainlogo:hover {
 	box-shadow: 1px 5px 28px #ff3079;
 }
 
@@ -97,7 +107,7 @@ a {
 	height: 25%;
 }
 
-#prevlogo {
+#maintoprevlogo {
 	top: -50%;
 	width: 40%;
 	height: 40%;
@@ -105,14 +115,28 @@ a {
     visibility: hidden;
 }
 
+#prevlogo {
+	top: -50%;
+    left: -100%;
+	opacity: 0.3;
+	width: 25%;
+	height: 25%;
+    visibility: hidden;
+}
+
 #nextButton {
-    top: 45%;
-    right: -60%;
+    top: 40%;
+    width: 12%;
+    height: 12%;
+    right: -90%;
 }
 
 #previousButton {
-    top: 45%;
-    left: -60%;
+    width: 12%;
+    height: 12%;
+    top: 40%;
+    left: -90%;
+    visibility: hidden;
 }
 #trackname {
 	font: 20px Arial,Helvetica,sans-serif;
@@ -135,15 +159,70 @@ a {
 }
 
 #like {
-    z-index: 10;
+    z-index: 5;
     opacity: 0.8;
     margin: auto;
     left: 0;
     right: 0;
-    top: -50%;
+    top: 0;
     bottom: 0;
-    width: 20%;
-    height:20%;
+    width: 40%;
+    height: 40%;
     position: inherit;
     visibility: hidden;
+}
+
+#progressBar {
+    background-color: black;/*#FFDA44;*/
+    width: 0%;
+    height: 100%;
+    z-index: 10;
+    opacity: 0.7;
+
+}
+
+#volume {
+    top: 80%;
+    height: 8%;
+    width: 30%;
+}
+
+#speaker {
+    width: 30px;
+    height: 30px;
+    left: -160%;
+}
+
+#ball {
+    left: 0px;
+    right: -100%;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+}
+#line {
+    background-color: #575757;
+    width: 100%;
+    height: 10px;
+    border-radius: 15px;
+    z-index: 0;
+}
+
+#fillingLine {
+    background-color: #282828;
+    width: 100%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    height: 12px;
+    border-radius: 15px;
+    z-index: 5;
+    margin: auto;
+	position: absolute;
+}
+
+#draggingZone {
+    width: auto;
+    height: auto;
+    z-index: 100;
 }

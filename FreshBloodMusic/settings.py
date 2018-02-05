@@ -20,6 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'ghp^77^#!$dr665bx505du*pgar$)@i(yz9&mfag6l+ld+9a45'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -77,6 +78,9 @@ WSGI_APPLICATION = 'FreshBloodMusic.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'music_db',
+        'USER': 'djeban',
+        'PASSWORD': 'iop139643234!QWE',
         #'HOST': '127.0.0.1',
         #'PORT': '3306',
     }
