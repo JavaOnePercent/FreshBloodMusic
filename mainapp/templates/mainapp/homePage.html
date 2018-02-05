@@ -1,40 +1,55 @@
 <html>
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
 <head>
-    {% load staticfiles %}
-    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}">
-    <title>{{track_name}}</title>
-    <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-    <script src="{% static 'mainapp/js/audio.js' %}"></script>
+<title>{{track_name}}</title>
+<script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
+<script src="{% static 'mainapp/js/audio.js' %}"></script>
 </head>
 <body>
 
 <div id="topbar">
     <a id="sitename" href="/">NubasMusicTopKodingProMegaSite</a>
     {% if username %}
-    <a id="logout" href="auth/logout/">Выйти ({{ username }})</a>
+    <a class ="login" id="logout" href="auth/logout/">Выйти ({{ username }})</a>
     {% else %}
-    <a id="login" href="auth/login/">Войти</a>
+    <a class ="login" id="login" href="auth/login/">Войти</a>
     {% endif %}
-
 </div>
 
 <div id="player">
     <div class="Player" id="playerBackground"></div>
     <div id="playerContainer">
-        <img class="Button Player" id="logo" src="{% static 'mainapp/images/Cover0.jpg' %}" draggable="false">
-        <img id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/> </img>
+        <div class="Button Player" id="mainlogo">
+
+            <img class="Button Player" id="logo" src="{% static logo_link %}" draggable="false" />
+
+            <img id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
+            <div id="progressBar"></div>
+        </div>
 
         <h1 class="Player" id="trackname">{{performer_name}} - {{track_name}} </h1>
 
-        <img class="Button Player" id="prevlogo" src="{% static 'mainapp/images/Cover0.jpg' %}" draggable="false" />
+        <img class="Player" id="maintoprevlogo" src="{% static logo_link %}" draggable="false" />
 
-        <img class="Button Player" id="nextlogo" src="{% static 'mainapp/images/Cover1.jpg' %}" draggable="false" />
+        <img class="Player" id="prevlogo" src="{% static logo_link %}" draggable="false" />
+
+        <img class="Player" id="nextlogo" src="{% static nextlogo_link %}" draggable="false" />
 
         <audio id="audio" src="{% static file_link %}"></audio>
 
         <img class="Button Player" id="playButton" src="{% static 'mainapp/images/playButton.png' %}" draggable="false" />
         <img class="Button Player" id="nextButton" src="{% static 'mainapp/images/nextButton.png' %}"  draggable="false"/>
         <img class="Button Player" id="previousButton" src="{% static 'mainapp/images/previousButton.png' %}" draggable="false" />
+
+        <div class="Player" id="volume">
+            <img class="Player Button" id="speaker" src="{% static 'mainapp/images/speaker100.png' %}" draggable="false"/>
+            <div class="Player" id="draggingZone"></div>
+            <img class="Player Button" id = "ball" src="{% static 'mainapp/images/circle.png' %}" draggable="false"/>
+            <div class="Player" id="line"></div>
+            <div id="fillingLine"></div>
+        </div>
+
     </div>
 </div>
 </body>
