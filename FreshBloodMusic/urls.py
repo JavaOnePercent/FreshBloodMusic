@@ -15,10 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import url, include
+from mainapp.models import Performer
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^auth/', include('loginsys.urls')),
+    url(r'^performers/', include('mymusic.urls')),
+    url(r'^performer/', include('musicgroup.urls')),
     url(r'^', include('mainapp.urls')),
 
 ]

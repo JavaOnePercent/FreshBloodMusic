@@ -4,11 +4,12 @@ from django.db import models
 class Performer(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userperformer')
-    name_per = models.CharField(max_length=30)
-    rating_per = models.IntegerField()
-    image_per = models.CharField(max_length=50)
-    about_per = models.TextField()
-    date_per = models.DateField()
+    name_per = models.CharField(max_length=30, unique=True)
+    rating_per = models.IntegerField(default=0)
+    image_per = models.CharField(max_length=50, default='0')
+    about_per = models.TextField(null=True, blank=True)
+    date_per = models.DateField(null=True, blank=True)
+    slug = models.SlugField(max_length=30, null=True, blank=True, unique=True)
 
     def __str__(self):
         return self.name_per
@@ -25,10 +26,11 @@ class Album(models.Model):
     per_id = models.ForeignKey(Performer, on_delete=models.CASCADE, related_name='performeralbum')
     name_alb = models.CharField(max_length=30)
     gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='albumgenre')
-    numplays_alb = models.IntegerField()
-    rating_alb = models.IntegerField()
-    image_alb = models.CharField(max_length=50)
+    numplays_alb = models.IntegerField(default=0)
+    rating_alb = models.IntegerField(default=0)
+    image_alb = models.CharField(max_length=50, default='0')
     date_alb = models.DateField()
+    slug = models.SlugField(max_length=30, null=True, blank=True)
 
     def __str__(self):
         return self.name_alb
@@ -39,8 +41,9 @@ class Track(models.Model):
     name_trc = models.CharField(max_length=50)
     gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='trackgenre')
     link_trc = models.CharField(max_length=50)
-    numplays_trc = models.IntegerField()
-    rating_trc = models.IntegerField()
+    numplays_trc = models.IntegerField(default=0)
+    rating_trc = models.IntegerField(default=0)
+    date_trc = models.DateField()
 
     def __str__(self):
         return self.name_trc

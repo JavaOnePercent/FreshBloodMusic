@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание нового исполнителя</title>
+</head>
+<body>
+    {% if user.username %}
+    <form action="/performers/newperformer" method="post">
+        {% csrf_token %}
+        <label for="nameper">Название исполнителя</label>
+        <input type="text" name="name_per" id="nameper">
+        <label for="aboutper">Об исполнителе</label>
+        <input type="text" name="about_per" id="aboutper">
+        <label for="file">Картинка исполнителя</label>
+        <input type="file" name="image_per" accept="image/*" id="file">
+        <input class="button" type="submit" value="Добавить исполнителя">
+        {% if per_error %}
+            <label class="error">{{ per_error }}</label>
+        {% endif %}
+    </form>
+    <form action="/performers">
+        <button type="submit">Назад</button>
+    </form>
+    {% else %}
+    <a href="/auth/login"><h3>Логинься</h3></a>
+    {% endif %}
+</body>
+</html>

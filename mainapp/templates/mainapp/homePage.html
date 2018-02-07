@@ -11,6 +11,7 @@
 <div id="topbar">
     <a id="sitename" href="/">NubasMusicTopKodingProMegaSite</a>
     {% if username %}
+    <a class ="login" id="mymusic" href="performers/">Моя музыка</a>
     <a class ="login" id="logout" href="auth/logout/">Выйти ({{ username }})</a>
     {% else %}
     <a class ="login" id="login" href="auth/login/">Войти</a>
@@ -49,7 +50,6 @@
             <div class="Player" id="line"></div>
             <div id="fillingLine"></div>
         </div>
-
     </div>
 </div>
 </body>

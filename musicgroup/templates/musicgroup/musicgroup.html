@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{performer.name_per}}</title>
+</head>
+<body>
+    <h1>{{performer.name_per}}</h1>
+    <h3>Рейтинг: {{performer.rating_per}} из 100</h3>
+    <h2>О группе: {{performer.about_per}}</h2>
+    <h3>Дата создания: {{performer.date_per}}</h3>
+    <h2>Музыка</h2>
+        {% for albums in performer.performeralbum.all %}
+            <h3>Альбом: {{albums.name_alb}}</h3>
+                {% for tracks in albums.albumtrack.all %}
+                    <h4>{{tracks.name_trc}}</h4>
+                {% endfor %}
+        {% endfor %}
+</body>
+</html>
