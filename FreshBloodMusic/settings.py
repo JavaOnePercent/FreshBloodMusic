@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'mainapp',
     'loginsys',
+    'mymusic',
+    'musicgroup',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
