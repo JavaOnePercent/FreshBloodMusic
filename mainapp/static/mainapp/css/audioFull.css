@@ -2,8 +2,12 @@
 	/*width: 128px;
 	height: 128px;*/
 	cursor: pointer;
-	width: 14%;
-	height: 14%;
+	user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 
 .Player {
@@ -13,9 +17,6 @@
     left: 0;
     margin: auto;
 	position: absolute;
-
-    -moz-user-select:none;
-    -webkit-user-select:none;
 
 }
 
@@ -39,8 +40,8 @@ a {
     top: 15px;
 }
 
-#mymusic {
-    right: 220px;
+#register {
+    right: 110px;
     top: 15px;
 }
 
@@ -77,7 +78,14 @@ a {
     position: absolute;
 }
 #playButton {
-	top: 40%;
+	top: 45%;
+	width: 14%;
+	height: 14%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
 }
 
 #mainlogo {
@@ -85,6 +93,13 @@ a {
     width: 40%;
 	height: 40%;
 	box-shadow: 0px 4px 28px black/*#64bdf5;*/;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
+	visibility:visible;
+	z-index:15;
 }
 #logo {
     width: 100%;
@@ -121,14 +136,18 @@ a {
 	opacity: 0.3;
 	width: 25%;
 	height: 25%;
-    visibility: hidden;
+	visibility: hidden;
 }
 
 #nextButton {
-    top: 40%;
+    top: 45%;
     width: 12%;
     height: 12%;
     right: -90%;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
 }
 
 #previousButton {
@@ -139,10 +158,27 @@ a {
     visibility: hidden;
 }
 #trackname {
-	font: 20px Arial,Helvetica,sans-serif;
+	font: 28px Arial,Helvetica,sans-serif;
 	color: #e8e8e8;
 	text-align:center;
+	top: 55%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
+}
+
+#performername {
+	font: 20px Arial,Helvetica,sans-serif;
+	color: #e8e8e8;
+	text-align: center;
 	top: 50%;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
 }
 
 #sitename {
@@ -184,7 +220,12 @@ a {
 #volume {
     top: 80%;
     height: 8%;
-    width: 30%;
+    width: 150px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
 }
 
 #speaker {
@@ -194,8 +235,11 @@ a {
 }
 
 #ball {
-    left: 0px;
-    right: -100%;
+    left: 0;
+    margin: auto;
+	position: absolute;
+	top:0;
+	bottom: 0;
     width: 20px;
     height: 20px;
     z-index: 10;
@@ -225,4 +269,56 @@ a {
     width: auto;
     height: auto;
     z-index: 100;
+}
+
+#dropdown {
+    margin: auto;
+	position: absolute;
+
+    width: 30px;
+    height: 30px;
+    top: 20px;
+    right: 50px;
+}
+
+#progress {
+    height: 10px;
+    width: 100%;
+    top: 100%;
+}
+#progressLine {
+    height: 100%;
+    width: 100%;
+    background-color: #b5b5b5;
+}
+
+#progressBarLine {
+    background-color: #282828;/*#FFDA44;*/
+    width: 0%;
+    left: 0%;
+    height: 100%;
+    z-index: 10;
+    left: 0;
+    margin: auto;
+	position: absolute;
+}
+
+#trackLength {
+    font: 15px Arial,Helvetica,sans-serif;
+	color: #e8e8e8;
+	text-align: right;
+	top: -20px;
+	right: 10px;
+	margin: auto;
+	position: absolute;
+}
+
+#playedTime {
+    font: 15px Arial,Helvetica,sans-serif;
+	color: #e8e8e8;
+	text-align: left;
+	top: -20px;
+	left: 10px;
+	margin: auto;
+	position: absolute;
 }
