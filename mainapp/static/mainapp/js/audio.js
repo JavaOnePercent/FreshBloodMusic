@@ -1,4 +1,5 @@
 var isFull = false;
+var is_liked = false;
 $(function() {
 
 	$("#playButton").click(function(){
@@ -57,18 +58,30 @@ $(function() {
 	});
 
 	$("#mainlogo").mouseenter(function(){
-	    $("#like").css('visibility', 'visible');
-	    if(isFull)
-		    $("#mainlogo").animate({width: '+=10px', height: '+=10px'}, 100);
-		else
-		    $("#mainlogo").animate({width: '+=4px', height: '+=4px', right: '-=2px', top: '-=2px'}, 100);
+	    if(!is_liked)
+	    {
+	        $("#like").css('visibility', 'visible');
+	        if(isFull)
+	        {
+		        $("#mainlogo").animate({width: '+=10px', height: '+=10px'}, 100);
+		        $("#mainlogo").css('box-shadow', '1px 5px 28px #ff3079');
+		    }
+		    else
+		        $("#mainlogo").animate({width: '+=4px', height: '+=4px', right: '-=2px', top: '-=2px'}, 100);
+		}
 	});
 	$("#mainlogo").mouseleave(function(){
-	    $("#like").css('visibility', 'hidden');
-	    if(isFull)
-		    $("#mainlogo").animate({width: '-=10px', height: '-=10px'}, 100);
-		else
-		    $("#mainlogo").animate({width: '-=4px', height: '-=4px', right: '+=2px', top: '+=2px'}, 100);
+	    if(!is_liked)
+	    {
+	        $("#like").css('visibility', 'hidden');
+	        if(isFull)
+	        {
+		        $("#mainlogo").animate({width: '-=10px', height: '-=10px'}, 100);
+		        $("#mainlogo").css('box-shadow', '0px 4px 28px black');
+		    }
+		    else
+		        $("#mainlogo").animate({width: '-=4px', height: '-=4px', right: '+=2px', top: '+=2px'}, 100);
+		}
 	});
 
     var volume = $("audio").get(0).volume;
@@ -94,6 +107,41 @@ $(function() {
             else if(volume <= 1.0)
             $("#speaker").attr("src", "/static/mainapp/images/speaker100.png");
         }
+    });
+
+    $("#mainlogo").click(function() {
+        if(is_liked == false)
+        {
+            var varData = {
+		    	current_track: trackID.current
+		    };
+
+		    var jsonData = JSON.stringify(varData);
+            sendJSON('like/', jsonData, successfulLikeFunc);
+        }
+    });
+
+    function successfulLikeFunc(data)
+    {
+        if(data.result == "success")
+        {
+            is_liked = true;
+            if(isFull)
+            {
+		        $("#mainlogo").animate({width: '-=10px', height: '-=10px'}, 100);
+		        $("#mainlogo").css('box-shadow', '0px 4px 28px black');
+		    }
+		    else
+		        $("#mainlogo").animate({width: '-=4px', height: '-=4px', right: '+=2px', top: '+=2px'}, 100);
+        }
+    }
+
+    $("#menuPic").click(function() {
+        $("#menuDropdown").fadeToggle(100);
+    });
+
+    $("#menuDropdown").mouseleave(function() {
+        $("#menuDropdown").fadeToggle(100);
     });
 
     var allowChangeTime = false;
@@ -150,15 +198,15 @@ $(function() {
         {
             var audio = $("audio").get(0);
             var seconds = event.pageX / $("#progress").width() * audio.duration;
-            //$("#trackname").text(Number(seconds));
-            audio.currentTime = seconds;
+            //$("#trackname").text(audio.currentTime + "   " + seconds);
 
+            audio.currentTime = Number(seconds);      //задание текущего времени проигрывания currentTime
+            $("#progressBarLine").animate({width: event.pageX + "px"}, 0);
             timerId = setInterval(progressBar, 500);
             setCurrentTime(seconds);
         }
         allowChangeTime = false;
 	});
-
 
 
     function makeMove(pageX) //передвижение ползунка громкости
@@ -253,6 +301,17 @@ $(function() {
 		success: function(data) {
 		    trackID.current = data.first_id;
 		    trackID.next = data.second_id;
+		    //alert(data.is_liked);
+		    if(data.is_liked == true)
+		    {
+		        is_liked = true;
+		        $("#like").css("visibility", "visible");
+		    }
+		    else
+		    {
+		        is_liked = false;
+		        $("#like").css("visibility", "hidden");
+		    }
 			//alert(trackID.current + " " + trackID.next);
 		}
 	});
@@ -264,53 +323,72 @@ $(function() {
     $('audio').bind("durationchange", setTrackLength);
 
     function nextTrack(){
-
+        $("#like").css("visibility", "hidden");
 		var varData = {
 			current_track: trackID.current,
 			next_track: trackID.next
 		};
 
 		var jsonData = JSON.stringify(varData);
-		//var csrftoken = getCookie('csrftoken');
 		//alert(jsonData);
-		var jqxhr = $.ajax({
-			type: "POST",
-			url: 'next/',
-			dataType: 'json',
-			contentType: 'application/json',
-			data: jsonData,
-			async: true,
-			headers: {
-                "X-CSRFToken": csrftoken
-			},
-			success: function(data) {
-				//alert(data.performer_name + " lol " + data.track_name);
-				$("#trackname").text(data.track_name);
-				$("#performername").text(data.performer_name);
-				//$("title").text(data.track_name);
-				$("#audio").attr("src", data.file_link);
-				//$("#logo").attr("src", data.logo_link);
-				//$("#nextlogo").attr("src", data.nextlogo_link);
-
-				startPlaying();
-				trackID.current = data.current_id;
-				trackID.next = data.next_id;
-				$("#progressBarLine").animate({width: 0 + "%"}, 100);
-				//alert(trackID.current + " " + trackID.next);
-				globalData = data;
-				if(isFull)
-				    nextTrackAnimation();
-				else
-				{
-				    logo = $("#logo").attr("src");
-				    $("#logo").attr("src", globalData.logo_link);
-                    $("#prevlogo").attr("src", logo);
-                    $("#nextlogo").attr("src", globalData.nextlogo_link);
-				}
-			}
-		});
+		sendJSON('next/', jsonData, nextTrackSuccessFunc); //////////////////////////////////////////////////////
 	};
 });
+
+function nextTrackSuccessFunc(data) {         //функция успеха после получения следующего трека
+	//alert(data.performer_name + " lol " + data.track_name);
+	$("#trackname").text(data.track_name);
+	$("#performername").text(data.performer_name);
+	//$("title").text(data.track_name);
+	$("#audio").attr("src", data.file_link);
+	//$("#logo").attr("src", data.logo_link);
+	//$("#nextlogo").attr("src", data.nextlogo_link)
+	startPlaying();
+	trackID.current = data.current_id;
+	trackID.next = data.next_id;
+	$("#progressBarLine").animate({width: 0 + "%"}, 100);
+	$("title").text(data.track_name);
+	//alert(trackID.current + " " + trackID.next);
+	globalData = data;
+
+	if(data.is_liked == true)
+	{
+	    is_liked = true;
+	}
+	else
+	{
+	    is_liked = false;
+		$("#like").css("visibility", "hidden");
+	}
+
+	if(isFull)
+	    nextTrackAnimation();
+	else
+	{
+	    if(is_liked) $("#like").css("visibility", "visible");
+	    logo = $("#logo").attr("src");
+	    $("#logo").attr("src", globalData.logo_link);
+        $("#prevlogo").attr("src", logo);
+        $("#nextlogo").attr("src", globalData.nextlogo_link);
+	}
+}
+
+function sendJSON(Url, jsonData, successFunc)
+{
+    var csrftoken = getCookie('csrftoken');
+    $.ajax({
+	type: "POST",
+	url: Url,
+	dataType: 'json',
+	contentType: 'application/json',
+	data: jsonData,
+	async: true,
+	headers: {
+              "X-CSRFToken": csrftoken
+	},
+	success: successFunc
+	})
+};
 
 var logo = null;
 var globalData = null;
@@ -328,10 +406,11 @@ function nextTrackAnimation() {
       setTimeout("$('#maintoprevlogo').attr('src', globalData.logo_link);", 400);//меняем картинку на съезжаеющем с главного назад
       setTimeout("$('#mainlogo').css('visibility', 'visible'); $('#prevlogo').css('visibility', 'visible');", 400); //главный и предыдущий врубаем
       $("#nextlogo").animate({width: '25%', height: '25%', left: '', right: '-100%', opacity: '0.3'}, 0); //следующий прыгает на свое место
+      setTimeout('$("#prevlogo").attr("src", logo);', 400);
       setTimeout('$("#nextlogo").attr("src", globalData.nextlogo_link);', 400); //меняем картинку на следующем
 
       setTimeout("$('#maintoprevlogo').animate({width: '40%', height: '40%', left: '0', right: '0', opacity: '1.0'}, 0);", 500); //возвращаем его на место главного
-      setTimeout('$("#prevlogo").attr("src", logo);', 400);
+      setTimeout('if(is_liked) $("#like").css("visibility", "visible");', 400);
 }
 
 // using jQuery
@@ -374,8 +453,8 @@ function startPlaying(){
 	$("#playButton").attr("src", "/static/mainapp/images/pauseButton.png");
 }
 
-function setCurrentTime(seconds) { //установка тацмера на текущее время
-    var progress = seconds / audio.duration * 100;
+function setCurrentTime(seconds) { //установка таймера на текущее время
+    //var progress = seconds / audio.duration * 100;
     mins = Math.floor(seconds / 60);
     secs = (seconds % 60).toFixed();
     $("#playedTime").text(mins + ":" + ((secs < 10) ? '0' + secs : secs));

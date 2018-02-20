@@ -18,8 +18,6 @@
     left: 0;
     margin: auto;
 	position: absolute;
-
-
 }
 
 body {
@@ -156,7 +154,7 @@ a {
 	width: 30%;
 	height: 35px;
 	top: 0px;
-    right: 480px;
+    right: 500px;
     margin: auto;
 	position: absolute;
 	line-height: 35px;
@@ -168,7 +166,7 @@ a {
 	width: 30%;
 	height: 35px;
 	top: 35px;
-    right: 480px;
+    right: 500px;
     margin: auto;
 	position: absolute;
 	line-height: 35px;
@@ -190,15 +188,56 @@ a {
 #like {
     z-index: 5;
     opacity: 0.9;
-    margin: auto;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
     width: 60%;
     height: 60%;
-    position: inherit;
     visibility: hidden;
+}
+#menu {
+    z-index: 5;
+    width: 25px;
+    height: 25px;
+    right: 450px;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+	position: absolute;
+}
+
+#menuPic {
+    width: 100%;
+    height: 100%;
+}
+
+#menuDropdown {
+    position: absolute;
+    top: 46px;
+    left: 0;
+    width: 160px;
+    z-index: 100;
+    /*-webkit-transition: 0.5s ease-in-out;
+    -moz-transition: 0.5s ease-in-out;
+    -o-transition: 0.5s ease-in-out;
+    transition: 0.5s ease-in-out;*/
+    list-style: none;
+    padding: 0;
+    background: #3b3b3b;
+    display: none;
+}
+
+li {
+    display: inline-block;
+    width: 100%;
+}
+
+li:hover {
+    background: #292929;
+}
+
+.menuElements {
+    font: 15px Arial,Helvetica,sans-serif;
+	color: #e8e8e8;
+	text-align: center;
+    padding: 0 10px 0 10px;
 }
 
 #volume {

@@ -26,12 +26,17 @@
 
             <img id="logo" src="{% static logo_link %}" draggable="false"/>
 
-            <img id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
+            <img class="Player" id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
             <!--<div id="progressBar"></div>-->
         </div>
-
-
-
+        <div id="menu">
+            <img class="Button" id="menuPic" src="{% static 'mainapp/images/menu.png' %}" draggable="false"/>
+            <ul id="menuDropdown">
+                <li class="Button"><p class="menuElements">На страницу исполнителя</p></li>
+                <li class="Button"><p class="menuElements">Добавить в избранное</p></li>
+                <li class="Button"><p class="menuElements">Пожаловаться</p></li>
+            </ul>
+        </div>
         <p id="trackname">{{track_name}}</p>
         <p id="performername">{{performer_name}}</p>
 
@@ -41,7 +46,7 @@
 
         <img class="Player" id="nextlogo" src="{% static nextlogo_link %}" draggable="false" />
 
-        <audio id="audio" src="{% static file_link %}"></audio>
+        <audio id="audio" ><source src="{% static file_link %}" type="audio/mpeg"/></audio>
 
         <img class="Button" id="playButton" src="{% static 'mainapp/images/playButton.png' %}" draggable="false" />
         <img class="Button" id="nextButton" src="{% static 'mainapp/images/nextButton.png' %}"  draggable="false"/>
