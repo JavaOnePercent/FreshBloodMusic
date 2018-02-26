@@ -1,76 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
-{% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
-<link id="playerCSS" rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audioSmall.css' %}" />
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'mainapp/css/main.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
+    <link id="playerCSS" rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audioSmall.css' %}" />
     <title>{{track_name}}</title>
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
     <script src="{% static 'mainapp/js/audio.js' %}"></script>
 </head>
+
 <body>
-{% csrf_token %}
-<div id="topbar">
-    <a id="sitename" href="/">NubasMusicTopKodingProMegaSite</a>
-    {% if username %}
-    <a class ="login" id="mymusic" href="performers/" style="right: 220px; top: 15px;">Моя музыка</a>
-    <a class ="login" id="logout" href="auth/logout/">Выйти ({{ username }})</a>
-    {% else %}
-    <a class ="login" id="login" href="auth/login/">Войти</a>
-    {% endif %}
-</div>
+        {% csrf_token %}
+    <div class="header" >
+        <header class="name">
+            BoysBand
+        </header>
+        <div class="radio">
+            <div id="player">
+                <div class="Player" id="playerBackground"></div>
 
-<div id="player">
-    <div class="Player" id="playerBackground"></div>
+                <div id="playerContainer">
+                    <div class="Button" id="mainlogo">
 
-    <div id="playerContainer">
-        <div class="Button" id="mainlogo">
+                        <img id="logo" src="" draggable="false"/>  <!--src="{% static logo_link %}"-->
 
-            <img id="logo" src="" draggable="false"/>  <!--src="{% static logo_link %}"-->
+                        <img class="Player" id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
+                        <!--<div id="progressBar"></div>-->
+                    </div>
+                    <div id="menu">
+                        <img class="Button" id="menuPic" src="{% static 'mainapp/images/menu.png' %}" draggable="false"/>
+                        <ul id="menuDropdown">
+                            <li class="Button"><p class="menuElements">На страницу исполнителя</p></li>
+                            <li class="Button"><p class="menuElements">Добавить в избранное</p></li>
+                            <li class="Button"><p class="menuElements">Пожаловаться</p></li>
+                        </ul>
+                    </div>
+                    <p id="trackname">{{track_name}}</p>
+                    <p id="performername">{{performer_name}}</p>
 
-            <img class="Player" id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
-            <!--<div id="progressBar"></div>-->
+                    <img class="Player" id="maintoprevlogo" src="" draggable="false" /> <!--src="{% static logo_link %}"-->
+
+                    <img class="Player" src="" id="prevlogo" draggable="false" />
+
+                    <img class="Player" id="nextlogo" src="" draggable="false" /> <!--src="{% static nextlogo_link %}"-->
+
+                    <audio id="audio" ><source src="" type="audio/mpeg"/></audio> <!--src="{% static file_link %}"-->
+
+                    <img class="Button" id="playButton" src="{% static 'mainapp/images/playButton.png' %}" draggable="false" />
+                    <img class="Button" id="nextButton" src="{% static 'mainapp/images/nextButton.png' %}"  draggable="false"/>
+                    <img class="Button Player" id="previousButton" src="{% static 'mainapp/images/previousButton.png' %}" draggable="false" />
+
+                    <div id="volume">
+                        <img class="Player Button" id="speaker" src="{% static 'mainapp/images/speaker100.png' %}" draggable="false"/>
+                        <div class="Player Button" id="draggingZone"></div>
+                        <img class="Button" id = "ball" src="{% static 'mainapp/images/circle.png' %}" draggable="false"/>
+                        <div class="Player Button" id="line"></div>
+                        <div id="fillingLine"></div>
+                    </div>
+                </div>
+                <img class="Button" id="dropdown" src="{% static 'mainapp/images/dropdown.png' %}" draggable="false" />
+                <div class="Player Button" id ="progress">
+                    <p id="playedTime">0:00</p>
+                    <p id="trackLength"></p>
+                    <div class="Player Button" id="progressLine"></div>
+                    <div id="progressBarLine"></div>
+                </div>
+            </div>
         </div>
-        <div id="menu">
-            <img class="Button" id="menuPic" src="{% static 'mainapp/images/menu.png' %}" draggable="false"/>
-            <ul id="menuDropdown">
-                <li class="Button"><p class="menuElements">На страницу исполнителя</p></li>
-                <li class="Button"><p class="menuElements">Добавить в избранное</p></li>
-                <li class="Button"><p class="menuElements">Пожаловаться</p></li>
-            </ul>
-        </div>
-        <p id="trackname">{{track_name}}</p>
-        <p id="performername">{{performer_name}}</p>
-
-        <img class="Player" id="maintoprevlogo" src="" draggable="false" /> <!--src="{% static logo_link %}"-->
-
-        <img class="Player" src="" id="prevlogo" draggable="false" />
-
-        <img class="Player" id="nextlogo" src="" draggable="false" /> <!--src="{% static nextlogo_link %}"-->
-
-        <audio id="audio" ><source src="" type="audio/mpeg"/></audio> <!--src="{% static file_link %}"-->
-
-        <img class="Button" id="playButton" src="{% static 'mainapp/images/playButton.png' %}" draggable="false" />
-        <img class="Button" id="nextButton" src="{% static 'mainapp/images/nextButton.png' %}"  draggable="false"/>
-        <img class="Button Player" id="previousButton" src="{% static 'mainapp/images/previousButton.png' %}" draggable="false" />
-
-        <div id="volume">
-            <img class="Player Button" id="speaker" src="{% static 'mainapp/images/speaker100.png' %}" draggable="false"/>
-            <div class="Player Button" id="draggingZone"></div>
-            <img class="Button" id = "ball" src="{% static 'mainapp/images/circle.png' %}" draggable="false"/>
-            <div class="Player Button" id="line"></div>
-            <div id="fillingLine"></div>
+        <div class="management">
+                {% if username %}
+                <a href="performers/">Моя музыка</a>
+                <a href="auth/logout/">Выйти ({{ username }})</a>
+                {% else %}
+                <a href="auth/login/">Авторизация</a>
+                <a href="auth/register">Регистрация</a>
+                {% endif %}
         </div>
     </div>
-    <img class="Button" id="dropdown" src="{% static 'mainapp/images/dropdown.png' %}" draggable="false" />
-    <div class="Player Button" id ="progress">
-        <p id="playedTime">0:00</p>
-        <p id="trackLength"></p>
-        <div class="Player Button" id="progressLine"></div>
-        <div id="progressBarLine"></div>
+    <div class="main">
+        <div class="topics">
+            <div class="music-top">
+                    <img class="img" src="https://is4-ssl.mzstatic.com/image/thumb/Music/d1/a9/8f/mzi.eocqaxhi.jpg/1200x630bb.jpg" alt="обложка">
+                <label>Лучшая в этом месяце</label>
+                <p>Manowar - Fighting The World</p>
+                <p>Понравилась: 155 пользователям</p>
+                <div class="play">
+                    <i class="fa fa-play fa-4x" aria-hidden="true"></i>
+                </div>
+                <div class="turn">
+                    <i class="fa fa-align-justify fa-4x" aria-hidden="true"></i>
+                </div>
+            </div> 
+            <div class="compositor-top">
+                <label>
+                Лучшие исполнители
+                </label>
+                <div class="compositor"> 
+                    <img src="https://ic.pics.livejournal.com/antt_trax/45655717/140600/140600_900.jpg" alt="обложка" class="compositor-avatar">
+                    <label>The Doors</label>
+                </div>
+                <div class="compositor"> 
+                    <img src="https://filed3-19.my.mail.ru/pic?url=https%3A%2F%2Fcontent-18.foto.my.mail.ru%2Fmail%2Fkononenko_mf%2F_musicplaylistcover%2Fi-26565.jpg&mw=&mh=&sig=ac9ca3e3b5af8fe2efe6b4f3affe7b39" alt="обложка" class="compositor-avatar">
+                    <label>Scorpions</label>
+                </div>
+                <div class="compositor"> 
+                    <img src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка" class="compositor-avatar">
+                    <label>In Flames</label>
+                </div>
+            </div>
+        </div>
+        <div class="recommendations">
+            <div class="sortirovka">
+                <label class="sortirovka-name">Рекомендации</label>
+                <div class="sort">
+                    <label>Отсортировать по:</label>
+                    <a class="time" id="button">времени</a>
+                    <a class="topic" id="button">популярности</a>
+                </div>
+            </div>
+            <div class="music-style">
+                <a class="janr" id="button">рок</a>
+                <a class="janr" id="button">фанк</a>
+                <a class="janr" id="button">классика</a>
+                <a class="janr" id="button">метал</a>
+                <a class="janr" id="button">поп</a>
+                <a class="janr" id="button">альтернатива</a>
+                <a class="janr" id="button">электронная</a>
+                <a class="janr" id="button">рэп</a>
+            </div>
+        </div>
+        <div class="compilation">
+        <div class="music">
+            <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
+            <label class="music-name">In Flames</label>
+        </div>
+        <div class="music">
+            <img class="cover" src="https://www.music-bazaar.com/album-images/vol32/1233/1233945/3102280-big/Legacy-The-Very-Best-Of-David-Bowie-Deluxe-CD2-cover.jpg" alt="обложка">
+            <label class="music-name">David Bowie</label>
+        </div>
+        <div class="music">
+                <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
+                <label class="music-name">In Flames</label>
+            </div>
+        <div class="music">
+                <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
+                <label class="music-name">In Flames</label>
+        </div>
+        <div class="music">
+                <img class="cover" src="https://www.music-bazaar.com/album-images/vol32/1233/1233945/3102280-big/Legacy-The-Very-Best-Of-David-Bowie-Deluxe-CD2-cover.jpg" alt="обложка">
+                <label class="music-name">David Bowie</label>
+        </div>
+        </div>
+    <footer>
+        ©Отвратительные мужики
+    </footer>
     </div>
-</div>
-
 </body>
 </html>

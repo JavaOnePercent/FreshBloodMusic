@@ -6,33 +6,32 @@
     left: 0;
     margin: auto;
 }
+
 #player {
-    right: 0;
-    position:absolute;
-    left: 0;
-    margin: auto;
-    top: 50px;
-    height: 80px;
+    position: relative;
+    margin: 0;
+    height: 69px;
 }
 
 #playButton {
 	width: 30px;
 	height: 30px;
-	top: 20px;
-    left: 50px;
+    left: 5px;
     margin: auto;
 	position: absolute;
+	top: 0;
+    bottom: 10px;
 }
 
 #mainlogo {
-    top: 5px;
-    width: 60px;
-	height: 60px;
+    width: 58px;
+	height: 58px;
 	/*box-shadow: 0px 4px 28px black/*#64bdf5;;*/
-	right: 370px;
-    margin: auto;
+	right: 150px;
 	position: absolute;
 	z-index: 15;
+	top: 0;
+    bottom: 0;
 }
 #logo {
     width: 100%;
@@ -41,6 +40,7 @@
     opacity: 0.9;
 	z-index: 0;
 	visibility: visible;
+	padding: 0;
 }
 
 #nextlogo {
@@ -72,10 +72,11 @@
 #nextButton {
     width: 30px;
     height: 30px;
-    top: 20px;
-    left: 130px;
+    left: 50px;
     margin: auto;
 	position: absolute;
+	top: 0;
+    bottom: 10px;
 }
 
 #previousButton {
@@ -89,25 +90,25 @@
 	font: 20px Arial,Helvetica,sans-serif;
 	color: #e8e8e8;
 	text-align: right;
-	width: 30%;
-	height: 35px;
+	width: 60%;
+	height: 30px;
 	top: 0px;
-    right: 500px;
+    right: 300px;
     margin: auto;
 	position: absolute;
-	line-height: 35px;
+	line-height: 30px;
 }
 #performername {
 	font: 18px Arial,Helvetica,sans-serif;
 	color: #e8e8e8;
 	text-align: right;
-	width: 30%;
-	height: 35px;
-	top: 35px;
-    right: 500px;
+	width: 60%;
+	height: 30px;
+	top: 30px;
+    right: 300px;
     margin: auto;
 	position: absolute;
-	line-height: 35px;
+	line-height: 30px;
 }
 
 #like {
@@ -116,24 +117,27 @@
     width: 60%;
     height: 60%;
     visibility: hidden;
+    padding: 0;
 }
 #menu {
     z-index: 5;
     width: 25px;
     height: 25px;
-    right: 450px;
+    right: 230px;
     top: 0;
-    bottom: 0;
+    bottom: 10px;
+    line-height:0;
     margin: auto;
 	position: absolute;
 }
 
 #volume {
-    top: 20px;
     margin: auto;
 	position: absolute;
     height: 25px;
     width: 120px;
-    right: 150px;
+    right: -60px;
+    top: 0;
+    bottom: 10px;
 }
 
