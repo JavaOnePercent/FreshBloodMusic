@@ -100,7 +100,7 @@
 }
 #performername {
 	font: 18px Arial,Helvetica,sans-serif;
-	color: #e8e8e8;
+	color: rgb(89, 89, 89);
 	text-align: right;
 	width: 60%;
 	height: 30px;
