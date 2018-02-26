@@ -1,10 +1,13 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 {% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
 <link id="playerCSS" rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audioSmall.css' %}" />
 <head>
-<title>{{track_name}}</title>
-<script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-<script src="{% static 'mainapp/js/audio.js' %}"></script>
+    <meta charset="UTF-8">
+    <title>{{track_name}}</title>
+    <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
+    <script src="{% static 'mainapp/js/audio.js' %}"></script>
 </head>
 <body>
 {% csrf_token %}
@@ -24,7 +27,7 @@
     <div id="playerContainer">
         <div class="Button" id="mainlogo">
 
-            <img id="logo" src="{% static logo_link %}" draggable="false"/>
+            <img id="logo" src="" draggable="false"/>  <!--src="{% static logo_link %}"-->
 
             <img class="Player" id="like" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
             <!--<div id="progressBar"></div>-->
@@ -40,13 +43,13 @@
         <p id="trackname">{{track_name}}</p>
         <p id="performername">{{performer_name}}</p>
 
-        <img class="Player" id="maintoprevlogo" src="{% static logo_link %}" draggable="false" />
+        <img class="Player" id="maintoprevlogo" src="" draggable="false" /> <!--src="{% static logo_link %}"-->
 
-        <img class="Player" id="prevlogo" draggable="false" />
+        <img class="Player" src="" id="prevlogo" draggable="false" />
 
-        <img class="Player" id="nextlogo" src="{% static nextlogo_link %}" draggable="false" />
+        <img class="Player" id="nextlogo" src="" draggable="false" /> <!--src="{% static nextlogo_link %}"-->
 
-        <audio id="audio" ><source src="{% static file_link %}" type="audio/mpeg"/></audio>
+        <audio id="audio" ><source src="" type="audio/mpeg"/></audio> <!--src="{% static file_link %}"-->
 
         <img class="Button" id="playButton" src="{% static 'mainapp/images/playButton.png' %}" draggable="false" />
         <img class="Button" id="nextButton" src="{% static 'mainapp/images/nextButton.png' %}"  draggable="false"/>
