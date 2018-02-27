@@ -1,60 +1,3 @@
-.Button {
-	/*width: 128px;
-	height: 128px;*/
-	cursor: pointer;
-	user-drag: none;
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-drag: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
-
-.Player {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    margin: auto;
-	position: absolute;
-
-}
-
-body {
-    background-color: #5e5e5e;
-}
-
-a {
-    text-decoration: none;
-    font: 20px Arial,Helvetica,sans-serif;
-    color: #e8e8e8;
-    margin: auto;
-    align: right;
-    position: inherit;
-    opacity: 1.0;
-    vertical-align: center;
-}
-
-.login {
-    right: 30px;
-    top: 15px;
-}
-
-#register {
-    right: 110px;
-    top: 15px;
-}
-
-#topbar {
-    top: 0;
-    right: 0;
-    left: 0;
-    margin: auto;
-    position: absolute;
-    height: 50px;
-	background-color: black;
-}
-
 #playerContainer {
 	width: 450px;
 	height: 450px;
@@ -72,11 +15,6 @@ a {
     height: 450px;
 }
 
-#playerBackground {
-    width: auto;
-    background-color: #3b3b3b;
-    position: absolute;
-}
 #playButton {
 	top: 45%;
 	width: 14%;
@@ -109,9 +47,6 @@ a {
 	z-index:0;
 
 
-}
-#mainlogo:hover {
-	box-shadow: 1px 5px 28px #ff3079;
 }
 
 #nextlogo {
@@ -181,40 +116,24 @@ a {
 	position: absolute;
 }
 
-#sitename {
-    font: 30px Arial,Helvetica,sans-serif;
-    color: #e8e8e8;
-    top: 8px;
-    left: 15px;
-    margin: auto;
-    position: absolute;
-    opacity: 1.0;
-    vertical-align: center;
-    width:auto;
-    height:auto;
-}
-
 #like {
     z-index: 5;
     opacity: 0.8;
-    margin: auto;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
     width: 40%;
     height: 40%;
-    position: inherit;
     visibility: hidden;
 }
 
-#progressBar {
-    background-color: black;/*#FFDA44;*/
-    width: 0%;
-    height: 100%;
-    z-index: 10;
-    opacity: 0.7;
-
+#menu {
+    z-index: 5;
+    width: 40px;
+    height: 40px;
+    right: 0;
+    left: -110%;
+    top: 0;
+    bottom: -10%;
+    margin: auto;
+	position: absolute;
 }
 
 #volume {
@@ -225,100 +144,5 @@ a {
     bottom: 0;
     left: 0;
     margin: auto;
-	position: absolute;
-}
-
-#speaker {
-    width: 30px;
-    height: 30px;
-    left: -160%;
-}
-
-#ball {
-    left: 0;
-    margin: auto;
-	position: absolute;
-	top:0;
-	bottom: 0;
-    width: 20px;
-    height: 20px;
-    z-index: 10;
-}
-#line {
-    background-color: #575757;
-    width: 100%;
-    height: 10px;
-    border-radius: 15px;
-    z-index: 0;
-}
-
-#fillingLine {
-    background-color: #282828;
-    width: 100%;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    height: 12px;
-    border-radius: 15px;
-    z-index: 5;
-    margin: auto;
-	position: absolute;
-}
-
-#draggingZone {
-    width: auto;
-    height: auto;
-    z-index: 100;
-}
-
-#dropdown {
-    margin: auto;
-	position: absolute;
-
-    width: 30px;
-    height: 30px;
-    top: 20px;
-    right: 50px;
-}
-
-#progress {
-    height: 10px;
-    width: 100%;
-    top: 100%;
-}
-#progressLine {
-    height: 100%;
-    width: 100%;
-    background-color: #b5b5b5;
-}
-
-#progressBarLine {
-    background-color: #282828;/*#FFDA44;*/
-    width: 0%;
-    left: 0%;
-    height: 100%;
-    z-index: 10;
-    left: 0;
-    margin: auto;
-	position: absolute;
-}
-
-#trackLength {
-    font: 15px Arial,Helvetica,sans-serif;
-	color: #e8e8e8;
-	text-align: right;
-	top: -20px;
-	right: 10px;
-	margin: auto;
-	position: absolute;
-}
-
-#playedTime {
-    font: 15px Arial,Helvetica,sans-serif;
-	color: #e8e8e8;
-	text-align: left;
-	top: -20px;
-	left: 10px;
-	margin: auto;
 	position: absolute;
 }
