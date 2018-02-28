@@ -74,38 +74,12 @@
                 </div>
             </div>
             <div class="music-style">
-                <a class="janr" id="button">рок</a>
-                <a class="janr" id="button">фанк</a>
-                <a class="janr" id="button">классика</a>
-                <a class="janr" id="button">метал</a>
-                <a class="janr" id="button">поп</a>
-                <a class="janr" id="button">альтернатива</a>
-                <a class="janr" id="button">электронная</a>
-                <a class="janr" id="button">рэп</a>
+                {% for gen in genre %}
+                    <a class="janr" name="{{gen.id}}" id="buttonjanr">{{gen.name_gnr}}</a>
+                {% endfor %}
             </div>
         </div>
-        <div class="compilation">
-        <div class="music">
-            <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
-            <label class="music-name">In Flames</label>
-        </div>
-        <div class="music">
-            <img class="cover" src="https://www.music-bazaar.com/album-images/vol32/1233/1233945/3102280-big/Legacy-The-Very-Best-Of-David-Bowie-Deluxe-CD2-cover.jpg" alt="обложка">
-            <label class="music-name">David Bowie</label>
-        </div>
-        <div class="music">
-                <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
-                <label class="music-name">In Flames</label>
-            </div>
-        <div class="music">
-                <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
-                <label class="music-name">In Flames</label>
-        </div>
-        <div class="music">
-                <img class="cover" src="https://www.music-bazaar.com/album-images/vol32/1233/1233945/3102280-big/Legacy-The-Very-Best-Of-David-Bowie-Deluxe-CD2-cover.jpg" alt="обложка">
-                <label class="music-name">David Bowie</label>
-        </div>
-        </div>
+        {% include "mainapp/genre.html" %}
 
 
 

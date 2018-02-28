@@ -1,11 +1,13 @@
 import json
+
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import auth
 from mainapp.models import Performer, Genre, Album, Track, LikedTrack
 from django.http import HttpResponse
 
 def main_view(request): # главная
-    return render(request,'mainapp/homePage.html', {'username': auth.get_user(request).username})
+    return render(request,'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
 
 def next_track(request):  # запрос следующего трека
     parsed_json = json.loads(request.body)
@@ -21,6 +23,13 @@ def next_track(request):  # запрос следующего трека
                                 "next_id": tracks.second.id, # id следующего трека
                             })
     return HttpResponse(json_data, content_type="application/json")
+
+def change_genre(request):
+    if request.method == "POST":
+        gen = request.POST.get('gn', '')
+        alb = Album.objects.all().filter(gnr_id = gen).values_list('name_alb', 'image_alb')
+        json_jn = json.dumps(list(alb), cls=DjangoJSONEncoder)
+        return HttpResponse(json_jn, content_type="application/json")
 
 def like(request): # обработчик лайков
     parsed_json = json.loads(request.body)
