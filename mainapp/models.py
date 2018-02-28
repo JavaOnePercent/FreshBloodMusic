@@ -94,6 +94,16 @@ class LikedTrack(models.Model):
             return False
 
     @staticmethod
+    def remove_like(track_id, user_id):  # удаление лайка из таблицы
+        if track_id is not None and user_id is not None:
+            track = Track.objects.get(pk=track_id)
+            user = User.objects.get(pk=user_id)
+            LikedTrack.objects.filter(user_id=user, trc_id=track).delete()
+            return True
+        else:
+            return False
+
+    @staticmethod
     def check_if_liked(user_id, track_id):  # проверка лайкнут ли трек
         try:
             is_liked = True

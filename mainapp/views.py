@@ -23,14 +23,23 @@ def next_track(request):  # запрос следующего трека
     return HttpResponse(json_data, content_type="application/json")
 
 def like(request): # обработчик лайков
-    track_id = json.loads(request.body)["current_track"]
+    parsed_json = json.loads(request.body)
+    track_id = parsed_json["current_track"]
     user_id = auth.get_user(request).id
-    result = LikedTrack.add_like(track_id, user_id)
-    if result:
-        json_data = json.dumps({"result": "success"})
+    if parsed_json["option"] == "add":  #добавление лайка
+        result = LikedTrack.add_like(track_id, user_id)
+        if result:
+            json_data = json.dumps({"result": "added"})
+        else:
+            json_data = json.dumps({"result": "failure"})
+    elif parsed_json["option"] == "remove":  #удаление лайка
+        result = LikedTrack.remove_like(track_id, user_id)
+        if result:
+            json_data = json.dumps({"result": "removed"})
+        else:
+            json_data = json.dumps({"result": "failure"})
     else:
         json_data = json.dumps({"result": "failure"})
-
     return HttpResponse(json_data, content_type="application/json")
 
 

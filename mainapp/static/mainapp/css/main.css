@@ -74,7 +74,7 @@ html, body
     justify-content: center;
 } 
 
-img /*обложка лучшей композиции*/
+.img /*обложка лучшей композиции*/
 {
     padding: 15px;
     display: block;
@@ -238,17 +238,17 @@ img /*обложка лучшей композиции*/
 }
 .compilation .music
 {
-    padding-right: 27.2px;
-    padding-left: 27.2px;
-    flex-basis: 225px;
+    padding-right: 2.5%;
+    padding-left: 2.5%;
+    flex-basis: 20%;
     height: 300px;
     text-align: center;
 }
 .cover
 {
     display: block;
-    height: 225px;
-    width: 225px; 
+    height: auto;
+    width: 100%;
     position: relative;
     padding: 0;
 }

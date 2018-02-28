@@ -8,11 +8,13 @@
 }
 #player {
     right: 0;
-    position:absolute;
     left: 0;
     margin: auto;
-    top: 50px;
+    top: 69px;
     height: 450px;
+    width: 70%;
+    position: fixed;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.13);
 }
 
 #playButton {
@@ -24,6 +26,10 @@
     left: 0;
     margin: auto;
 	position: absolute;
+}
+#playButton:hover {
+	width: 15%;
+	height: 15%;
 }
 
 #mainlogo {
@@ -39,14 +45,16 @@
 	visibility:visible;
 	z-index:15;
 }
+#mainlogo:hover {
+	width: 41%;
+	height: 41%;
+	box-shadow: 1px 5px 28px #ff3079;
+}
+
 #logo {
     width: 100%;
 	height: 100%;
-
-
 	z-index:0;
-
-
 }
 
 #nextlogo {
@@ -84,6 +92,11 @@
     margin: auto;
 	position: absolute;
 }
+#nextButton:hover {
+	width: 13%;
+	height: 13%;
+}
+
 
 #previousButton {
     width: 12%;
@@ -94,7 +107,7 @@
 }
 #trackname {
 	font: 28px Arial,Helvetica,sans-serif;
-	color: #e8e8e8;
+	color: rgb(0, 0, 0);
 	text-align:center;
 	top: 55%;
     right: 0;
@@ -106,7 +119,7 @@
 
 #performername {
 	font: 20px Arial,Helvetica,sans-serif;
-	color: #e8e8e8;
+	color: rgb(89, 89, 89);
 	text-align: center;
 	top: 50%;
     right: 0;
@@ -121,19 +134,56 @@
     opacity: 0.8;
     width: 40%;
     height: 40%;
-    visibility: hidden;
 }
 
 #menu {
     z-index: 5;
-    width: 40px;
-    height: 40px;
+    width: 10%;
+    height: 10%;
     right: 0;
     left: -110%;
     top: 0;
     bottom: -10%;
     margin: auto;
 	position: absolute;
+}
+#menuDropdown {
+    position: absolute;
+    margin: auto;
+    top: 110%;
+    width: 160px;
+    left: -40px;
+    right: 0;
+    z-index: 1000;
+    list-style: none;
+    padding: 0;
+    background: rgba(245, 245, 245, 0.95);/*#323232;*/
+    display: none;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08), 0 10px 10px rgba(0,0,0,0.05);
+}
+
+#menuPic:hover {
+    position: absolute;
+    left: -3%;
+    top: -3%;
+	width: 106%;
+	height: 106%;
+}
+
+#speaker {
+    width: 35px;
+    height: 35px;
+    top: 80%;
+    right: 0;
+    bottom: 0;
+    left: -50%;
+    margin: auto;
+	position: absolute;
+}
+#speakerPic {
+    width: 100%;
+    height: 100%;
+    padding: initial;
 }
 
 #volume {
@@ -145,4 +195,76 @@
     left: 0;
     margin: auto;
 	position: absolute;
+}
+
+#trackLength {
+    font: 14px Arial,Helvetica,sans-serif;
+	color: black;
+	text-align: right;
+	right: 10px;
+	margin: auto;
+	position: absolute;
+	bottom: 15px;
+	height: 100%;
+	z-index: 20;
+}
+
+#playedTime {
+    font: 14px Arial,Helvetica,sans-serif;
+	color: black;
+	text-align: left;
+	left: 10px;
+	margin: auto;
+	position: absolute;
+	height: 100%;
+	z-index: 20;
+	bottom: 15px;
+}
+
+#ball {
+    left: 110px;
+    margin: auto;
+	position: absolute;
+	top:0;
+	bottom: 0;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+}
+#line {
+    background-color: #d5d5d5;
+    width: 100%;
+    height: 10px;
+    border-radius: 15px;
+    z-index: 0;
+}
+
+#fillingLine {
+    background-color: #959595;
+    width: 100%;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    height: 12px;
+    border-radius: 15px;
+    z-index: 5;
+    margin: auto;
+	position: absolute;
+}
+
+#dropdown {
+    margin: auto;
+	position: absolute;
+    width: 30px;
+    height: 30px;
+    right: 15px;
+    top: 15px;
+}
+
+#progress {
+    height: 4px;
+    width: 100%;
+    top: 100%;
+    margin: auto;
+    position: absolute;
 }
