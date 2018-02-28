@@ -1,0 +1,12 @@
+
+/*font-family:"Rex Bold" ;*/
+@font-face
+{
+    font-family:"Rex Bold";
+    src: url("fonts/Rex Bold/Rex Bold.eot");
+    src: url("fonts/Rex Bold/Rex Bold.eot?#iefix") format("embedded-opentype"),
+    url("fonts/Rex Bold/Rex Bold.woff") format("woff"),
+    url("fonts/Rex Bold/Rex Bold.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}

@@ -17,7 +17,7 @@
     height: 69px;
     width: 90%;
     position: fixed;
-    box-shadow: 0 -6px 12px rgba(0,0,0,0.08), 0 -10px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 
 #playButton {
@@ -167,7 +167,10 @@
     padding: 0;
     background: rgba(245, 245, 245, 0.95);/*#323232;*/
     display: none;
-    box-shadow: 0 -6px 12px rgba(0,0,0,0.08), 0 -10px 10px rgba(0,0,0,0.05);
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .8),
+    23px 0 20px -23px rgba(0, 0, 0, .8),
+    0 0 40px rgba(0, 0, 0, .1) inset;
 }
 
 #volumeBackground {
@@ -177,7 +180,10 @@
     width: 40px;
     bottom: -20px;
     background: rgba(245, 245, 245, 0.95);/*#323232;*/
-    box-shadow: 0 -6px 12px rgba(0,0,0,0.08), 0 -10px 10px rgba(0,0,0,0.05);
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .8),
+    23px 0 20px -23px rgba(0, 0, 0, .8),
+    0 0 40px rgba(0, 0, 0, .1) inset;
 }
 
 #speaker {

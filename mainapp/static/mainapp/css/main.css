@@ -1,6 +1,7 @@
 
 html, body
 {
+    /*font-family:"Rex Bold";*/
     height: auto;
     width: 100%;
     margin: 0;
@@ -19,12 +20,12 @@ html, body
     position: fixed;
     display: flex;
     justify-content: center;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.13);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.13), 0 5px 5px rgba(0,0,0,0.11);
 }
 .management, .radio, .name
 {
     display: block;
-    padding: 0 5px;
+    padding: 0 15px;
     height: 69px;
     flex-basis: 280px;
     text-align:center;
@@ -37,6 +38,7 @@ html, body
 }
 .radio
 {
+    
     line-height:69px;
     flex-grow: 0.5;
     text-align: center;
@@ -63,7 +65,7 @@ html, body
 /*панель топов*/
 .topics
 {
-    background-color: rgb(102, 102, 102);
+    background-color: rgb(85, 85, 85);
     top: 0px;
     left: 0px;
     height: 350px;
@@ -102,14 +104,15 @@ html, body
 .music-top label
 {
     font-size: 25px;
-    line-height:50px;
+    line-height:60px;
 }
 /*панель топов-композиторов*/
 .compositor-top
 {   
     display: flex;
     flex-direction: column;
-    background-color: rgb(172, 169, 169);
+    color:black;
+    background-color: rgb(140, 140, 140);
     font-size: 20px;
     box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
     -23px 0 20px -23px rgba(0, 0, 0, .8),
@@ -119,11 +122,11 @@ html, body
 .compositor
 {
     cursor: pointer;
-    background-color: rgb(44, 43, 43);
-    flex-basis: 78px;
-    line-height:70px;
+    background-color: rgb(115, 115, 115);
+    flex-basis: 80.6666667px;
+    line-height:80.6666667px;
     font-size: 25px;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
 }
 .compositor label
 {
@@ -131,19 +134,20 @@ html, body
 }
 .compositor:hover
 {
-    background-color: rgba(192,192,192,0.8);
+    color: white;
+    background-color: rgba(51, 51, 51,0.8);
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .compositor-avatar
 {
     padding: 0;
-    height: 78px;
-    width: 78px;
+    height: 80.6666667px;
+    width: 80.6666667px;
     float: left
 }
 .compositor-top label
 {
-    line-height:50px;
+    line-height:60px;
 }
 /*играть и очередь*/
 .play, .turn
@@ -212,7 +216,7 @@ html, body
 .music-style
 {
     color: white;
-    background-color: rgb(75, 74, 74);
+    background-color: rgb(85, 85, 85);
 }
 .janr
 {
@@ -224,31 +228,47 @@ html, body
     background-color: rgba(192,192,192,0.8);
     border-bottom: 2px solid currentColor;
     line-height: 1.5;
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
 }
 /*подборка*/
-.compilation
-{
-    margin: auto;
-    width: 60%;
-    padding-top: 25px;
-    align-items: flex-end;
-    display: flex;
-    flex-wrap: wrap;
-}
+
+@media screen and (max-width: 950px) {
+    .compilation
+     {
+        width: 100%;
+        padding-top: 25px;
+        align-items: flex-end;
+        display: flex;
+        flex-wrap: wrap;
+    }
+  }
+  @media screen and (min-width: 950px) {
+    .compilation
+    {
+        margin: auto;
+        max-width:60% ;
+        padding-top: 25px;
+        align-items: flex-end;
+        display: flex;
+        flex-wrap: wrap;
+    }
+  }
 .compilation .music
 {
     padding-right: 2.5%;
     padding-left: 2.5%;
+    padding-bottom: 20px;
     flex-basis: 20%;
-    height: 300px;
+    overflow: hidden;
+    max-height: 300px;
     text-align: center;
 }
 .cover
 {
+    top: 0; right: 0; bottom: 0; left: 0;
     display: block;
     height: auto;
-    width: 100%;
+    width: 100%; 
     position: relative;
     padding: 0;
 }
@@ -258,10 +278,10 @@ html, body
 }
 .cover:hover
 {
+    transform: scale(1.05);
     cursor: pointer;
     filter: sepia(100%);
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-    background-blend-mode: darken;
 }
 /*подвал*/
 footer
