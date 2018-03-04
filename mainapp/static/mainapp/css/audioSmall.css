@@ -8,31 +8,54 @@
 }
 
 #player {
-    position: relative;
-    margin: 0;
+    /*position: relative;*/
+    margin: auto;
     height: 69px;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    height: 69px;
+    width: 90%;
+    position: fixed;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 
 #playButton {
 	width: 30px;
 	height: 30px;
-    left: 5px;
+    left: 30px;
     margin: auto;
 	position: absolute;
-	top: 0;
-    bottom: 10px;
+	top: 4px;
+    bottom: 0px;
+}
+#playButton:hover {
+    top: 3px;
+    left: 29px;
+	width: 32px;
+	height: 32px;
 }
 
 #mainlogo {
-    width: 58px;
-	height: 58px;
+    width: 56px;
+	height: 56px;
 	/*box-shadow: 0px 4px 28px black/*#64bdf5;;*/
-	right: 150px;
+	/*right: 115px;*/
+	right: 210px;
 	position: absolute;
 	z-index: 15;
-	top: 0;
-    bottom: 0;
+	top: 4px;
+    bottom: 0px;
+    margin: auto;
 }
+
+#mainlogo:hover {
+    top: 3px;
+    right: 209px;
+	width: 58px;
+	height: 58px;
+}
+
 #logo {
     width: 100%;
 	height: 100%;
@@ -44,20 +67,11 @@
 }
 
 #nextlogo {
-	top: -50%;
-	opacity: 0.3;
-	right: 0;
-	width: 90px;
-	height: 90px;
-	visibility: hidden;
+	display: none;
 }
 
 #maintoprevlogo {
-	top: -50%;
-	width: 40%;
-	height: 40%;
-	z-index:0;
-    visibility: hidden;
+    display: none;
 }
 
 #prevlogo {
@@ -72,43 +86,45 @@
 #nextButton {
     width: 30px;
     height: 30px;
-    left: 50px;
+    left: 90px;
     margin: auto;
 	position: absolute;
-	top: 0;
-    bottom: 10px;
+	top: 4px;
+    bottom: 0px;
+}
+#nextButton:hover {
+    top: 3px;
+    left: 89px;
+	width: 32px;
+	height: 32px;
 }
 
 #previousButton {
-    width: 12%;
-    height: 12%;
-    top: 40%;
-    left: -90%;
-    visibility: hidden;
+    display: none;
 }
 #trackname {
 	font: 20px Arial,Helvetica,sans-serif;
 	color: rgb(0, 0, 0);/* #e8e8e8;*/
 	text-align: right;
 	width: 60%;
-	height: 30px;
-	top: 0px;
-    right: 300px;
+	height: 32px;
+	top: 4px;
+    right: 296px;
     margin: auto;
 	position: absolute;
-	line-height: 30px;
+	line-height: 32px;
 }
 #performername {
 	font: 18px Arial,Helvetica,sans-serif;
 	color: rgb(89, 89, 89);
 	text-align: right;
 	width: 60%;
-	height: 30px;
-	top: 30px;
-    right: 300px;
+	height: 32px;
+	top: 36px;
+    right: 296px;
     margin: auto;
 	position: absolute;
-	line-height: 30px;
+	line-height: 32px;
 }
 
 #like {
@@ -116,28 +132,171 @@
     opacity: 0.9;
     width: 60%;
     height: 60%;
-    visibility: hidden;
     padding: 0;
 }
 #menu {
     z-index: 5;
-    width: 25px;
-    height: 25px;
-    right: 230px;
-    top: 0;
-    bottom: 10px;
+    width: 30px;
+    height: 30px;
+    /*right: 191px;*/
+    right: 150px;
+    top: 4px;
+    bottom: 0px;
     line-height:0;
     margin: auto;
 	position: absolute;
 }
 
+#menuPic:hover {
+    position: absolute;
+    left: -3%;
+    top: -3%;
+	width: 106%;
+	height: 106%;
+}
+
+#menuDropdown {
+    position: absolute;
+    margin: auto;
+    bottom: 62px;
+    width: 160px;
+    left: -60px;
+    right: 0;
+    z-index: 100;
+    list-style: none;
+    padding: 0;
+    background: rgba(245, 245, 245, 0.95);/*#323232;*/
+    display: none;
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .8),
+    23px 0 20px -23px rgba(0, 0, 0, .8),
+    0 0 40px rgba(0, 0, 0, .1) inset;
+}
+
+#volumeBackground {
+    position: absolute;
+    margin: auto;
+    height: 160px;
+    width: 40px;
+    bottom: -20px;
+    background: rgba(245, 245, 245, 0.95);/*#323232;*/
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .8),
+    23px 0 20px -23px rgba(0, 0, 0, .8),
+    0 0 40px rgba(0, 0, 0, .1) inset;
+}
+
+#speaker {
+    width: 30px;
+    height: 30px;
+    right: 90px;
+    padding: 0;
+    position: absolute;
+    top: 4px;
+    bottom: 0px;
+    margin: auto;
+    line-height: 0;
+}
+
+#speaker:hover {
+    top: 3px;
+    right: 89px;
+	width: 32px;
+	height: 32px;
+}
+
+#speakerPic {
+    width: 100%;
+    height: 100%;
+    padding: initial;
+}
+
 #volume {
     margin: auto;
 	position: absolute;
-    height: 25px;
-    width: 120px;
-    right: -60px;
-    top: 0;
-    bottom: 10px;
+    height: 120px;
+    width: 40px;
+    right: 85px;
+    bottom: 99px;
+    display: none;
+}
+
+#trackLength {
+    font: 12px Arial,Helvetica,sans-serif;
+	color: black;/*#e8e8e8;*/
+	text-align: right;
+	right: 0.5%;
+	margin: auto;
+	position: absolute;
+	height: 100%;
+	z-index: 20;
+	visibility: collapse;
+}
+
+#playedTime {
+    font: 12px Arial,Helvetica,sans-serif;
+	color: black;/*#e8e8e8;*/
+	text-align: left;
+	left: 0.5%;
+	margin: auto;
+	position: absolute;
+	height: 100%;
+	z-index: 20;
+	visibility: collapse;
+}
+
+#ball {
+    left: 0;
+    right: 0;
+    margin: auto;
+	position: absolute;
+	bottom: 110px;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+}
+#line {
+    background-color: #d5d5d5;
+    width: 10px;
+    height: 120px;
+    border-radius: 15px;
+    z-index: 0;
+}
+
+#fillingLine {
+    background-color: /*#282828;*/ /*black;*/ #959595;
+    height: 120px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 12px;
+    border-radius: 15px;
+    z-index: 5;
+    margin: auto;
+	position: absolute;
+}
+
+#dropdown {
+    margin: auto;
+	position: absolute;
+    width: 30px;
+    height: 30px;
+    right: 30px;
+    top: 4px;
+    bottom: 0px;
+}
+#dropdown:hover {
+    top: 3px;
+    right: 29px;
+	width: 32px;
+	height: 32px;
+}
+
+#progress {
+    height: 4px;
+    width: 100%;
+    bottom: 65px;
+    margin: auto;
+    position: absolute;
 }
 

@@ -28,7 +28,7 @@ class Album(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     per_id = models.ForeignKey(Performer, on_delete=models.CASCADE, related_name='performeralbum')
     name_alb = models.CharField(max_length=30)
-    gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='albumgenre')
+    gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='genrealbum')
     numplays_alb = models.IntegerField(default=0)
     rating_alb = models.IntegerField(default=0)
     image_alb = models.CharField(max_length=50, default='0')
@@ -42,7 +42,7 @@ class Track(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     alb_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albumtrack')
     name_trc = models.CharField(max_length=50)
-    gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='trackgenre')
+    gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='genretrack')
     link_trc = models.CharField(max_length=50)
     numplays_trc = models.IntegerField(default=0)
     rating_trc = models.IntegerField(default=0)
@@ -89,6 +89,16 @@ class LikedTrack(models.Model):
             track = Track.objects.get(pk=track_id)
             user = User.objects.get(pk=user_id)
             LikedTrack(user_id=user, trc_id=track).save()
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def remove_like(track_id, user_id):  # удаление лайка из таблицы
+        if track_id is not None and user_id is not None:
+            track = Track.objects.get(pk=track_id)
+            user = User.objects.get(pk=user_id)
+            LikedTrack.objects.filter(user_id=user, trc_id=track).delete()
             return True
         else:
             return False

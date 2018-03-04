@@ -1,5 +1,6 @@
 var isFull = false;
 var is_liked = false;
+var trackLenPer = null;
 
 $(function() {
 
@@ -13,11 +14,10 @@ $(function() {
 		    clearInterval(timerId);
 			$("#audio").trigger('pause');
 			$("#playButton").attr("src", "/static/mainapp/images/playButton.png");
-
 		}
 	});
 
-	$("#playButton").mouseenter(function(){
+	/*$("#playButton").mouseenter(function(){
 	    if(isFull)
 		    $("#playButton").animate({width: '+=7px', height: '+=7px'}, 50);
 		else
@@ -40,19 +40,20 @@ $(function() {
 		    $("#nextButton").animate({width: '-=7px', height: '-=7px'}, 50);
 		else
 		    $("#nextButton").animate({width: '-=2px', height: '-=2px', left: '+=1px', top: '+=1px'}, 50);
-	});
+	});*/
 	$("#previousButton").mouseenter(function(){
 		$("#previousButton").animate({width: '+=7px', height: '+=7px'}, 50);
 	});
 	$("#previousButton").mouseleave(function(){
 		$("#previousButton").animate({width: '-=7px', height: '-=7px'}, 50);
 	});
+	/*
 	$("#dropdown").mouseenter(function(){
-		$("#dropdown").animate({width: '+=4px', height: '+=4px', right: '-=2px', top: '-=2px'}, 50);
+		$("#dropdown").animate({width: '+=2px', height: '+=2px', right: '-=1px', top: '-=1px'}, 50);
 	});
 	$("#dropdown").mouseleave(function(){
-		$("#dropdown").animate({width: '-=4px', height: '-=4px', right: '+=2px', top: '+=2px'}, 50);
-	});
+		$("#dropdown").animate({width: '-=2px', height: '-=2px', right: '+=1px', top: '+=1px'}, 50);
+	});*/
 
 	$("#mainlogo").mouseenter(function(){
 	    if(!is_liked)
@@ -60,11 +61,11 @@ $(function() {
 	        $("#like").css('visibility', 'visible');
 	        if(isFull)
 	        {
-		        $("#mainlogo").animate({width: '+=10px', height: '+=10px'}, 100);
-		        $("#mainlogo").css('box-shadow', '1px 5px 28px #ff3079');
+		        //$("#mainlogo").animate({width: '+=10px', height: '+=10px'}, 100);
+		        //$("#mainlogo").css('box-shadow', '1px 5px 28px #ff3079');
 		    }
-		    else
-		        $("#mainlogo").animate({width: '+=4px', height: '+=4px', right: '-=2px', top: '-=2px'}, 100);
+		    //else
+		    //    $("#mainlogo").animate({width: '+=2px', height: '+=2px', right: '-=1px', top: '-=1px'}, 100);
 		}
 	});
 	$("#mainlogo").mouseleave(function(){
@@ -73,16 +74,21 @@ $(function() {
 	        $("#like").css('visibility', 'hidden');
 	        if(isFull)
 	        {
-		        $("#mainlogo").animate({width: '-=10px', height: '-=10px'}, 100);
-		        $("#mainlogo").css('box-shadow', '0px 4px 28px black');
+		        //$("#mainlogo").animate({width: '-=10px', height: '-=10px'}, 100);
+		        //$("#mainlogo").css('box-shadow', '0px 4px 28px black');
 		    }
-		    else
-		        $("#mainlogo").animate({width: '-=4px', height: '-=4px', right: '+=2px', top: '+=2px'}, 100);
+		    //else
+		    //    $("#mainlogo").animate({width: '-=2px', height: '-=2px', right: '+=1px', top: '+=1px'}, 100);
 		}
 	});
 
     var volume = $("audio").get(0).volume;
 
+    $("#speaker").mouseenter(function() {
+        if(!isFull)
+            $("#volume").fadeToggle(100);
+
+    });
     $("#speaker").click(function() {
         var vol = $("audio").get(0).volume;
         var volOffset = $("#volume").offset().left;
@@ -90,7 +96,7 @@ $(function() {
         {
             makeMove(volOffset);
             volume = vol;
-            $("#speaker").attr("src", "/static/mainapp/images/speaker0.png");
+            $("#speakerPic").attr("src", "/static/mainapp/images/speaker0.png");
             $("audio").get(0).volume = 0.0;
         }
         else
@@ -98,27 +104,31 @@ $(function() {
             makeMove(volOffset + volume*$("#volume").width())
             $("audio").get(0).volume = volume;
             if(volume <= 0.33)
-            $("#speaker").attr("src", "/static/mainapp/images/speaker33.png");
+            $("#speakerPic").attr("src", "/static/mainapp/images/speaker33.png");
             else if(volume <= 0.66)
-            $("#speaker").attr("src", "/static/mainapp/images/speaker66.png");
+            $("#speakerPic").attr("src", "/static/mainapp/images/speaker66.png");
             else if(volume <= 1.0)
-            $("#speaker").attr("src", "/static/mainapp/images/speaker100.png");
+            $("#speakerPic").attr("src", "/static/mainapp/images/speaker100.png");
         }
     });
 
     $("#mainlogo").click(function() {
-        if(is_liked == false)
-        {
-            var varData = {
+        var varData = {
+                option: "",
 		    	current_track: trackID.current
 		    };
-
-		    var jsonData = JSON.stringify(varData);
-            sendJSON('like/', jsonData, successfulLikeFunc);
+        if(is_liked == false)
+        {
+            varData.option = "add";
         }
+        else
+        {
+            varData.option = "remove";
+        }
+
+		var jsonData = JSON.stringify(varData);
+        sendJSON('like/', jsonData, successfulLikeFunc);
     });
-
-
 
     $("#menuPic").click(function() {
         $("#menuDropdown").fadeToggle(100);
@@ -151,9 +161,14 @@ $(function() {
         {
             //$("#trackname").text(event.pageX / $("#progress").width());
             //$("#progressBarLine").animate({width: event.pageX / $("#progress").width() * 100 + "%"}, 0);
-            var seconds = event.pageX / $("#progress").width() * audio.duration;
-            $("#progressBarLine").animate({width: event.pageX + "px"}, 0);
-            setCurrentTime(seconds);
+            var xCoord = event.pageX - $("#player").offset().left;
+            if(xCoord <= $("#player").width())
+            {
+                var seconds = xCoord / $("#progress").width() * audio.duration;
+                $("#progressBarLine").animate({width: xCoord + "px"}, 0);
+                setCurrentTime(seconds);
+                timeColorChanger();
+            }
         }
     });
 
@@ -161,7 +176,10 @@ $(function() {
     $("#draggingZone").mousedown(function(event){
 
         allowMove = true;
-        makeMove(event.pageX);
+        if(isFull)
+            makeMove(event.pageX);
+        else
+            makeMove(null, event.pageY);
 	});
 
     $("#draggingZone").mouseenter(function(event){
@@ -181,21 +199,28 @@ $(function() {
         if(allowChangeTime)
         {
             var audio = $("audio").get(0);
-            var seconds = event.pageX / $("#progress").width() * audio.duration;
-            //$("#trackname").text(audio.currentTime + "   " + seconds);
+            var xCoord = event.pageX - $("#player").offset().left;
+            if(xCoord <= $("#player").width())
+            {
+                var seconds = xCoord / $("#progress").width() * audio.duration;
+                //$("#trackname").text(audio.currentTime + "   " + seconds);
 
-            audio.currentTime = Number(seconds);      //задание текущего времени проигрывания currentTime
-            $("#progressBarLine").animate({width: event.pageX + "px"}, 0);
-            timerId = setInterval(progressBar, 500);
-            setCurrentTime(seconds);
+                audio.currentTime = Number(seconds);      //задание текущего времени проигрывания currentTime
+                $("#progressBarLine").animate({width: xCoord + "px"}, 0);
+                timerId = setInterval(progressBar, 500);
+                setCurrentTime(seconds);
+                timeColorChanger();
+            }
         }
         allowChangeTime = false;
 	});
 
-
     $("#draggingZone").mousemove(function(event){
         if(allowMove) {
-            makeMove(event.pageX);
+            if(isFull)
+                makeMove(event.pageX);
+            else
+                makeMove(null, event.pageY);
         }
     });
 
@@ -208,7 +233,8 @@ $(function() {
             source = "/static/mainapp/css/audioSmall.css";
             isFull = false;
             button = "/static/mainapp/images/dropdown.png";
-
+            isPlayedTimeColorChanged = false;
+            isTrackLengthColorChanged = false;
             $('#prevlogo').css('visibility', 'hidden');
             //$('#nextlogo').css('visibility', 'hidden');
         }
@@ -228,17 +254,27 @@ $(function() {
 
         $("#dropdown").attr('src', button);
         $("#playerCSS").attr('href', source);
-
-        $('#playButton').attr("style", "");
+        var likeStyle = $('#like').attr('style');
+        $('*').attr("style", "");
+        $('#like').attr('style', likeStyle);
+        /*$('#playButton').attr("style", "");
         $('#nextButton').attr("style", "");
         $('#mainlogo').attr("style", "");
         $('#nextlogo').attr("style", "");
+        $('#dropdown').attr("style", "");
+        $('#progress').attr("style", "");
+        $('#trackLength').attr("style", "");
+        $('#playedTime').attr("style", "");
+        $('#volume').attr("style", "");
+        $('#line').attr("style", "");
+        $('#fillingLine').attr("style", "");
+        $('#ball').attr("style", "");*/
 
-        makeMove($("audio").get(0).volume * $("#volume").width() + $("#volume").offset().left);
+        //makeMove($("audio").get(0).volume * $("#volume").width() + $("#volume").offset().left);
 
-        var volPer = $("audio").get(0).volume*100;
-        $("#ball").animate({left: volPer - 7 + "%"}, 0);
-        $("#fillingLine").css("width", volPer + "%");
+        //var volPer = $("audio").get(0).volume*100;
+        //$("#ball").animate({left: volPer - 7 + "%"}, 0);
+        //$("#fillingLine").css("width", volPer + "%");
 
     });
 
@@ -247,37 +283,55 @@ $(function() {
 	$('audio').bind("ended", nextTrack);
     $('audio').bind("durationchange", setTrackLength);
 
-    $("#progress").mouseenter(function(){
-        $("#progress").animate({height: '+=3px'}, 100);
+    $("#player").mouseenter(function(){
+        trackLenPer = Number(99.5) - Number($("#trackLength").width() / $("#player").width() * 100);
+        $("#progress").animate({height: '14px'}, 100);
+        $("#trackLength").css("visibility", "visible");
+        $("#playedTime").css("visibility", "visible");
     });
 
-    $("#progress").mouseleave(function(){
-        $("#progress").animate({height: '-=3px'}, 100);
+    $("#player").mouseleave(function(){
+        trackLenPer = null;
+        $("#progress").animate({height: '4px'}, 100);
+        if(!isFull)
+        {
+            $("#trackLength").css("visibility", "hidden");
+            $("#playedTime").css("visibility", "hidden");
+            if($("#volume").css("display") != "none")
+                $("#volume").fadeToggle(100);
+        }
     });
 });
 
-function makeMove(pageX) //передвижение ползунка громкости
+function makeMove(pageX, pageY = null) //передвижение ползунка громкости
 {
-    //var offset = $("#ball").offset();
     var volOffset = $("#volume").offset();
-    //var move = pageX - volOffset.left - $("#volume").width() / 2;
-    //$("#ball").animate({left: move + "px", right: (-move) + "px"}, 0);
-    var move = pageX - volOffset.left - 10;
-    $("#ball").animate({left: move + "px"}, 0);
-    $("#fillingLine").css("width", (pageX - volOffset.left) + "px");
-    var volume = (pageX - volOffset.left)/$("#volume").width();
+    if(pageX != null)
+    {
+        var move = pageX - volOffset.left - 10;
+        $("#ball").animate({left: move + "px"}, 0);
+        $("#fillingLine").css("width", (pageX - volOffset.left) + "px");
+        var volume = (pageX - volOffset.left)/$("#volume").width();
+    }
+    else if(pageY != null)
+    {
+        var move = $("#line").height() - (pageY - volOffset.top) - 10;
+        $("#ball").animate({bottom: move + "px"}, 0);
+        $("#fillingLine").css("height", (move + 10) + "px");
+        var volume = (move + 10)/$("#line").height();
+    }
     $("audio").get(0).volume = volume;
     if(volume <= 0.01)
     {
-        $("#speaker").attr("src", "/static/mainapp/images/speaker0.png");
+        $("#speakerPic").attr("src", "/static/mainapp/images/speaker0.png");
         $("audio").get(0).volume = 0.0;
     }
     else if(volume <= 0.33)
-        $("#speaker").attr("src", "/static/mainapp/images/speaker33.png");
+        $("#speakerPic").attr("src", "/static/mainapp/images/speaker33.png");
     else if(volume <= 0.66)
-        $("#speaker").attr("src", "/static/mainapp/images/speaker66.png");
+        $("#speakerPic").attr("src", "/static/mainapp/images/speaker66.png");
     else if(volume <= 1.0)
-        $("#speaker").attr("src", "/static/mainapp/images/speaker100.png");
+        $("#speakerPic").attr("src", "/static/mainapp/images/speaker100.png");
 };
 
 trackID = {
@@ -286,8 +340,10 @@ trackID = {
     };
 
 nextTrack();
+isFirst = true;
 
 var csrftoken = getCookie('csrftoken');
+
 function nextTrack(){
     $("#like").css("visibility", "hidden");
 	var varData = {
@@ -298,14 +354,23 @@ function nextTrack(){
 	sendJSON('next/', jsonData, nextTrackSuccessFunc);
 };
 
+var isPlayedTimeColorChanged = false;
+var	isTrackLengthColorChanged = false;
+
 function nextTrackSuccessFunc(data) {         //функция успеха после получения следующего трека
+    timeColorChanger();
 	$("#trackname").text(data.track_name);
 	$("#performername").text(data.performer_name);
 	$("#audio").attr("src", data.file_link);
-	startPlaying();
+	if(!isFirst)
+	    startPlaying();
+	else
+	    isFirst = false;
 	trackID.current = data.current_id;
 	trackID.next = data.next_id;
 	$("#progressBarLine").animate({width: 0 + "%"}, 50);
+	isPlayedTimeColorChanged = false;
+	isTrackLengthColorChanged = false;
 	$("title").text(data.track_name);
 
 	globalData = data;
@@ -332,7 +397,7 @@ function nextTrackSuccessFunc(data) {         //функция успеха по
 	}
 }
 
-function sendJSON(Url, jsonData, successFunc)
+function sendJSON(Url, jsonData, successFunc, isFirst)
 {
     var csrftoken = getCookie('csrftoken');
     $.ajax({
@@ -351,17 +416,19 @@ function sendJSON(Url, jsonData, successFunc)
 
 function successfulLikeFunc(data)
 {
-    if(data.result == "success")
+    if(data.result == "added")
     {
         is_liked = true;
-        if(isFull)
-        {
-	        $("#mainlogo").animate({width: '-=10px', height: '-=10px'}, 100);
-	        $("#mainlogo").css('box-shadow', '0px 4px 28px black');
-	    }
+        $("#like").css('visibility', 'visible');
+	        //$("#mainlogo").animate({width: '-=10px', height: '-=10px'}, 100);
+	        //$("#mainlogo").css('box-shadow', '0px 4px 28px black');
 	}
-	else
-	    $("#mainlogo").animate({width: '-=4px', height: '-=4px', right: '+=2px', top: '+=2px'}, 100);
+	else if(data.result == "removed")
+	{
+        is_liked = false;
+        $("#like").css('visibility', 'hidden');
+	}
+	    //$("#mainlogo").animate({width: '-=4px', height: '-=4px', right: '+=2px', top: '+=2px'}, 100);
 
 }
 
@@ -411,9 +478,47 @@ function progressBar()
     var currTime = audio.currentTime;
     var progress = currTime / audio.duration * 100;
     $("#progressBarLine").animate({width: progress + "%"}, 250);
+    timeColorChanger();
     mins = Math.floor(currTime / 60);
     secs = (currTime % 60).toFixed();
     $("#playedTime").text(mins + ":" + ((secs < 10) ? '0' + secs : secs));
+}
+
+function timeColorChanger(progress = null)
+{
+    if(!isFull)
+    {
+        if(progress == null)
+        {
+            var audio = $("audio").get(0);
+            var currTime = audio.currentTime;
+            progress = currTime / audio.duration * 100;
+        }
+        if(trackLenPer != null)
+        {
+            if(progress >= 0.5 && isPlayedTimeColorChanged == false)
+            {
+                $("#playedTime").css("color", "white");
+                isPlayedTimeColorChanged = true;
+            }
+            else if(progress < 0.5)
+            {
+                $("#playedTime").css("color", "black");
+                isPlayedTimeColorChanged = false;
+            }
+
+            if(progress >= trackLenPer && isTrackLengthColorChanged == false)
+            {
+                $("#trackLength").css("color", "white");
+                isTrackLengthColorChanged = true;
+            }
+            else if(progress < trackLenPer)
+            {
+                $("#trackLength").css("color", "black");
+                isTrackLengthColorChanged = false;
+            }
+        }
+    }
 }
 
 var timerId = null;
