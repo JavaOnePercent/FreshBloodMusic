@@ -7,10 +7,20 @@ from mainapp.models import Performer, Genre, Album, Track, LikedTrack
 from django.http import HttpResponse
 
 def main_view(request): # главная
-    return render(request,'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
+    tracks = Track.objects.all().filter(gnr_id=1)
+    name_track = tracks.values_list('name_trc')
+
+    track_id = tracks.values('alb_id')
+    image_track = []
+    for track in track_id:
+        image = Album.objects.get(pk=track["alb_id"]).image_alb
+        image_track.append(image)
+    names = Names(name_track, image_track)
+    return render(request,'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all(), 'names': names})
 
 def next_track(request):  # запрос следующего трека
-    parsed_json = json.loads(request.body)
+    new_data = request.body.decode("utf-8", "strict")
+    parsed_json = json.loads(new_data)
     tracks = Track.get_two(parsed_json)
     is_liked = LikedTrack.check_if_liked(auth.get_user(request).id, tracks.first.id)
     json_data = json.dumps({"track_name": tracks.first.name_trc, # имя трека
@@ -27,8 +37,16 @@ def next_track(request):  # запрос следующего трека
 def change_genre(request):
     if request.method == "POST":
         gen = request.POST.get('gn', '')
-        alb = Album.objects.all().filter(gnr_id = gen).values_list('name_alb', 'image_alb')
-        json_jn = json.dumps(list(alb), cls=DjangoJSONEncoder)
+        tracks = Track.objects.all().filter(gnr_id = gen)
+        name_track = tracks.values_list('name_trc')
+
+        track_id = tracks.values('alb_id')
+        image_track = []
+        for track in track_id:
+
+            image = Album.objects.get(pk=track["alb_id"]).image_alb
+            image_track.append(image)
+        json_jn = json.dumps({"names": list(name_track), "images": image_track}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def like(request): # обработчик лайков
@@ -51,5 +69,9 @@ def like(request): # обработчик лайков
         json_data = json.dumps({"result": "failure"})
     return HttpResponse(json_data, content_type="application/json")
 
-
-
+class Names:
+    name_track = ""
+    image_track = ""
+    def __init__(self, name_track, image_track):
+        self.name_track = name_track
+        self.image_track = image_track

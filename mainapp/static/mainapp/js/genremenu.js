@@ -1,10 +1,19 @@
 $(function() {
     $(".janr").click(function() {
+        var kek = "";
+        genre(kek, this);
+    });
+});
+
+function genre(kek, obj = null){
+    if(kek == "") {
+        kek = $(obj).attr("name");
+    }
         $.ajax({
             type: "POST",
             url: "change_genre/",
             data: {
-                gn:$(this).attr("name")
+                gn:kek
             },
             dataType: "json",
             cache: false,
@@ -12,33 +21,43 @@ $(function() {
               "X-CSRFToken": csrftoken
 	        },
             success: function(data) {
-                var brr;
-                var crr;
-                var j = 0;
-                var k = 0;
-                var arr = data.toString().split(',');
-                for(var i = 0; i < arr.lastIndexOf(); i++)
-                    if(i % 2 == 0){
-                        brr[j] = arr(i);
-                        j++;
+                //alert(data.names + " " + data.images);
+                var arrNames = data.names.toString().split(',');
+                var arrImages = data.images.toString().split(',');
+                var counter = 0;
+                var arrLen = arrNames.length;
+                if(data.names.toString() === "") arrLen = 0;
+                 if(arrLen > 0) {
+                        $(".music").css("display", "block");
                     }
-                    else {
-                        crr[k] = arr(i);
-                        k++;
-                    }
+                for(var i=$(".music").length; i < arrLen-1; i++)  //добавление элементов, в случае если на странице их меньше, чем пришло с сервера
+                {
 
-                //alert(arr[0]);
-                for(var i = 0; i < brr.lastIndexOf(); i++) {
-                    $($(".music-name").get(i)).text(brr[i]);
-                    //document.getElementsByClassName(".music-name").get[i].innerText(brr[i]);
-                    $($(".cover").get(i)).attr("src", "/static/mainapp/album_sources/" + crr[i]);
+                    $(".music").clone().appendTo(".compilation");
+                }
+                for(var i=$(".music").length-1; i >= arrLen; i--)  //удаление элементов, в случае если на странице их слишком много
+                {
+                    if(i === 0)
+                    {
+                        $(".music").css("display", "none");
+                    }
+                    else
+                    $($(".music")[i]).remove();
+                }
+
+
+                for(var i = 0; i < arrNames.length; i++) {
+
+                        $($(".music-name")[i]).text(jQuery.trim(arrNames[i]));
+
+
+                        $($(".cover")[i]).attr("src", "/static/mainapp/album_sources/" + jQuery.trim(arrImages[i]));
                 }
             }
         });
-    });
+}
 
-});
-
+genre("1");
 
 var csrftoken = getCookie('csrftoken');
 
