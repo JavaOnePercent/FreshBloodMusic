@@ -12,6 +12,8 @@
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
     <script src="{% static 'mainapp/js/audio.js' %}"></script>
     <script src="{% static 'mainapp/js/genremenu.js' %}"></script>
+    <script src="{% static 'mainapp/js/bestperformer.js' %}"></script>
+    <script src="{% static 'mainapp/js/topmonth.js' %}"></script>
 </head>
 
 <body>
@@ -36,10 +38,11 @@
     <div class="main">
         <div class="topics">
             <div class="music-top">
-                    <img class="img" src="https://is4-ssl.mzstatic.com/image/thumb/Music/d1/a9/8f/mzi.eocqaxhi.jpg/1200x630bb.jpg" alt="обложка">
+                <img class="img" src="" alt="обложка">
                 <label>Лучшая в этом месяце</label>
-                <p>Manowar - Fighting The World</p>
-                <p>Понравилась: 155 пользователям</p>
+                <p class="performer-top"></p>
+                <label class="track-top"></label>
+                <p class="rating-top"></p>
                 <div class="play">
                     <i class="fa fa-play fa-4x" aria-hidden="true"></i>
                 </div>
@@ -51,18 +54,7 @@
                 <label>
                 Лучшие исполнители
                 </label>
-                <div class="compositor"> 
-                    <img src="https://ic.pics.livejournal.com/antt_trax/45655717/140600/140600_900.jpg" alt="обложка" class="compositor-avatar">
-                    <label>The Doors</label>
-                </div>
-                <div class="compositor"> 
-                    <img src="https://filed3-19.my.mail.ru/pic?url=https%3A%2F%2Fcontent-18.foto.my.mail.ru%2Fmail%2Fkononenko_mf%2F_musicplaylistcover%2Fi-26565.jpg&mw=&mh=&sig=ac9ca3e3b5af8fe2efe6b4f3affe7b39" alt="обложка" class="compositor-avatar">
-                    <label>Scorpions</label>
-                </div>
-                <div class="compositor"> 
-                    <img src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка" class="compositor-avatar">
-                    <label>In Flames</label>
-                </div>
+                {% include "mainapp/bestperformer.html" %}
             </div>
         </div>
         <div class="recommendations">
