@@ -101,7 +101,7 @@ $(function() {
         }
         else
         {
-            makeMove(volOffset + volume*$("#volume").width())
+            makeMove(volOffset + volume*$("#volume").width());
             $("audio").get(0).volume = volume;
             if(volume <= 0.33)
             $("#speakerPic").attr("src", "/static/mainapp/images/speaker33.png");
