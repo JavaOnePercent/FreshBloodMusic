@@ -8,8 +8,11 @@ function topmonth() {
                 "X-CSRFToken": csrftoken
             },
             success: function (data) {
-                alert(data.name_track /*+ " " + data.permormer_track + " " + data.image_track + " " + data.like_track*/);
-                //$($(".track-top")).text(jQuery.trim(data.name_track));
+                //alert(data.name_track + " " + data.like_track);
+                $($(".track-top")).text(jQuery.trim(data.name_track));
+                $($(".rating-top")).text("Понравилась: " + jQuery.trim(data.like_track));
+                $($(".performer-top")).text(jQuery.trim(data.performer_track));
+                $($(".img")).attr("src", "/static/mainapp/album_sources/" + jQuery.trim(data.image_track));
 
 
             }

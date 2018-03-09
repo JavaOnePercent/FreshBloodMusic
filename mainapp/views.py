@@ -50,13 +50,14 @@ def best_performer(request):
 
 def top_month(request):
     if request.method == "POST":
-        #name_track = Track.objects.order_by('rating_trc').reverse()[:1]
-        name_track = Track.objects.values('name_per', 'rating_per',  'album__image_alb', 'performer__name_per').order_by('rating_trc').reverse()[:1]
-        name = name_track.values_list('name_per')
+        name_track = Track.objects.order_by('rating_trc').reverse()[:1]
+        name = name_track.values_list('name_trc')
         rating = name_track.values_list('rating_trc')
-        image = name_track.values_list('album__image_alb')
-        performer = name_track.values_list('performer__name_per')
-        json_jn = json.dumps({"name_track": list(name), "image_track": list(image), "permormer_track": list(performer), "like_track": list(rating)}, cls=DjangoJSONEncoder)
+        alb_id = name_track.values('alb_id')
+        for alb in alb_id:
+            image = Album.objects.get(pk = alb["alb_id"]).image_alb
+            performer = Album.objects.get(pk = alb["alb_id"]).per_id.name_per
+        json_jn = json.dumps({"name_track": list(name), "like_track": list(rating), "image_track": image, "performer_track": performer}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def like(request): # обработчик лайков
