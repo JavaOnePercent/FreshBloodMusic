@@ -5,7 +5,7 @@ $(function() {
     });
 });
 
-function genre(kek, obj = null){
+function genre(kek){
     if(kek == "") {
         kek = $(obj).attr("name");
     }
@@ -18,8 +18,8 @@ function genre(kek, obj = null){
             dataType: "json",
             cache: false,
             headers: {
-              "X-CSRFToken": csrftoken
-	        },
+                "X-CSRFToken": csrftoken
+            },
             success: function(data) {
                 //alert(data.names + " " + data.images);
                 var arrNames = data.names.toString().split(',');
