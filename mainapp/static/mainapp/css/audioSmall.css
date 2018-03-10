@@ -36,7 +36,7 @@
 	height: 32px;
 }
 
-#mainlogo {
+#mainLogo {
     width: 56px;
 	height: 56px;
 	/*box-shadow: 0px 4px 28px black/*#64bdf5;;*/
@@ -49,11 +49,18 @@
     margin: auto;
 }
 
-#mainlogo:hover {
+#mainLogo:hover {
     top: 3px;
     right: 209px;
 	width: 58px;
 	height: 58px;
+}
+
+#like {
+    z-index: 5;
+    opacity: 0.9;
+    width: 35px;
+    height: 35px;
 }
 
 #logo {
@@ -127,13 +134,7 @@
 	line-height: 32px;
 }
 
-#like {
-    z-index: 5;
-    opacity: 0.9;
-    width: 60%;
-    height: 60%;
-    padding: 0;
-}
+
 #menu {
     z-index: 5;
     width: 30px;
@@ -166,7 +167,6 @@
     list-style: none;
     padding: 0;
     background: rgba(245, 245, 245, 0.95);/*#323232;*/
-    display: none;
     box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
     -23px 0 20px -23px rgba(0, 0, 0, .8),
     23px 0 20px -23px rgba(0, 0, 0, .8),
@@ -218,7 +218,6 @@
     width: 40px;
     right: 85px;
     bottom: 99px;
-    display: none;
 }
 
 #trackLength {
