@@ -55,9 +55,10 @@ function genre(kek){
         });
 }
 
-genre("1");
 
 var csrftoken = getCookie('csrftoken');
+
+genre("2");
 
 function getCookie(name) {
     var cookieValue = null;

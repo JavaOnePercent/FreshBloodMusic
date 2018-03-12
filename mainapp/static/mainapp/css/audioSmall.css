@@ -20,6 +20,10 @@
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 
+#player:hover {
+    background-color: rgba(235, 235, 235, 0.95);
+}
+
 #playButton {
 	width: 30px;
 	height: 30px;
@@ -28,6 +32,7 @@
 	position: absolute;
 	top: 4px;
     bottom: 0px;
+    z-index: 10;
 }
 #playButton:hover {
     top: 3px;
@@ -58,9 +63,9 @@
 
 #like {
     z-index: 5;
-    opacity: 0.9;
-    width: 35px;
-    height: 35px;
+    opacity: 0.8;
+    width: 70%;
+    height: 70%;
 }
 
 #logo {
@@ -98,6 +103,7 @@
 	position: absolute;
 	top: 4px;
     bottom: 0px;
+    z-index: 10;
 }
 #nextButton:hover {
     top: 3px;
@@ -159,30 +165,30 @@
 #menuDropdown {
     position: absolute;
     margin: auto;
-    bottom: 62px;
+    bottom: 58px;
     width: 160px;
-    left: -60px;
     right: 0;
     z-index: 100;
     list-style: none;
     padding: 0;
     background: rgba(245, 245, 245, 0.95);/*#323232;*/
-    box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
-    -23px 0 20px -23px rgba(0, 0, 0, .8),
-    23px 0 20px -23px rgba(0, 0, 0, .8),
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .1), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .3),
+    23px 0 20px -23px rgba(0, 0, 0, .3),
     0 0 40px rgba(0, 0, 0, .1) inset;
 }
 
 #volumeBackground {
-    position: absolute;
     margin: auto;
+	position: absolute;
     height: 160px;
-    width: 40px;
-    bottom: -20px;
+    width: 50px;
+    left: -8px;
+    bottom: 1px;
     background: rgba(245, 245, 245, 0.95);/*#323232;*/
-    box-shadow:  0 -2px 4px rgba(0, 0, 0, .3), /*тут бы поиграть с тенями*/
-    -23px 0 20px -23px rgba(0, 0, 0, .8),
-    23px 0 20px -23px rgba(0, 0, 0, .8),
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .1), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .5),
+    23px 0 20px -23px rgba(0, 0, 0, .5),
     0 0 40px rgba(0, 0, 0, .1) inset;
 }
 
@@ -192,17 +198,16 @@
     right: 90px;
     padding: 0;
     position: absolute;
-    top: 4px;
-    bottom: 0px;
+    bottom: 18px;
     margin: auto;
     line-height: 0;
+    z-index: 5
 }
 
 #speaker:hover {
-    top: 3px;
-    right: 89px;
 	width: 32px;
 	height: 32px;
+    bottom: 17px;
 }
 
 #speakerPic {
@@ -214,10 +219,21 @@
 #volume {
     margin: auto;
 	position: absolute;
-    height: 120px;
-    width: 40px;
-    right: 85px;
-    bottom: 99px;
+    height: 155px;
+    width: 34px;
+    right: 0;
+    left: 0;
+    bottom:75px;
+}
+
+#volumeControlZone {
+    margin: auto;
+	position: absolute;
+    right: 75px;
+    bottom: 0;
+    width: 60px;
+    height: 236px;
+    z-index: 20;
 }
 
 #trackLength {

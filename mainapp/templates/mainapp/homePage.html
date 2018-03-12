@@ -1,16 +1,14 @@
+{% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="utf-8">
-    {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'mainapp/css/font.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'mainapp/css/main.css' %}" type="text/css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
-    <link id="playerCSS" rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audioSmall.css' %}" />
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">-->
     <title>{{track_name}}</title>
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-    <!--<script src="{% static 'mainapp/js/audio.js' %}"></script>-->
     <script src="{% static 'mainapp/js/genremenu.js' %}"></script>
     <script src="{% static 'mainapp/js/bestperformer.js' %}"></script>
     <script src="{% static 'mainapp/js/topmonth.js' %}"></script>
@@ -54,7 +52,12 @@
                 <label>
                 Лучшие исполнители
                 </label>
-                {% include "mainapp/bestperformer.html" %}
+                <div class="compositors">
+                    <div class="compositor">
+                        <img class="compositor-avatar" src="" alt="обложка">
+                        <label class="compositor-name"></label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="recommendations">
@@ -72,8 +75,12 @@
                 {% endfor %}
             </div>
         </div>
-        {% include "mainapp/genre.html" %}
-
+        <div class="compilation">
+            <div class="music" >
+                <img class="cover" src="" alt="обложка"/>
+                <label class="music-name"></label>
+            </div>
+        </div>
 
 
     <footer>
@@ -81,6 +88,14 @@
     </footer>
     </div>
 
-    {% include "mainapp/player.html" %}
+    
+    <script src="{% static 'mainapp/js/vue.js' %}"></script>
+    <div id="VueContainer"> <!-- сюда пихать все vue компоненты -->
+        <top-player></top-player>
+    </div>
+    <div>
+        {% include "mainapp/playerTemplates.html" %}
+    </div>
+
 </body>
 </html>

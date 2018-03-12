@@ -19,7 +19,6 @@
 	position: absolute;
 
 }
-
 /*a {
     text-decoration: none;
     font: 20px Arial,Helvetica,sans-serif;
@@ -123,3 +122,16 @@ li:hover .menuElements {
 	position: absolute;
 }
 
+.menu-more-enter-active, .menu-more-leave-active {
+    transition: opacity .2s;
+}
+.menu-more-enter, .menu-more-leave-to {
+    opacity: 0;
+}
+
+.volume-enter-active, .volume-leave-active {
+    transition: opacity .2s;
+}
+.volume-enter, .volume-leave-to {
+    opacity: 0;
+}
