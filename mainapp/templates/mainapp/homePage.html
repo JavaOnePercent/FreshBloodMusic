@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="{% static 'mainapp/css/font.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'mainapp/css/main.css' %}" type="text/css">
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <title>{{track_name}}</title>
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
     <script src="{% static 'mainapp/js/genremenu.js' %}"></script>
@@ -25,6 +25,7 @@
         </div>
         <div class="management">
                 {% if username %}
+                <a href="loader-music/">Моя музыка</a>
                 <a href="performers/">Моя музыка</a>
                 <a href="auth/logout/">Выйти ({{ username }})</a>
                 {% else %}
@@ -33,21 +34,9 @@
                 {% endif %}
         </div>
     </div>
-    <div class="main">
+    <div id="main" class="main">
         <div class="topics">
-            <div class="music-top">
-                <img class="img" src="" alt="обложка">
-                <label>Лучшая в этом месяце</label>
-                <p class="performer-top"></p>
-                <label class="track-top"></label>
-                <p class="rating-top"></p>
-                <div class="play">
-                    <i class="fa fa-play fa-4x" aria-hidden="true"></i>
-                </div>
-                <div class="turn">
-                    <i class="fa fa-align-justify fa-4x" aria-hidden="true"></i>
-                </div>
-            </div> 
+            <app-music-top></app-music-top>
             <div class="compositor-top">
                 <label>
                 Лучшие исполнители
@@ -75,14 +64,7 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="compilation">
-            <div class="music" >
-                <img class="cover" src="" alt="обложка"/>
-                <label class="music-name"></label>
-            </div>
-        </div>
-
-
+        <app-compilation></app-compilation>
     <footer>
         ©Отвратительные мужики
     </footer>
@@ -90,12 +72,15 @@
 
     
     <script src="{% static 'mainapp/js/vue.js' %}"></script>
+    
     <div id="VueContainer"> <!-- сюда пихать все vue компоненты -->
         <top-player></top-player>
     </div>
     <div>
+        {% include "mainapp/music-top.html" %}
         {% include "mainapp/playerTemplates.html" %}
     </div>
+    <script src="{% static 'mainapp/js/music-top.js' %}"></script>
 
 </body>
 </html>

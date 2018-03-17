@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{% static 'loader-music.css' %}" type="text/css">
+</head>
+
+<body>
+
+
+    <div class="loader-conteiner">
+        <div class="track-img-loader-conteiner">
+            <label>Обложка альбома</label>
+            <img class="track-img-loader" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
+        </div>
+
+        <div class="track-name-loader-conteiner">
+            <label for="track-name-loader">Название:</label>
+            <input class="track-name-loader" type="text" name="track-name-loader" placeholder="">
+        </div>
+
+        <div class="track-janr-loader-conteiner">
+                <label for="track-janr-loader">Жанр:</label>
+                <div class="menu-wrap">
+                    <ul>
+                        <li>Альтернатива</li>
+                        <li>Классика</li>
+                        <li>Рок</a>
+                            <ul>
+                                <li>Пердеж бати</li>
+                                <li>Орущие мужики</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+        </div>
+
+        <div class="description-conteiner">
+            <label for="track-name-loader">Описание:</label>
+            <input type="text" name="description" placeholder="">
+        </div>
+
+
+        <input class="add" type="file" name="photo" multiple accept="image/*,image/jpeg">
+    </div>
+
+
+</body>

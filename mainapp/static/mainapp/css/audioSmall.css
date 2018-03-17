@@ -9,6 +9,7 @@
 
 #player {
     /*position: relative;*/
+    z-index: 70;
     margin: auto;
     height: 69px;
     bottom: 0px;

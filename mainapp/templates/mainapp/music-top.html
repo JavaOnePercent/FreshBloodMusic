@@ -1,0 +1,63 @@
+
+{% load staticfiles %}
+<script type="text/x-template" id="music-top">
+<div class="music-top">
+    <div id="next-page" class="next-page"></div>
+    <div id="previous-page" class="previous-page"></div>
+    <img class="img"  alt="обложка">
+    <div class="text">
+            <label>Лучшая в этом месяце</label>
+            <p>Manowar - Fighting The World</p>
+                <p>Понравилась: 155 пользователям</p>
+                <div class="play">
+                    <i class="fa fa-play fa-4x" aria-hidden="true"></i>
+                </div>
+                <div class="turn">
+                    <i class="fa fa-align-justify fa-4x" aria-hidden="true"></i>
+                </div>
+    </div>
+</div>
+</div>
+</script>
+
+<script type="text/x-template" id="compilation">
+<div class="compilation convert">
+    <div class="music">
+        <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
+        <transition>
+            <img class="disk" src="{% static 'mainapp/images/disk.png' %}" alt="disk">
+        </transition>
+        <span class="group-name">In Flames</span>
+        <span class="music-name" title="сюда тоже спавнить название трека">Мощный, прям ваще, пердёжь твоего бати</span>
+    </div>
+    <div class="music">
+        <img class="cover" src="https://www.music-bazaar.com/album-images/vol32/1233/1233945/3102280-big/Legacy-The-Very-Best-Of-David-Bowie-Deluxe-CD2-cover.jpg" alt="обложка">
+        <transition>
+            <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
+        </transition>
+        <span class="group-name">David Bowie</span>
+        <span class="music-name" title="сюда тоже спавнить название трека">Гениальная музыка</span>
+    </div>
+    <div class="music">
+        <img class="cover"  src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
+        <transition>
+            <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
+        </transition>
+        <span class="group-name">In Flames</span>
+        <span class="music-name" title="сюда тоже спавнить название трека">Мощный, прям ваще, пердёжь твоего бати</span>
+        </div>
+    <div class="music">
+        <img class="cover" src="https://avatars.yandex.net/get-music-content/34131/7e9c933a.a.3783100-1/m1000x1000?webp=false" alt="обложка">
+        <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
+        <span class="group-name">In Flames</span>
+        <span class="music-name" title="сюда тоже спавнить название трека">Мощный, прям ваще, пердёжь твоего бати</span>
+    </div>
+    <div class="music">
+        <img class="cover" src="https://www.music-bazaar.com/album-images/vol32/1233/1233945/3102280-big/Legacy-The-Very-Best-Of-David-Bowie-Deluxe-CD2-cover.jpg" alt="обложка">
+        <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
+        <span class="group-name">David Bowie</span>
+        <span class="music-name" title="сюда тоже спавнить название трека">Гениальная музыка</span>
+    </div>
+    </div>
+</script>
+<script src="{% static 'mainapp/js/music-top.js' %}"></script>

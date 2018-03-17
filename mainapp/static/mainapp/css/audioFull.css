@@ -11,6 +11,7 @@
     margin: auto;
 }
 #player {
+    z-index: 116;
     right: 0;
     left: 0;
     margin: auto;

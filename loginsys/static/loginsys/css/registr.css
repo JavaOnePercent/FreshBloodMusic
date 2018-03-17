@@ -7,11 +7,17 @@ html, body
     background: url(photo-1453120566849-be97281a59ae.jpg)no-repeat center center fixed;
     background-size: cover;
 }
+
 label
 {
+
     font-size: 375%;
     width: 23.915%;
     margin-bottom: 15px;
+}
+.form :not(:nth-child(3))
+{
+    border-top:0px; 
 }
 .form
 {
@@ -24,17 +30,26 @@ label
 }
 form input
 {
+    position: relative;
     width: 300px;
     height: 30px;
     font-size: 15px;
     padding-left:15px; 
+    border-color: rgba(0,0,0,0.50);
 }
-form input:last-child
+p
 {
-    border-bottom: 1px;
+    color: red;
+    line-height:30px;
+    height: 30px;
+    font-size: 25px;
+    width: 300px;
+    margin: auto;
+    display: block;
 }
 form input[name="register"]
 {
+    line-height:15px;
     padding: 15px 0 30px 0;
     margin: 15px 0 20px 0;
     font-size: 15px;
@@ -43,6 +58,7 @@ form input[name="register"]
 }
 form input[name="register"]:hover
 {
+    line-height:15px;
     transition: all 0.3s;
     background-color: rgb(14, 201, 60);
     color: #fff;

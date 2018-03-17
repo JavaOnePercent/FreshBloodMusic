@@ -2,11 +2,16 @@
 html, body
 {
     /*font-family:"Rex Bold";*/
-    height: auto;
+    height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
     font-family: Arial,Helvetica,sans-serif;
+}
+.convert
+{
+    max-width: 1143px;
+    margin: 0 auto;
 }
 .header
 {
@@ -32,7 +37,6 @@ html, body
 }
 .name
 {
-    font: Arial,Helvetica,sans-serif;
     font-size: 375%;
     width: 23.915%;
 }
@@ -78,11 +82,11 @@ html, body
 
 .img /*обложка лучшей композиции*/
 {
-    padding: 15px;
+    padding: 15px 15px 15px 3.82%;
     display: block;
     height: 320px;
     width: 320px; 
-    position: relative;
+    position: absolute;
     float: left;
 }
 .music-top, .compositor-top
@@ -91,24 +95,69 @@ html, body
     color: white;
     flex-basis: 400px;
 }
+.next-page:hover, .previous-page:hover
+{
+    background-color: rgba(255, 254, 255, 0.10);
+}
+.next-page, .previous-page
+{
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    display: block;
+    z-index: 110;
+    width: 10%;
+    height: 350px;
+    position: relative;
+}
+.next-page
+{
+    
+    opacity: 0.4;
+    background-size: 35px;
+    background-position: left center;
+    background-repeat:no-repeat;
+    background-image:url(../images/left.png);
+    float: left;
+}
+.previous-page
+{
+    background-size: 35px;
+    opacity: 0.4;
+    background-position: right center;
+    background-repeat:no-repeat;
+    background-image:url(../images/right.png);
+    float: right;
+}
+.text
+{
+    left:45%;
+    text-align: left;
+    position: relative;
+}
 .music-top
 {
+    
     display: inline-block;
     background-color: rgb(85, 85, 85);
     flex-grow: 0.3; 
 }
 .music-top p
 {
+    position: relative;
     font-size: 20px;
 }
 .music-top label
 {
+    
+    position: relative;
     font-size: 25px;
     line-height:60px;
 }
 /*панель топов-композиторов*/
 .compositor-top
 {   
+    z-index: 115;
     display: flex;
     flex-direction: column;
     color:black;
@@ -152,6 +201,7 @@ html, body
 /*играть и очередь*/
 .play, .turn
 {
+    left:165px;
     padding: 40px 20px 20px 20px;
     display: inline-block;   
 }
@@ -187,7 +237,6 @@ html, body
 .sort
 {
     flex-grow: 0.4;
-    
 }
 .sort a
 {
@@ -232,61 +281,123 @@ html, body
 }
 /*подборка*/
 
-@media screen and (max-width: 950px) {
-    .compilation
-     {
-        width: 100%;
-        padding-top: 25px;
-        align-items: flex-end;
-        display: flex;
-        flex-wrap: wrap;
-    }
-  }
-  @media screen and (min-width: 950px) {
-    .compilation
-    {
-        margin: auto;
-        max-width:60% ;
-        padding-top: 25px;
-        align-items: flex-end;
-        display: flex;
-        flex-wrap: wrap;
-    }
-  }
+.compilation
+{
+    max-width: 1143px;
+    margin: 0 auto;
+    position: relative;
+    padding-top: 25px;
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .compilation .music
 {
+    
+    position: relative;
     padding-right: 2.5%;
     padding-left: 2.5%;
     padding-bottom: 20px;
     flex-basis: 20%;
     overflow: hidden;
+    min-height: 195px;
     max-height: 300px;
     text-align: center;
 }
+
 .cover
 {
+    backface-visibility: hidden;
+    transition: 1.4s transform;
+    position:relative;
+    z-index: 50;
     top: 0; right: 0; bottom: 0; left: 0;
     display: block;
     height: auto;
     width: 100%; 
-    position: relative;
     padding: 0;
+}
+.disk
+{
+    
+    margin: 0 auto auto auto;
+    transition: 1s transform;
+    backface-visibility: hidden;
+    position:absolute;
+    z-index: 40;
+    top: 0.8%; right: 0; bottom: 0; left: 0;
+    display: block;
+    height: auto;
+    width: 80%; 
+    padding: 0;
+
+}
+.cover:hover + .disk
+{
+    z-index: 40;
+    transition-duration: .7s;
+    transform: translateX(-13.5%) rotate(45deg);
+    -o-transform: translateX(-13.5%) rotate(45deg);
+    -ms-transform: translateX(-13.5%) rotate(45deg);
+    -moz-transform: translateX(-13.5%) rotate(45deg);
+    -webkit-transform: translateX(-13.5%) rotate(45deg);
+    display: block;
+    z-index: 40;
+}
+.cover:hover~span
+{
+
+    transition-duration: .7s;
+    transform: /*scale(1.05)*/ translateX(8.3%) /*translateY(5px)*/;
+}
+.group-name
+{
+    cursor: pointer;
+    backface-visibility: hidden;
+    transition: 1.4s transform;
+    display: block;
+    overflow-x:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size:23px; 
+}
+.hover-music-name
+{
+    visibility: hidden;
 }
 .music-name
 {
-    font-size:25px; 
-}
-.cover:hover
-{
-    transform: scale(1.05);
     cursor: pointer;
-    filter: sepia(100%);
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    backface-visibility: hidden;
+    transition: 1.4s transform;
+    overflow-x:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: grey;
+    display: block;
+    font-size:18px; 
+}
+.cover:hover 
+{
+    z-index: 60;
+    padding:0;
+    top: 0; right: 0; bottom: 0; left: 0;
+    -o-transform: translateX(8.3%);
+    -ms-transform: translateX(8.3%);
+    -moz-transform: translateX(8.3%);
+    -webkit-transform: translateX(8.3%);
+    transform: /*scale(1.05)*/ translateX(8.3%);
+    transition-duration: .7s;
+    cursor: pointer;
+    filter: sepia(80%);
+    /*box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);*/ 
 }
 /*подвал*/
 footer
 {
+    position: relative;
     display: block;
-    margin: 0 auto;
+    margin: 0 auto 69px auto;
     text-align: center;
 }
