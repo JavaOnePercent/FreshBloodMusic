@@ -4,12 +4,10 @@
 <head>
     {% load staticfiles %}
     <meta charset="utf-8">
-    <link rel="stylesheet" href="{% static 'loader-music.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'mainapp/css/loader-music.css' %}" type="text/css">
 </head>
 
 <body>
-
-
     <div class="loader-conteiner">
         <div class="track-img-loader-conteiner">
             <label>Обложка альбома</label>
@@ -44,6 +42,7 @@
 
 
         <input class="add" type="file" name="photo" multiple accept="image/*,image/jpeg">
+        <input class="add" type="file" name="track" multiple accept="audio/mpeg">
     </div>
 
 

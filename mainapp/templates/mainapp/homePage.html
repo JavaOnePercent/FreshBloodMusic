@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'mainapp/css/font.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'mainapp/css/main.css' %}" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <title>{{track_name}}</title>
+    <title id="title">{{track_name}}</title>
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
     <script src="{% static 'mainapp/js/genremenu.js' %}"></script>
     <script src="{% static 'mainapp/js/bestperformer.js' %}"></script>
@@ -25,8 +25,8 @@
         </div>
         <div class="management">
                 {% if username %}
-                <a href="loader-music/">Моя музыка</a>
-                <a href="performers/">Моя музыка</a>
+                <a href="loader-music/">Добавить</a>
+                <!--<a href="performers/">Моя музыка</a>-->
                 <a href="auth/logout/">Выйти ({{ username }})</a>
                 {% else %}
                 <a href="auth/login/">Авторизация</a>
@@ -72,7 +72,7 @@
 
     
     <script src="{% static 'mainapp/js/vue.js' %}"></script>
-    
+    <script src="{% static 'mainapp/js/vue-resource.js' %}"></script>
     <div id="VueContainer"> <!-- сюда пихать все vue компоненты -->
         <top-player></top-player>
     </div>

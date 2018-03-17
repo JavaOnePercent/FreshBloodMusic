@@ -79,6 +79,10 @@
 	padding: 0;
 }
 
+#vinyl {
+    display: none;
+}
+
 #nextlogo {
 	display: none;
 }

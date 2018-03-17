@@ -86,3 +86,6 @@ class Names:
     def __init__(self, name_track, image_track):
         self.name_track = name_track
         self.image_track = image_track
+
+def load_music(request):
+    return render(request, 'mainapp/loader-music.html')

@@ -24,7 +24,8 @@ var playerComponent = Vue.component('topPlayer', {
                 logoLink: '',
                 nextLogoLink: '',
                 prevLogoLink: '',
-                isLiked: false
+                isLiked: false,
+                progress: 0.0
             },
             trackPerformer: {
                 trackName: '',
@@ -40,8 +41,13 @@ var playerComponent = Vue.component('topPlayer', {
     created: function() {
         this.loadNextTrack();
     },
-
     methods: {
+        changeProgress: function() {
+            var progress = this.$refs.audioPlayer.progress;
+            this.logos.progress = progress;
+            if(progress === 1)
+                this.loadNextTrack();
+        },
         changeVolume: function() {
             this.audio.volume = this.$refs.volumeController.value;
         },
@@ -96,36 +102,29 @@ var playerComponent = Vue.component('topPlayer', {
             this.sendJSON('next/', jsonData, this.nextTrackSuccessFunc);
         },
         nextTrackSuccessFunc: function (data) {         //функция успеха после получения следующего трека
-            this.trackPerformer.trackName = data.track_name;
-            this.trackPerformer.performerName = data.performer_name;
-            this.audio.audioLink = data.file_link;
-            this.track.currentID = data.current_id;
-            this.track.nextID = data.next_id;
+            this.trackPerformer.trackName = data.body.track_name;
+            this.trackPerformer.performerName = data.body.performer_name;
+            this.audio.audioLink = data.body.file_link;
+            this.track.currentID = data.body.current_id;
+            this.track.nextID = data.body.next_id;
             //$("#progressBarLine").animate({width: 0 + "%"}, 50);
-            $("title").text(data.track_name);
+            document.getElementById('title').innerHTML = data.body.track_name;
 
             logo = this.logos.logoLink;
-            this.logos.logoLink = data.logo_link;
+            this.logos.logoLink = data.body.logo_link;
             this.logos.prevLogoLink = logo;
-            this.logos.nextLogoLink = data.nextlogo_link;
+            this.logos.nextLogoLink = data.body.nextlogo_link;
 
-            this.track.isLiked = !!(data.is_liked);
+            this.track.isLiked = !!(data.body.is_liked);
             this.logos.isLiked = this.track.isLiked;
         },
         sendJSON: function (Url, jsonData, successFunc) {
             var csrftoken = this.getCookie('csrftoken');
-            $.ajax({
-                type: "POST",
-                url: Url,
-                dataType: 'json',
-                contentType: 'application/json',
-                data: jsonData,
-                async: true,
-                headers: {
-                    "X-CSRFToken": csrftoken
-                },
-                success: successFunc
-            })
+            var config = {
+                headers: {"X-CSRFToken": csrftoken}, 
+                responseType: 'json'
+            };
+            this.$http.post(Url, jsonData, config).then(successFunc);
         },
         getCookie: function (name) {
             var cookieValue = null;
@@ -190,12 +189,19 @@ var logosComponent = Vue.component('logos', {
         'logoLink',
         'nextLogoLink',
         'prevLogoLink',
-        'isLiked'
+        'isLiked',
+        'progress'
     ],
     data() {
         return {
             showLike: false,
             showPrev: false
+        }
+    },
+    computed: {
+        rotationCSS: function(){
+            var angle = this.progress * 360 * 3;
+            return 'transform: rotate(' + angle + 'deg);'
         }
     },
     watch: {
@@ -342,14 +348,23 @@ var audioComponent = Vue.component('audioPlayer', {
     ],
     data() {
         return {
-            isFirst: true
+            isFirst: true,
+            timer: '',
+            progress: 0.0
         }
     },
     watch: {
         playing: function(pl){
-            (pl) ?
-                this.$el.play() :
+            if(pl)
+            {
+                this.$el.play();
+                this.timer = setInterval(this.updateProgress, 500); //таймер для обновления прогресса воспроизведения
+            }
+            else
+            {
+                clearInterval(this.timer);
                 this.$el.pause();
+            }
         },
         volume: function(vol){
             this.$el.volume = this.volume / 100;
@@ -363,6 +378,10 @@ var audioComponent = Vue.component('audioPlayer', {
             }
             else
                 this.isFirst = false;
+        },
+        updateProgress: function() {
+            this.$emit('progresschanged')
+            this.progress = this.$el.currentTime / this.$el.duration;
         }
     }
 });

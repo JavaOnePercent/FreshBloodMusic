@@ -8,11 +8,11 @@
             <div id="player" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
                 <div id="playerContainer">
                     <buttons :isFull="isFull" @nextclick="loadNextTrack" @playclick="switchPlaying" @dropdownclick="switchPlayerView" :playing="audio.playing"></buttons>
-                    <logos v-bind="logos" @likepressed="onLikePressed"></logos>
+                    <logos v-bind="logos" @likepressed="onLikePressed" ></logos>
                     <menu-more></menu-more>
                     <track-performer v-bind="trackPerformer"></track-performer>
                     <volume-controller ref="volumeController" @volumechanged="changeVolume" :isFull="isFull" :defaultValue="audio.volume"></volume-controller>
-                    <audio-player v-bind="audio" @startplaying="startPlaying"></audio-player>
+                    <audio-player ref="audioPlayer" v-bind="audio" @startplaying="startPlaying" @progresschanged="changeProgress"></audio-player>
                     <!--<img class="Button Player" id="previousButton" src="" draggable="false" />-->
                 </div>
                 <progress-bar></progress-bar>
@@ -28,8 +28,9 @@
 
     <script type="text/x-template" id="logos"> <!--компонент для всех лого-->
         <div>
-            <div class="Button" id="mainLogo" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain">
-                <img id="logo" :src="logoLink" draggable="false"/>  <!--src="{% static logo_link %}"-->
+            <div class="Button" id="mainLogo" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain" >
+                <img id=vinyl src="{% static 'mainapp/images/redVinyl.png' %}">
+                <img id="logo" :src="logoLink" draggable="false" :style="rotationCSS"/>  <!--src="{% static logo_link %}"-->
                 <img class="Player" id="like" v-show="showLike" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
             </div>
             <!--<img class="Player" id="maintoprevlogo" src="" draggable="false" />--> <!--src="{% static logo_link %}"-->

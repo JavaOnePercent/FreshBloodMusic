@@ -58,7 +58,7 @@ function genre(kek){
 
 var csrftoken = getCookie('csrftoken');
 
-genre("1");
+genre("2");
 
 function getCookie(name) {
     var cookieValue = null;
