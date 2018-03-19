@@ -15,6 +15,8 @@ var playerComponent = Vue.component('topPlayer', {
             CSSRefs: CSSRefs,
             CSSRef: CSSRefs.small,
             isFull: false,
+            isHovered: false,
+            progress: 0.0,
             track: {
                 currentID: null,
                 nextID: null,
@@ -24,8 +26,7 @@ var playerComponent = Vue.component('topPlayer', {
                 logoLink: '',
                 nextLogoLink: '',
                 prevLogoLink: '',
-                isLiked: false,
-                progress: 0.0
+                isLiked: false
             },
             trackPerformer: {
                 trackName: '',
@@ -35,16 +36,28 @@ var playerComponent = Vue.component('topPlayer', {
                 audioLink: '',
                 playing: false,
                 volume: 100
+            },
+            progressOptions: {
+                playedTime: '',
+                trackLength: ''
             }
         }
     },
     created: function() {
         this.loadNextTrack();
     },
+    computed: {
+        progressValue: function() {
+            return this.progress * 100;
+        }
+    },
     methods: {
         changeProgress: function() {
+            this.progressOptions.playedTime = this.$refs.audioPlayer.currentTime;
+            this.progressOptions.trackLength = this.$refs.audioPlayer.duration;
+
             var progress = this.$refs.audioPlayer.progress;
-            this.logos.progress = progress;
+            this.progress = progress;
             if(progress === 1)
                 this.loadNextTrack();
         },
@@ -81,16 +94,17 @@ var playerComponent = Vue.component('topPlayer', {
             }
         },
         onMouseEnter: function() {
-            $("#progress").animate({height: '10px'}, 100);
+            this.isHovered = true;
         },
         onMouseLeave: function() {
-            $("#progress").animate({height: '4px'}, 100);
+            this.isHovered = false;
         },
         switchPlaying: function() {
             this.audio.playing = !this.audio.playing;
         },
         startPlaying: function() {
             this.audio.playing = true;
+            
         },
         loadNextTrack: function() {
             this.likeTrack();
@@ -107,7 +121,6 @@ var playerComponent = Vue.component('topPlayer', {
             this.audio.audioLink = data.body.file_link;
             this.track.currentID = data.body.current_id;
             this.track.nextID = data.body.next_id;
-            //$("#progressBarLine").animate({width: 0 + "%"}, 50);
             document.getElementById('title').innerHTML = data.body.track_name;
 
             logo = this.logos.logoLink;
@@ -190,7 +203,8 @@ var logosComponent = Vue.component('logos', {
         'nextLogoLink',
         'prevLogoLink',
         'isLiked',
-        'progress'
+        'progress',
+        'isFull'
     ],
     data() {
         return {
@@ -200,8 +214,11 @@ var logosComponent = Vue.component('logos', {
     },
     computed: {
         rotationCSS: function(){
-            var angle = this.progress * 360 * 3;
-            return 'transform: rotate(' + angle + 'deg);'
+            if(this.isFull)
+            {
+                var angle = this.progress * 360 * 3;
+                return 'transform: rotate(' + angle + 'deg);'
+            }
         }
     },
     watch: {
@@ -284,6 +301,7 @@ var volumeControllerComponent = Vue.component('volumeController', {
             }
         },
         value: function(value) {
+            localStorage.setItem("volume", this.value);
             this.$emit('volumechanged');
             if(value === 0)
                 this.speakerPic = this.speakerPics.zero;
@@ -295,7 +313,27 @@ var volumeControllerComponent = Vue.component('volumeController', {
                 this.speakerPic = this.speakerPics.hundred;
         }
     },
+    created: function() {
+        var vol = localStorage.getItem("volume");
+        if(vol)
+            this.value = Number(vol);
+    },
     methods: {
+        clickSpeaker: function() {
+            if(this.value > 0)
+            {
+                sessionStorage.setItem("volume", this.value);
+                this.value = 0;
+            }
+            else 
+            {
+                var vol = Number(sessionStorage.getItem("volume"));
+                if(vol !== 0)
+                    this.value = vol;
+                else
+                    this.value = 100;
+            }
+        },
         refreshFunc: function() {
             this.$refs.fullSlider.refresh();
         },
@@ -350,7 +388,9 @@ var audioComponent = Vue.component('audioPlayer', {
         return {
             isFirst: true,
             timer: '',
-            progress: 0.0
+            progress: 0.0,
+            currentTime: '00:00',
+            duration: '99:99'
         }
     },
     watch: {
@@ -382,12 +422,58 @@ var audioComponent = Vue.component('audioPlayer', {
         updateProgress: function() {
             this.$emit('progresschanged')
             this.progress = this.$el.currentTime / this.$el.duration;
+            this.currentTime = this.$el.currentTime;
+            this.duration = this.$el.duration;
         }
     }
 });
 
-var progressBarComponent = Vue.component('progressBar', {
+Vue.component('progressBar', {
     template: '#progressBar',
+    props: {
+        'val': {
+            default: 0
+        },
+        'playedTime': {
+            default: ''
+        },
+        'trackLength': {
+            default: ''
+        },
+        'isPlayerHovered': {}
+    },
+    computed: {
+        pct() {
+            var pct = this.val
+            pct = pct.toFixed(2)
+            return Math.min(pct, 100)
+        },
+        bar_style() {
+            var style = {
+                'width': this.pct+'%'
+            }
+            return style
+        },
+        showPlayedTime() {
+            return this.isPlayerHovered;
+        },
+        showTrackLength() {
+            return this.isPlayerHovered;
+        },
+        playedTimeTop() {
+            return this.toNormalTime(this.playedTime);
+        },
+        trackLengthTop() {
+            return this.toNormalTime(this.trackLength);
+        }
+    },
+    methods: {
+        toNormalTime(seconds) {
+            mins = Math.floor(seconds / 60);
+            secs = (seconds % 60).toFixed()
+            return mins + ":" + ((secs < 10) ? '0' + secs : secs)
+        }
+    }
 });
 
 new Vue({

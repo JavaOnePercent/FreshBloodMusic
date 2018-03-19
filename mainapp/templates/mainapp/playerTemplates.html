@@ -8,14 +8,14 @@
             <div id="player" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
                 <div id="playerContainer">
                     <buttons :isFull="isFull" @nextclick="loadNextTrack" @playclick="switchPlaying" @dropdownclick="switchPlayerView" :playing="audio.playing"></buttons>
-                    <logos v-bind="logos" @likepressed="onLikePressed" ></logos>
+                    <logos v-bind="logos" @likepressed="onLikePressed" :progress="progress" :isFull="isFull"></logos>
                     <menu-more></menu-more>
                     <track-performer v-bind="trackPerformer"></track-performer>
                     <volume-controller ref="volumeController" @volumechanged="changeVolume" :isFull="isFull" :defaultValue="audio.volume"></volume-controller>
                     <audio-player ref="audioPlayer" v-bind="audio" @startplaying="startPlaying" @progresschanged="changeProgress"></audio-player>
                     <!--<img class="Button Player" id="previousButton" src="" draggable="false" />-->
                 </div>
-                <progress-bar></progress-bar>
+                <progress-bar v-bind="progressOptions" :val="progressValue" :isPlayerHovered="isHovered"></progress-bar>
             </div>
         </div>
     </script>
@@ -75,11 +75,11 @@
 
             
             <div id="fullVolume" @mouseenter="refreshFunc">
-                    <vue-slider-component ref="fullSlider" v-model="value" :show="showFullVolume && isFull" v-bind="sliderpropsFull"></vue-slider-component>
+                <vue-slider-component ref="fullSlider" v-model="value" :show="showFullVolume && isFull" v-bind="sliderpropsFull"></vue-slider-component>
             </div>
             
         </div>
-        <div id="speaker" @mouseenter="openSpeaker">
+        <div id="speaker" @mouseenter="openSpeaker" @click="clickSpeaker">
             <img class="Button" id="speakerPic" :src="speakerPic" draggable="false"/>
         </div>
     </div>
@@ -88,11 +88,17 @@
 
 
     <script type="text/x-template" id="progressBar">  <!-- компонент для полоски прогресса -->
-        <div class="Button" id ="progress">
+        <!--<div class="Button" id ="progress">
             <p id="playedTime">0:00</p>
             <p id="trackLength"></p>
             <div class="Player Button" id="progressLine"></div>
             <div id="progressBarLine"></div>
+        </div>-->
+        <div class="vue-simple-progress">
+            <div class="foreground-progress-bar" :style="bar_style"></div>
+            <div class="background-progress-bar" :style="bar_style"></div>
+            <div v-show="showPlayedTime" class="played-time">{{ '{{' }}playedTimeTop}}</div>
+            <div v-show="showTrackLength" class="track-length">{{ '{{' }}trackLengthTop}}</div>
         </div>
     </script>
 

@@ -1,10 +1,15 @@
 import json
 
+import os
+import re
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import auth
 from mainapp.models import Performer, Genre, Album, Track, LikedTrack
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from mainapp.compressor import compress_image, compress_audio
+
 
 def main_view(request): # главная
     return render(request,'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
@@ -91,5 +96,26 @@ def load_music(request):
     return render(request, 'mainapp/loader-music.html')
 
 def add_album(request):
-    #json_data = json.dumps(json.loads(request.body))
-    return HttpResponse(request.FILES, content_type="text/plain")
+    if request.method == 'POST':
+        path = './mainapp/static/mainapp/album_sources/'
+        album_name = request.POST["name"]
+        os.mkdir(path + album_name)
+        path += album_name + '/'
+        photo = request.FILES["photo"]
+        track = request.FILES["track"]
+        if re.fullmatch(r'image/\S*', photo.content_type):
+            uploadedPic = path + "pic"
+            f = open(uploadedPic, "wb")
+            f.write(photo.read())
+            f.close()
+            compress_image(uploadedPic, path + 'pic.jpg')
+            os.remove(uploadedPic)
+        if re.fullmatch(r'audio/\S*', track.content_type):
+            uploadedAudio = path + "audio"
+            f = open(uploadedAudio, "wb")
+            f.write(track.read())
+            f.close()
+            compress_audio(uploadedAudio, path + 'audio.mp3')
+            os.remove(uploadedAudio)
+
+    return HttpResponse(status=200)

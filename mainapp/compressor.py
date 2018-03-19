@@ -8,7 +8,7 @@ def compress_image(src, dest):
     im.save(dest, 'jpeg', quality=95, optimize=True)
 
 
-compress_image("./static/mainapp/album_sources/govno.jpg", "./static/mainapp/album_sources/govno1.jpg")
+#compress_image("./static/mainapp/album_sources/govno.jpg", "./static/mainapp/album_sources/govno1.jpg")
 
 
 def compress_audio(src, dest):
