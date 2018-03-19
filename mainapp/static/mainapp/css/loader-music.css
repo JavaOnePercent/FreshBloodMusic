@@ -11,7 +11,7 @@ body, html
 	background-color: rgb(85, 85, 85);
 	height: 600px;
 	max-width: 800px;
-	margin: 250px auto
+	margin: 100px auto 0 auto ;
 }
 input
 {

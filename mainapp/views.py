@@ -89,3 +89,7 @@ class Names:
 
 def load_music(request):
     return render(request, 'mainapp/loader-music.html')
+
+def add_album(request):
+    #json_data = json.dumps(json.loads(request.body))
+    return HttpResponse(request.FILES, content_type="text/plain")

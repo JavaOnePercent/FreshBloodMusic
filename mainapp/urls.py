@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^next/$', views.next_track, name='next_track'), # запрос следующего трека
     url(r'^like/$', views.like, name='like'),  # обработка лайкусиков
     url(r'^loader-music/$', views.load_music, name='load_music'),
+    url(r'^add_album/$', views.add_album, name='add_album'),
 
 ]

@@ -40,3 +40,4 @@ def register(request):
         else:
             args['form'] = newuser_form
     return render(request, 'loginsys/register.html', args)
+
