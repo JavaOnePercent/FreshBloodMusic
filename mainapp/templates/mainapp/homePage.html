@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <title id="title">{{track_name}}</title>
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-    <script src="{% static 'mainapp/js/genremenu.js' %}"></script>
-    <script src="{% static 'mainapp/js/bestperformer.js' %}"></script>
-    <script src="{% static 'mainapp/js/topmonth.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue-resource.js' %}"></script>
+    <!--<script src="{% static 'mainapp/js/genremenu.js' %}"></script>-->
 </head>
 
 <body>
@@ -37,17 +37,7 @@
     <div id="main" class="main">
         <div class="topics">
             <app-music-top></app-music-top>
-            <div class="compositor-top">
-                <label>
-                Лучшие исполнители
-                </label>
-                <div class="compositors">
-                    <div class="compositor">
-                        <img class="compositor-avatar" src="" alt="обложка">
-                        <label class="compositor-name"></label>
-                    </div>
-                </div>
-            </div>
+            <compositor-top></compositor-top>
         </div>
         <div class="recommendations">
             <div class="sortirovka">
@@ -70,17 +60,13 @@
     </footer>
     </div>
 
-    
-    <script src="{% static 'mainapp/js/vue.js' %}"></script>
-    <script src="{% static 'mainapp/js/vue-resource.js' %}"></script>
-    <div id="VueContainer"> <!-- сюда пихать все vue компоненты -->
+    <div id="VueContainer">
         <top-player></top-player>
     </div>
     <div>
         {% include "mainapp/music-top.html" %}
         {% include "mainapp/playerTemplates.html" %}
     </div>
-
 
 </body>
 </html>

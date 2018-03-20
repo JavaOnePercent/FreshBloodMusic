@@ -4,11 +4,11 @@
 <div class="music-top">
     <div id="next-page" class="next-page"></div>
     <div id="previous-page" class="previous-page"></div>
-    <img class="img"  alt="обложка">
+    <img class="img" :src="infotrack[0]" alt="обложка">
     <div class="text">
             <label>Лучшая в этом месяце</label>
-            <p>Manowar - Fighting The World</p>
-                <p>Понравилась: 155 пользователям</p>
+            <p>{{ '{{' }} infotrack[1]}} - {{ '{{' }} infotrack[2]}}</p>
+                <p>Понравилась: {{ '{{' }} infotrack[3]}} пользователям</p>
                 <div class="play">
                     <i class="fa fa-play fa-4x" aria-hidden="true"></i>
                 </div>
@@ -19,7 +19,19 @@
 </div>
 </div>
 </script>
-
+<script type="text/x-template" id="compositor-top">
+<div class="compositor-top">
+    <label>
+        Лучшие исполнители
+    </label>
+    <div class="compositors" id="compositors">
+        <div class="compositor" v-for="compositor in compositors">
+            <img class="compositor-avatar" :src="compositor[1]" alt="обложка">
+            <label class="compositor-name">{{ '{{' }} compositor[0]}}</label>
+        </div>
+    </div>
+</div>
+</script>
 <script type="text/x-template" id="compilation">
 <div class="compilation convert">
     <div class="music">

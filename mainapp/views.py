@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.contrib import auth
 from mainapp.models import Performer, Genre, Album, Track, LikedTrack
 from django.http import HttpResponse, JsonResponse
-from mainapp.compressor import compress_image, compress_audio
+#from mainapp.compressor import compress_image, compress_audio
 
 
 def main_view(request): # главная
@@ -32,37 +32,39 @@ def next_track(request):  # запрос следующего трека
 
 def change_genre(request):
     if request.method == "POST":
-        gen = request.POST.get('gn', '')
+        #gen = request.POST.get('gn', '')
+        gen = 1
         tracks = Track.objects.all().filter(gnr_id = gen)
         name_track = tracks.values_list('name_trc')
 
         track_id = tracks.values('alb_id')
         image_track = []
         for track in track_id:
-
             image = Album.objects.get(pk=track["alb_id"]).image_alb
             image_track.append(image)
-        json_jn = json.dumps({"names": list(name_track), "images": image_track}, cls=DjangoJSONEncoder)
+        json_jn = json.dumps({"names": name_track, "images": image_track}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def best_performer(request):
     if request.method == "POST":
         performer = Performer.objects.order_by('rating_per').reverse()[:3]
-        name_performer = performer.values_list('name_per')
-        image_performer = performer.values_list('image_per')
-        json_jn = json.dumps({"names": list(name_performer), "images": list(image_performer)}, cls=DjangoJSONEncoder)
+        performers = performer.values_list('name_per', 'image_per')
+        #image_performer = performer.values_list('image_per')
+        json_jn = json.dumps({"performers": list(performers)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def top_month(request):
     if request.method == "POST":
         name_track = Track.objects.order_by('rating_trc').reverse()[:1]
-        name = name_track.values_list('name_trc')
-        rating = name_track.values_list('rating_trc')
+        track = name_track.values_list('name_trc', 'rating_trc')
+        #rating = name_track.values_list('rating_trc')
         alb_id = name_track.values('alb_id')
         for alb in alb_id:
             image = Album.objects.get(pk = alb["alb_id"]).image_alb
             performer = Album.objects.get(pk = alb["alb_id"]).per_id.name_per
-        json_jn = json.dumps({"name_track": list(name), "like_track": list(rating), "image_track": image, "performer_track": performer}, cls=DjangoJSONEncoder)
+        month = [image, performer]
+        json_jn = json.dumps({"track": track[0], "month": month}, cls=DjangoJSONEncoder)
+        #json_jn = json.dumps({"name_track": list(name), "like_track": list(rating), "image_track": image, "performer_track": performer}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def like(request): # обработчик лайков
