@@ -40,16 +40,23 @@ var playerComponent = Vue.component('topPlayer', {
             progressOptions: {
                 playedTime: '',
                 trackLength: ''
-            }
+            },
+            HTTPConfig: '',
         }
     },
     created: function() {
+        this.HTTPConfig = {
+            headers: {"X-CSRFToken": csrftoken}, 
+            responseType: 'json'
+        }
         this.loadNextTrack();
+        
     },
     computed: {
         progressValue: function() {
             return this.progress * 100;
-        }
+        },
+        
     },
     methods: {
         changeProgress: function() {
@@ -78,20 +85,16 @@ var playerComponent = Vue.component('topPlayer', {
             if(this.logos.isLiked != this.track.isLiked)
             {   
                 var varData = {
-                    option: "",
-                    current_track: this.track.currentID
+                    track_id: this.track.currentID
                 };
-                varData.option = (this.logos.isLiked) ? "add" : "remove";
-                this.sendJSON('like/', JSON.stringify(varData), this.successfulLikeFunc);
+                if(this.logos.isLiked)
+                    this.$http.put('like/', JSON.stringify(varData), this.HTTPConfig).then(this.successfulLikeFunc); //добавление
+                else
+                    this.$http.post('like/', JSON.stringify(varData), this.HTTPConfig).then(this.successfulLikeFunc); //удаление
             }
         },
         successfulLikeFunc: function (data) {
-            if (data.result === "added") {
-                console.log('added');
-            }
-            else if (data.result === "removed") {
-                console.log('removed');
-            }
+            //тут надо обрабатывать статусы
         },
         onMouseEnter: function() {
             this.isHovered = true;
@@ -113,46 +116,29 @@ var playerComponent = Vue.component('topPlayer', {
                 next_track: this.track.nextID
             };
             var jsonData = JSON.stringify(varData);
-            this.sendJSON('next/', jsonData, this.nextTrackSuccessFunc);
+            this.$http.post('next/', jsonData, this.HTTPConfig).then(this.nextTrackSuccessFunc);
         },
         nextTrackSuccessFunc: function (data) {         //функция успеха после получения следующего трека
-            this.trackPerformer.trackName = data.body.track_name;
-            this.trackPerformer.performerName = data.body.performer_name;
-            this.audio.audioLink = data.body.file_link;
-            this.track.currentID = data.body.current_id;
-            this.track.nextID = data.body.next_id;
-            document.getElementById('title').innerHTML = data.body.track_name;
+            //console.log(data.body)
+            var current = data.body.current;
+            var next = data.body.next;
+
+            this.trackPerformer.trackName = current.name_trc;
+            this.trackPerformer.performerName = current.name_per;//
+            this.audio.audioLink = toStatic(current.link_trc);
+            this.track.currentID = current.id;
+            this.track.nextID = next.id;
+            document.getElementById('title').innerHTML = current.name_per + " - " + current.name_trc;
 
             logo = this.logos.logoLink;
-            this.logos.logoLink = data.body.logo_link;
+            this.logos.logoLink = toStatic(current.image_alb);
             this.logos.prevLogoLink = logo;
-            this.logos.nextLogoLink = data.body.nextlogo_link;
+            this.logos.nextLogoLink = toStatic(next.image_alb);
 
-            this.track.isLiked = !!(data.body.is_liked);
+            this.track.isLiked = !!(current.is_liked);
             this.logos.isLiked = this.track.isLiked;
         },
-        sendJSON: function (Url, jsonData, successFunc) {
-            var csrftoken = this.getCookie('csrftoken');
-            var config = {
-                headers: {"X-CSRFToken": csrftoken}, 
-                responseType: 'json'
-            };
-            this.$http.post(Url, jsonData, config).then(successFunc);
-        },
-        getCookie: function (name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
+        
     }
 });
 

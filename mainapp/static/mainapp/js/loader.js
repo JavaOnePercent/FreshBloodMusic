@@ -59,7 +59,7 @@ new Vue({
             console.log('track_name_loader, track, photo=', track_name_loader, track, photo)
             if (track_name_loader && track) {
               this.errorMessage = ''
-              var csrftoken = this.getCookie('csrftoken');
+              var csrftoken = getCookie('csrftoken');
               var config = {
                 headers: {"X-CSRFToken": csrftoken}, 
                 //responseType: 'json'
@@ -74,20 +74,5 @@ new Vue({
               console.log('errorMessage=', this.errorMessage)
             }
           },
-          
-    getCookie: function (name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
   }
 });

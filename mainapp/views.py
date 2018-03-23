@@ -1,39 +1,55 @@
 import json
-
 import os
 import re
-
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import auth
-from mainapp.models import Performer, Genre, Album, Track, LikedTrack
-from django.http import HttpResponse, JsonResponse
-#from mainapp.compressor import compress_image, compress_audio
+from .models import Performer, Genre, Album, Track, LikedTrack
+from django.http import HttpResponse
+from .compressor import compress_image, compress_audio
+from .serializers import TrackSerializer
+from .model_methods import TrackMethods, LikedTrackMethods
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 
-def main_view(request): # главная
-    return render(request,'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
+def main_view(request):  # главная
+    return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username})
 
-def next_track(request):  # запрос следующего трека
-    new_data = request.body.decode("utf-8", "strict")
-    parsed_json = json.loads(new_data)
-    tracks = Track.get_two(parsed_json)
-    is_liked = LikedTrack.check_if_liked(auth.get_user(request).id, tracks.first.id)
-    json_data = json.dumps({"track_name": tracks.first.name_trc, # имя трека
-                                "performer_name": tracks.first.alb_id.per_id.name_per, # имя исполнителя
-                                "file_link": "/static/mainapp/album_sources/" + tracks.first.link_trc, # ссылка на аудиофайл
-                                "logo_link": "/static/mainapp/album_sources/" + tracks.first.alb_id.image_alb, # ссылка на лого ВОЗМОЖНО НЕ НУЖНО ЕЕ КАЖДЫЙ РАЗ ОТПРАВЛЯТЬ
-                                "is_liked": is_liked, # лайкнут ли трек
-                                "nextlogo_link": "/static/mainapp/album_sources/" + tracks.second.alb_id.image_alb, # ссылка на лого следующего трека
-                                "current_id": tracks.first.id, # id текущего трека
-                                "next_id": tracks.second.id, # id следующего трека
-                            })
-    return HttpResponse(json_data, content_type="application/json")
+
+@api_view(['POST'])  # запрос следующего трека
+def next_track(request):
+    if request.method == 'POST':
+        tracks = TrackMethods.get_two(request.data)
+        is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, tracks[0].id)
+        serializer = TrackSerializer(tracks, many=True)
+        serializer.data[0]["is_liked"] = is_liked
+        return Response({'current': serializer.data[0], 'next': serializer.data[1]}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST', 'PUT'])  # обработчик лайков
+def like(request):
+    if request.method == 'PUT':  # добавление лайка
+        result = LikedTrackMethods.add_like(request.data['track_id'], auth.get_user(request).id)
+        if result:
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'POST':  # удаление лайка
+        result = LikedTrackMethods.remove_like(request.data['track_id'], auth.get_user(request).id)
+        if result:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 def change_genre(request):
-    if request.method == "POST":
+    if request.method == "GET":
         #gen = request.POST.get('gn', '')
-        gen = 1
+        gen = 2
         tracks = Track.objects.all().filter(gnr_id = gen)
         name_track = tracks.values_list('name_trc')
 
@@ -42,11 +58,11 @@ def change_genre(request):
         for track in track_id:
             image = Album.objects.get(pk=track["alb_id"]).image_alb
             image_track.append(image)
-        json_jn = json.dumps({"names": name_track, "images": image_track}, cls=DjangoJSONEncoder)
+        json_jn = json.dumps({"names": list(name_track), "images": list(image_track)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def best_performer(request):
-    if request.method == "POST":
+    if request.method == "GET":
         performer = Performer.objects.order_by('rating_per').reverse()[:3]
         performers = performer.values_list('name_per', 'image_per')
         #image_performer = performer.values_list('image_per')
@@ -54,7 +70,7 @@ def best_performer(request):
         return HttpResponse(json_jn, content_type="application/json")
 
 def top_month(request):
-    if request.method == "POST":
+    if request.method == "GET":
         name_track = Track.objects.order_by('rating_trc').reverse()[:1]
         track = name_track.values_list('name_trc', 'rating_trc')
         #rating = name_track.values_list('rating_trc')
@@ -66,26 +82,6 @@ def top_month(request):
         json_jn = json.dumps({"track": track[0], "month": month}, cls=DjangoJSONEncoder)
         #json_jn = json.dumps({"name_track": list(name), "like_track": list(rating), "image_track": image, "performer_track": performer}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
-
-def like(request): # обработчик лайков
-    parsed_json = json.loads(request.body)
-    track_id = parsed_json["current_track"]
-    user_id = auth.get_user(request).id
-    if parsed_json["option"] == "add":  #добавление лайка
-        result = LikedTrack.add_like(track_id, user_id)
-        if result:
-            json_data = json.dumps({"result": "added"})
-        else:
-            json_data = json.dumps({"result": "failure"})
-    elif parsed_json["option"] == "remove":  #удаление лайка
-        result = LikedTrack.remove_like(track_id, user_id)
-        if result:
-            json_data = json.dumps({"result": "removed"})
-        else:
-            json_data = json.dumps({"result": "failure"})
-    else:
-        json_data = json.dumps({"result": "failure"})
-    return HttpResponse(json_data, content_type="application/json")
 
 class Names:
     name_track = ""

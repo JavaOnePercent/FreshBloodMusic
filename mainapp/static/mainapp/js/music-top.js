@@ -8,7 +8,7 @@ Vue.component('app-compilation',{
     },
     methods: {
         showGenre: function() {
-            this.$http.post('change_genre/').then(function(response){
+            this.$http.get('change_genre/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
                 console.log(response);
             }, function(error){
             })
@@ -19,10 +19,6 @@ Vue.component('app-compilation',{
     }
 });
 
-
-
-
-
 Vue.component('app-music-top', {
     template:'#music-top',
     data: function() {
@@ -32,7 +28,7 @@ Vue.component('app-music-top', {
     },
     methods: {
         showMonth: function() {
-            this.$http.post('top_month/').then(function(response){
+            this.$http.get('top_month/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
                 console.log(response);
                 this.infotrack = response.data.month;
                 this.infotrack[0] = "/static/mainapp/album_sources/" + this.infotrack[0];
@@ -57,7 +53,7 @@ Vue.component('compositor-top', {
     },
     methods: {
         showBest: function() {
-            this.$http.post('best_performer/').then(function(response){
+            this.$http.get('best_performer/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
                 console.log(response);
                 this.compositors = response.data.performers;
                 this.compositors.forEach(function(item, i, arr) {
@@ -76,7 +72,7 @@ Vue.component('compositor-top', {
 var vm = new Vue ({
 	el: '#main',
 	data: {
-        message: 'Ты Хуй',
+        message: 'сообщение',
         hoverClass:'disk'
     },
     methods: {
