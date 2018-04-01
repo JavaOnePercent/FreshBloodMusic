@@ -2,20 +2,25 @@ Vue.component('app-compilation',{
     template:'#compilation',
     data: function() {
         return{
-          compilation: []
+          compilations:[]
           //hoverClass: 'disk'
         }
     },
     methods: {
-        showGenre: function() {
-            this.$http.get('change_genre/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
-                console.log(response);
+        showGenre: function(message) {
+            this.$http.get('change_genre/', {params: {genre: message}, headers: {"X-CSRFToken": csrftoken}}).then(function(response){
+                //console.log(response);
+                this.compilations = response.data.genre;
+                this.compilations.forEach(function(item, i, arr) {
+                    item[1] = "/static/mainapp/album_sources/" + item[1];
+                });
+                //alert(this.compilations);
             }, function(error){
             })
         },
     },
     created: function() {
-        this.showGenre()
+        this.showGenre(1)
     }
 });
 
@@ -23,18 +28,18 @@ Vue.component('app-music-top', {
     template:'#music-top',
     data: function() {
         return{
-          infotrack: []
+          infotracks: []
         }
     },
     methods: {
         showMonth: function() {
             this.$http.get('top_month/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
-                console.log(response);
-                this.infotrack = response.data.month;
-                this.infotrack[0] = "/static/mainapp/album_sources/" + this.infotrack[0];
-                this.infotrack.push(response.data.track[0]);
-                this.infotrack.push(response.data.track[1]);
-                //alert(this.infotrack);
+                //console.log(response);
+                this.infotracks = response.data.month;
+                this.infotracks.forEach(function(item, i, arr) {
+                    item[2] = "/static/mainapp/album_sources/" + item[2];
+                });
+                //alert(this.infotracks);
             }, function(error){
             })
         },
@@ -54,7 +59,7 @@ Vue.component('compositor-top', {
     methods: {
         showBest: function() {
             this.$http.get('best_performer/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
-                console.log(response);
+                //console.log(response);
                 this.compositors = response.data.performers;
                 this.compositors.forEach(function(item, i, arr) {
                     item[1] = "/static/mainapp/performer_sources/" + item[1];
@@ -70,8 +75,7 @@ Vue.component('compositor-top', {
 })
 
 var vm = new Vue ({
-	el: '#main',
-	data: {
+	el: '#main',	data: {
         message: 'сообщение',
         hoverClass:'disk'
     },

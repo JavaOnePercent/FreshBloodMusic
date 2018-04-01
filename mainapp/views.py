@@ -15,7 +15,7 @@ from rest_framework import status
 
 
 def main_view(request):  # главная
-    return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username})
+    return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
 
 
 @api_view(['POST'])  # запрос следующего трека
@@ -45,42 +45,23 @@ def like(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 def change_genre(request):
     if request.method == "GET":
-        #gen = request.POST.get('gn', '')
-        gen = 2
-        tracks = Track.objects.all().filter(gnr_id = gen)
-        name_track = tracks.values_list('name_trc')
-
-        track_id = tracks.values('alb_id')
-        image_track = []
-        for track in track_id:
-            image = Album.objects.get(pk=track["alb_id"]).image_alb
-            image_track.append(image)
-        json_jn = json.dumps({"names": list(name_track), "images": list(image_track)}, cls=DjangoJSONEncoder)
+        gen = request.GET.get('genre', None)
+        tracks = Track.objects.all().select_related('alb_id__per_id').values_list('name_trc', 'alb_id__image_alb', 'alb_id__per_id__name_per').filter(gnr_id=gen)
+        json_jn = json.dumps({"genre": list(tracks)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def best_performer(request):
     if request.method == "GET":
-        performer = Performer.objects.order_by('rating_per').reverse()[:3]
-        performers = performer.values_list('name_per', 'image_per')
-        #image_performer = performer.values_list('image_per')
-        json_jn = json.dumps({"performers": list(performers)}, cls=DjangoJSONEncoder)
+        performer = Performer.objects.order_by('rating_per').reverse()[:3].values_list('name_per', 'image_per')
+        json_jn = json.dumps({"performers": list(performer)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 def top_month(request):
     if request.method == "GET":
-        name_track = Track.objects.order_by('rating_trc').reverse()[:1]
-        track = name_track.values_list('name_trc', 'rating_trc')
-        #rating = name_track.values_list('rating_trc')
-        alb_id = name_track.values('alb_id')
-        for alb in alb_id:
-            image = Album.objects.get(pk = alb["alb_id"]).image_alb
-            performer = Album.objects.get(pk = alb["alb_id"]).per_id.name_per
-        month = [image, performer]
-        json_jn = json.dumps({"track": track[0], "month": month}, cls=DjangoJSONEncoder)
-        #json_jn = json.dumps({"name_track": list(name), "like_track": list(rating), "image_track": image, "performer_track": performer}, cls=DjangoJSONEncoder)
+        month = Track.objects.order_by('rating_trc').reverse()[:1].select_related('alb_id__per_id').values_list('name_trc', 'rating_trc', 'alb_id__image_alb', 'alb_id__per_id__name_per')
+        json_jn = json.dumps({"month": list(month)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
 class Names:

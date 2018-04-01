@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
-
 
 class Performer(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -51,6 +49,11 @@ class Track(models.Model):
 
     def __str__(self):
         return self.name_trc
+
+    # def __str__(self):
+    #     return "%s (%s)" % (
+    #         self.name_trc,
+    #         ", ".join(album.name_alb for album in self.alb_id),)
 
 
 class LikedTrack(models.Model):

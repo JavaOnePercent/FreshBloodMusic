@@ -4,11 +4,12 @@
 <div class="music-top">
     <div id="next-page" class="next-page"></div>
     <div id="previous-page" class="previous-page"></div>
-    <img class="img" :src="infotrack[0]" alt="обложка">
+    <div class="infotrack" v-for="infotrack in infotracks">
+    <img class="img" :src="infotrack[2]" alt="обложка">
     <div class="text">
             <label>Лучшая в этом месяце</label>
-            <p>{{ '{{' }} infotrack[1]}} - {{ '{{' }} infotrack[2]}}</p>
-                <p>Понравилась: {{ '{{' }} infotrack[3]}} пользователям</p>
+            <p>{{ '{{' }} infotrack[3]}} - {{ '{{' }} infotrack[0]}}</p>
+                <p>Понравилась: {{ '{{' }} infotrack[1]}} пользователям</p>
                 <div class="play">
                     <i class="fa fa-play fa-4x" aria-hidden="true"></i>
                 </div>
@@ -16,9 +17,10 @@
                     <i class="fa fa-align-justify fa-4x" aria-hidden="true"></i>
                 </div>
     </div>
-</div>
+    </div>
 </div>
 </script>
+
 <script type="text/x-template" id="compositor-top">
 <div class="compositor-top">
     <label>
@@ -32,43 +34,33 @@
     </div>
 </div>
 </script>
+
 <script type="text/x-template" id="compilation">
-<div class="compilation convert">
-    <div class="music">
-        <img class="cover" src="" alt="обложка">
-        <transition>
-            <img class="disk" src="{% static 'mainapp/images/disk.png' %}" alt="disk">
-        </transition>
-        <span class="group-name">In Flames</span>
-        <span class="music-name" title="сюда тоже спавнить название трека">Мощный, прям ваще, пердёжь твоего бати</span>
-    </div>
-    <div class="music">
-        <img class="cover" src="" alt="обложка">
-        <transition>
-            <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
-        </transition>
-        <span class="group-name">David Bowie</span>
-        <span class="music-name" title="сюда тоже спавнить название трека">Гениальная музыка</span>
-    </div>
-    <div class="music">
-        <img class="cover"  src="" alt="обложка">
-        <transition>
-            <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
-        </transition>
-        <span class="group-name">In Flames</span>
-        <span class="music-name" title="сюда тоже спавнить название трека">Мощный, прям ваще, пердёжь твоего бати</span>
+    <div id="compilation-top">
+    <div class="recommendations">
+            <div class="sortirovka">
+                <label class="sortirovka-name">Рекомендации</label>
+                <div class="sort">
+                    <label>Отсортировать по:</label>
+                    <a class="time" id="button">времени</a>
+                    <a class="topic" id="button">популярности</a>
+                </div>
+            </div>
+            <div class="music-style">
+                {% for gen in genre %}
+                    <a class="janr" name="{{gen.id}}" id="buttonjanr" @click="showGenre('{{gen.id}}')">{{gen.name_gnr}}</a>
+                {% endfor %}
+            </div>
         </div>
-    <div class="music">
-        <img class="cover" src="" alt="обложка">
-        <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
-        <span class="group-name">In Flames</span>
-        <span class="music-name" title="сюда тоже спавнить название трека">Мощный, прям ваще, пердёжь твоего бати</span>
-    </div>
-    <div class="music">
-        <img class="cover" src="" alt="обложка">
-        <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
-        <span class="group-name">David Bowie</span>
-        <span class="music-name" title="сюда тоже спавнить название трека">Гениальная музыка</span>
+    <div class="compilation convert">
+        <div class="music" v-for="compilation in compilations">
+            <img class="cover" :src="compilation[1]" alt="обложка">
+                <transition>
+                    <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
+                </transition>
+            <span class="group-name">{{ '{{' }} compilation[0]}}</span>
+            <span class="music-name" title="сюда тоже спавнить название трека">{{ '{{' }} compilation[2]}}</span>
+        </div>
     </div>
     </div>
 </script>
