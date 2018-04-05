@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from . import views
+from django.views.generic import ListView, DetailView
+from mainapp.models import Performer
 
 urlpatterns = [
     url(r'^$', views.main_view, name='main_view'), # главная
@@ -10,5 +12,6 @@ urlpatterns = [
     url(r'^like/$', views.like, name='like'),  # обработка лайкусиков
     url(r'^loader-music/$', views.load_music, name='load_music'),
     url(r'^add_album/$', views.add_album, name='add_album'),
-
+    #url(r'^performer/$', ListView.as_view(queryset=Performer.objects.all(), template_name="mainapp/musicgroup.html")),
+    url(r'^performer/(?P<slug>\w+)', DetailView.as_view(model = Performer, template_name = "mainapp/musicgroup.html")),
 ]

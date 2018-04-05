@@ -21,7 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^auth/', include('loginsys.urls')),
     url(r'^performers/', include('mymusic.urls')),
-    url(r'^performer/', include('musicgroup.urls')),
     url(r'^', include('mainapp.urls')),
 
 ]

@@ -1,14 +1,20 @@
+Vue.http.interceptors.push(function(request) {
+  request.headers.set('X-CSRFToken', csrftoken);
+}); //эта штука перехватывает все запросы на Vue и преобразует их в запрос с csrf token'ом
+
 Vue.component('app-compilation',{
     template:'#compilation',
     data: function() {
         return{
-          compilations:[]
+            compilations:[],
           //hoverClass: 'disk'
         }
     },
     methods: {
         showGenre: function(message) {
-            this.$http.get('change_genre/', {params: {genre: message}, headers: {"X-CSRFToken": csrftoken}}).then(function(response){
+          data = new FormData();
+          data.append('genre ', message);
+            this.$http.post('change_genre/', data).then(function(response){
                 //console.log(response);
                 this.compilations = response.data.genre;
                 this.compilations.forEach(function(item, i, arr) {
@@ -33,7 +39,7 @@ Vue.component('app-music-top', {
     },
     methods: {
         showMonth: function() {
-            this.$http.get('top_month/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
+            this.$http.post('top_month/').then(function(response){
                 //console.log(response);
                 this.infotracks = response.data.month;
                 this.infotracks.forEach(function(item, i, arr) {
@@ -58,7 +64,7 @@ Vue.component('compositor-top', {
     },
     methods: {
         showBest: function() {
-            this.$http.get('best_performer/', {headers: {"X-CSRFToken": csrftoken}}).then(function(response){
+            this.$http.post('best_performer/').then(function(response){
                 //console.log(response);
                 this.compositors = response.data.performers;
                 this.compositors.forEach(function(item, i, arr) {
@@ -72,7 +78,7 @@ Vue.component('compositor-top', {
     created: function() {
         this.showBest()
     }
-})
+});
 
 var vm = new Vue ({
 	el: '#main',	data: {
