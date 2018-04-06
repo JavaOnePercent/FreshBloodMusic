@@ -7,7 +7,7 @@ from django.contrib import auth
 from .models import Performer, Genre, Album, Track, LikedTrack
 from django.http import HttpResponse
 from .compressor import compress_image, compress_audio
-from .serializers import TrackSerializer
+from .serializers import TrackSerializer, NoLinkTrackSerializer
 from .model_methods import TrackMethods, LikedTrackMethods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -45,22 +45,32 @@ def like(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-def change_genre(request):
-    if request.method == "POST":
-        gen = request.POST.get('genre', '')
+@api_view(['GET'])
+def track(request):
+    if request.method == "GET":
+        gen = request.query_params['genre']
         #print(gen)
-        tracks = Track.objects.all().select_related('alb_id__per_id').values_list('name_trc', 'alb_id__image_alb', 'alb_id__per_id__name_per').filter(gnr_id=gen)
-        json_jn = json.dumps({"genre": list(tracks)}, cls=DjangoJSONEncoder)
-        return HttpResponse(json_jn, content_type="application/json")
+        #tracks = Track.objects.all().select_related('alb_id__per_id').values('name_trc', 'alb_id__image_alb',
+                                                                                  #'alb_id__per_id__name_per', 'id')
+        tracks = Track.objects.all()
+        if gen != 'all':
+            tracks = tracks.filter(gnr_id=gen)
 
+        serializer = NoLinkTrackSerializer(tracks, many=True)
+        #json_jn = json.dumps(list(tracks), cls=DjangoJSONEncoder)
+        #return HttpResponse(json_jn, content_type="application/json")
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
 def best_performer(request):
-    if request.method == "POST":
+    if request.method == "GET":
         performer = Performer.objects.order_by('rating_per').reverse()[:3].values_list('name_per', 'image_per')
         json_jn = json.dumps({"performers": list(performer)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
+@api_view(['GET'])
 def top_month(request):
-    if request.method == "POST":
+    if request.method == "GET":
         month = Track.objects.order_by('rating_trc').reverse()[:1].select_related('alb_id__per_id').values_list('name_trc', 'rating_trc', 'alb_id__image_alb', 'alb_id__per_id__name_per')
         json_jn = json.dumps({"month": list(month)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")

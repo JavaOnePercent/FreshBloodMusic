@@ -16,7 +16,8 @@
 
 <body>
     {% csrf_token %}
-    <div class="header" >
+    <div id="VueContainer">
+     <div class="header" >
         <header class="name">
             BoysBand
         </header>
@@ -34,18 +35,9 @@
                 {% endif %}
         </div>
     </div>
-    <div id="main" class="main">
-        <div class="topics">
-            <app-music-top></app-music-top>
-            <compositor-top></compositor-top>
-        </div>
-        <app-compilation></app-compilation>
-    <footer>
-        ©Отвратительные мужики
-    </footer>
-    </div>
+        <main-compilation></main-compilation>
 
-    <div id="VueContainer">
+
         <top-player></top-player>
     </div>
     <div>

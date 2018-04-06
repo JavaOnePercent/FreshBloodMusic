@@ -308,6 +308,7 @@ html, body
 
 .cover
 {
+    image-rendering: -webkit-crisp-edges;
     backface-visibility: hidden;
     transition: 1.4s transform;
     position:relative;
@@ -380,6 +381,7 @@ html, body
 }
 .cover:hover 
 {
+    /*image-rendering: optimizeSpeed;*/
     z-index: 60;
     padding:0;
     top: 0; right: 0; bottom: 0; left: 0;
@@ -390,7 +392,8 @@ html, body
     transform: /*scale(1.05)*/ translateX(8.3%);
     transition-duration: .7s;
     cursor: pointer;
-    filter: sepia(80%);
+    -webkit-filter: sepia(50%);
+    /*filter: sepia(50%);
     /*box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);*/ 
 }
 /*подвал*/

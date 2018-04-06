@@ -1,3 +1,11 @@
+Object.defineProperty(Vue.prototype, '$bus', {
+	get() {
+		return this.$root.bus;
+	}
+});
+
+var bus = new Vue({});
+
 Vue.http.interceptors.push(function(request) {
   request.headers.set('X-CSRFToken', csrftoken);
 }); //эта штука перехватывает все запросы на Vue и преобразует их в запрос с csrf token'ом
@@ -12,21 +20,26 @@ Vue.component('app-compilation',{
     },
     methods: {
         showGenre: function(message) {
-          data = new FormData();
-          data.append('genre ', message);
-            this.$http.post('change_genre/', data).then(function(response){
-                //console.log(response);
-                this.compilations = response.data.genre;
-                this.compilations.forEach(function(item, i, arr) {
-                    item[1] = "/static/mainapp/album_sources/" + item[1];
-                });
+          this.$http.get('track',{params: {genre: message}}).then(function(response){
+              //console.log(JSON.parse(response.bodyText));
+              this.compilations = JSON.parse(response.bodyText);
+              this.compilations.forEach(function(item) {
+                  item.image_alb = "/static/mainapp/album_sources/" + item.image_alb;
+              });
+              //console.log(this.compilations);
                 //alert(this.compilations);
-            }, function(error){
+          }, function(error){
             })
         },
+        trackClick: function(index) {
+            //this.$emit('trackclicked');
+            this.$bus.$emit('trackclicked', {
+				id: this.compilations[index].id
+			});
+        }
     },
     created: function() {
-        this.showGenre(1)
+        this.showGenre('all')
     }
 });
 
@@ -39,7 +52,7 @@ Vue.component('app-music-top', {
     },
     methods: {
         showMonth: function() {
-            this.$http.post('top_month/').then(function(response){
+            this.$http.get('top_month/').then(function(response){
                 //console.log(response);
                 this.infotracks = response.data.month;
                 this.infotracks.forEach(function(item, i, arr) {
@@ -64,7 +77,7 @@ Vue.component('compositor-top', {
     },
     methods: {
         showBest: function() {
-            this.$http.post('best_performer/').then(function(response){
+            this.$http.get('best_performer/').then(function(response){
                 //console.log(response);
                 this.compositors = response.data.performers;
                 this.compositors.forEach(function(item, i, arr) {
@@ -80,10 +93,13 @@ Vue.component('compositor-top', {
     }
 });
 
-var vm = new Vue ({
-	el: '#main',	data: {
-        message: 'сообщение',
-        hoverClass:'disk'
+Vue.component('main-compilation', {
+	template: '#main',
+    data() {
+	    return {
+            message: 'сообщение',
+            hoverClass: 'disk'
+        }
     },
     methods: {
 

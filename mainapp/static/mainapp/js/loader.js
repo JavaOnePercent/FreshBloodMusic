@@ -55,7 +55,7 @@ new Vue({
           data.append('photo ', this.photo);
           data.append('track ', this.track);
           data.append('name ', this.track_name_loader);
-            console.log('track_name_loader, track, photo=', track_name_loader, track, photo)
+            console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
             if (track_name_loader && track) {
               this.errorMessage = '';
               this.$http.post('/add_album/', data).then(function(response){ //csrf token уже подключён перехватчиком, который находится в music-top
@@ -64,7 +64,7 @@ new Vue({
             })
             }
             else {
-              this.errorMessage = 'Ты в пиве'
+              this.errorMessage = 'Ты в пиве';
               console.log('errorMessage=', this.errorMessage)
             }
           },

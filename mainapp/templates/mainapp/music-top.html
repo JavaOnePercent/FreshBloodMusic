@@ -47,21 +47,35 @@
                 </div>
             </div>
             <div class="music-style">
+                <a class="janr" name="" @click="showGenre('all')">Все</a>
                 {% for gen in genre %}
-                    <a class="janr" name="{{gen.id}}" id="buttonjanr" @click="showGenre('{{gen.id}}')">{{gen.name_gnr}}</a>
+                    <a class="janr" name="{{gen.id}}" @click="showGenre('{{gen.id}}')">{{gen.name_gnr}}</a>
                 {% endfor %}
             </div>
         </div>
     <div class="compilation convert">
-        <div class="music" v-for="compilation in compilations">
-            <img class="cover" :src="compilation[1]" alt="обложка">
+        <div class="music" v-for="(compilation, index) in compilations">
+            <img class="cover" :src="compilation.image_alb" alt="обложка" @click="trackClick(index)">
                 <transition>
                     <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
                 </transition>
-            <span class="group-name">{{ '{{' }} compilation[0]}}</span>
-            <span class="music-name" title="сюда тоже спавнить название трека">{{ '{{' }} compilation[2]}}</span>
+            <span :title="compilation.name_trc" class="group-name">{{ '{{' }} compilation.name_trc}}</span>
+            <span class="music-name" >{{ '{{' }} compilation.name_per}}</span>
         </div>
     </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="main">
+    <div class="main">
+        <div class="topics">
+            <app-music-top></app-music-top>
+            <compositor-top></compositor-top>
+        </div>
+        <app-compilation></app-compilation>
+    <footer>
+        ©Отвратительные мужики
+    </footer>
     </div>
 </script>
 <script src="{% static 'mainapp/js/music-top.js' %}"></script>

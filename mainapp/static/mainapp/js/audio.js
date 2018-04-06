@@ -1,3 +1,5 @@
+
+
 var playerComponent = Vue.component('topPlayer', {
     template: '#topPlayer',
     /*components:{
@@ -9,6 +11,7 @@ var playerComponent = Vue.component('topPlayer', {
         progressBarComponent,
         audioComponent
     },*/
+
     data() {
         var CSSRefs = { small: "/static/mainapp/css/audioSmall.css", full: "/static/mainapp/css/audioFull.css" };
         return {
@@ -55,10 +58,15 @@ var playerComponent = Vue.component('topPlayer', {
     computed: {
         progressValue: function() {
             return this.progress * 100;
-        },
+        }
         
     },
     methods: {
+        playNow: function(id) {
+            console.log(id);
+            this.track.nextID = id;
+            this.loadNextTrack();
+        },
         changeProgress: function() {
             this.progressOptions.playedTime = this.$refs.audioPlayer.currentTime;
             this.progressOptions.trackLength = this.$refs.audioPlayer.duration;
@@ -138,7 +146,12 @@ var playerComponent = Vue.component('topPlayer', {
             this.track.isLiked = !!(current.is_liked);
             this.logos.isLiked = this.track.isLiked;
         },
-        
+        mounted() {
+		// Register event listener
+		    this.$bus.$on('trackclicked', function(event) {
+		    	this.playNow(event.id);
+		    });
+	    },
     }
 });
 
@@ -464,7 +477,7 @@ Vue.component('progressBar', {
 
 new Vue({
     el: '#VueContainer',
-    components: {
-        playerComponent
-    }
+    data: {
+		bus: bus // Here we bind our event bus to our $root Vue model.
+	}
 });
