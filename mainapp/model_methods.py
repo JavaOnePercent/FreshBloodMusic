@@ -19,11 +19,11 @@ class TrackMethods:
         all_tracks = Track.objects.all()
         tracks = []
 
-        if parsed_json is not None and parsed_json["next_track"] is not None:
+        if parsed_json["next_track"] != '' and parsed_json["next_track"] != '':
             tracks.append(all_tracks.get(pk=parsed_json["next_track"]))
             while tracks.__len__() == 1:
                 track = get_random(all_tracks)
-                if track != tracks[0] and track.id != parsed_json["current_track"]:
+                if track != tracks[0] and str(track.id) != parsed_json["current_track"]:
                     tracks.append(track)
                     break
         else:

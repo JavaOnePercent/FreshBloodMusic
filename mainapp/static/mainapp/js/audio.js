@@ -48,12 +48,10 @@ var playerComponent = Vue.component('topPlayer', {
         }
     },
     created: function() {
-        this.HTTPConfig = {
-            headers: {"X-CSRFToken": csrftoken}, 
-            responseType: 'json'
-        }
         this.loadNextTrack();
-        
+        this.$bus.$on('trackclicked', event => {
+            this.playNow(event.id);
+        });
     },
     computed: {
         progressValue: function() {
@@ -63,7 +61,6 @@ var playerComponent = Vue.component('topPlayer', {
     },
     methods: {
         playNow: function(id) {
-            console.log(id);
             this.track.nextID = id;
             this.loadNextTrack();
         },
@@ -96,9 +93,15 @@ var playerComponent = Vue.component('topPlayer', {
                     track_id: this.track.currentID
                 };
                 if(this.logos.isLiked)
-                    this.$http.put('like/', JSON.stringify(varData), this.HTTPConfig).then(this.successfulLikeFunc); //добавление
+                    this.$http.put('like', {}, {
+                        headers: {"X-CSRFToken": csrftoken},
+                        params: varData
+                    }).then(this.successfulLikeFunc); //добавление
                 else
-                    this.$http.post('like/', JSON.stringify(varData), this.HTTPConfig).then(this.successfulLikeFunc); //удаление
+                    this.$http.delete('like', {
+                        headers: {"X-CSRFToken": csrftoken},
+                        params: varData
+                    }).then(this.successfulLikeFunc); //удаление
             }
         },
         successfulLikeFunc: function (data) {
@@ -123,8 +126,10 @@ var playerComponent = Vue.component('topPlayer', {
                 current_track: this.track.currentID,
                 next_track: this.track.nextID
             };
-            var jsonData = JSON.stringify(varData);
-            this.$http.post('next/', jsonData, this.HTTPConfig).then(this.nextTrackSuccessFunc);
+            this.$http.get('next', {
+                responseType: 'json',
+                params: varData
+            }).then(this.nextTrackSuccessFunc);
         },
         nextTrackSuccessFunc: function (data) {         //функция успеха после получения следующего трека
             //console.log(data.body)
@@ -148,9 +153,7 @@ var playerComponent = Vue.component('topPlayer', {
         },
         mounted() {
 		// Register event listener
-		    this.$bus.$on('trackclicked', function(event) {
-		    	this.playNow(event.id);
-		    });
+		    
 	    },
     }
 });
@@ -208,16 +211,8 @@ var logosComponent = Vue.component('logos', {
     data() {
         return {
             showLike: false,
-            showPrev: false
-        }
-    },
-    computed: {
-        rotationCSS: function(){
-            if(this.isFull)
-            {
-                var angle = this.progress * 360 * 3;
-                return 'transform: rotate(' + angle + 'deg);'
-            }
+            showPrev: false,
+            rotationCSS: ''
         }
     },
     watch: {
@@ -227,6 +222,13 @@ var logosComponent = Vue.component('logos', {
         prevLogoLink: function(pr) {
             if(pr != '')
                 this.showPrev = true;
+        },
+        isFull: function(iF) {
+            if(!iF) this.rotationCSS = ''
+            else this.rotate(animation=false);
+        },
+        progress: function() {
+            this.rotate(animation=true);
         }
     },
     template: '#logos',
@@ -241,6 +243,21 @@ var logosComponent = Vue.component('logos', {
         onMouseLeaveMain: function() {
             if(this.isLiked === false)
                 this.showLike = false;
+        },
+        rotate: function(animation) {
+            if(this.isFull)
+            {
+                var angle = this.progress * 360 * 3;
+                if(animation)
+                {
+                    this.rotationCSS = 'transform: rotate(' + angle + 'deg); transition: transform 0.49s linear;'
+                }
+                else
+                {
+                    this.justSwitched = false;
+                    this.rotationCSS = 'transform: rotate(' + angle + 'deg);'
+                }
+            }
         }
     }
 });

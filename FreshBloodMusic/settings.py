@@ -26,7 +26,7 @@ SECRET_KEY = 'ghp^77^#!$dr665bx505du*pgar$)@i(yz9&mfag6l+ld+9a45'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.0.137',
+    '192.168.0.7',
     '127.0.0.1'
 ]
 
@@ -34,7 +34,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'mainapp',
+    'mainapp.apps.MainappConfig',
     'loginsys',
     'mymusic',
     'django.contrib.admin',

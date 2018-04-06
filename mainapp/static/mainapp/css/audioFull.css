@@ -56,7 +56,7 @@
 #mainLogo:hover {
 	width: 47%;
 	height: 47%;
-	box-shadow: 1px 5px 28px #ff3079;
+	box-shadow: 1px 5px 28px #C732B1;
 }
 
 #logo {
@@ -65,7 +65,7 @@
     border-radius: 50%;
     z-index:0;
     position: absolute;
-    transition: all 0.5s linear;
+    
 }
 
 #vinyl {
@@ -151,8 +151,8 @@
 #like {
     z-index: 5;
     opacity: 0.8;
-    width: 40%;
-    height: 40%;
+    width: 128px;
+    height: 128px;
 }
 
 #menu {

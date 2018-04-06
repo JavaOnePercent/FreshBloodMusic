@@ -18,26 +18,26 @@ def main_view(request):  # главная
     return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
 
 
-@api_view(['POST'])  # запрос следующего трека
+@api_view(['GET'])  # запрос следующего трека
 def next_track(request):
-    if request.method == 'POST':
-        tracks = TrackMethods.get_two(request.data)
+    if request.method == 'GET':
+        tracks = TrackMethods.get_two(request.query_params)
         is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, tracks[0].id)
         serializer = TrackSerializer(tracks, many=True)
         serializer.data[0]["is_liked"] = is_liked
         return Response({'current': serializer.data[0], 'next': serializer.data[1]}, status=status.HTTP_200_OK)
 
 
-@api_view(['POST', 'PUT'])  # обработчик лайков
+@api_view(['PUT', 'DELETE'])  # обработчик лайков
 def like(request):
     if request.method == 'PUT':  # добавление лайка
-        result = LikedTrackMethods.add_like(request.data['track_id'], auth.get_user(request).id)
+        result = LikedTrackMethods.add_like(request.query_params['track_id'], auth.get_user(request).id)
         if result:
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'POST':  # удаление лайка
-        result = LikedTrackMethods.remove_like(request.data['track_id'], auth.get_user(request).id)
+    elif request.method == 'DELETE':  # удаление лайка
+        result = LikedTrackMethods.remove_like(request.query_params['track_id'], auth.get_user(request).id)
         if result:
             return Response(status=status.HTTP_200_OK)
         else:
