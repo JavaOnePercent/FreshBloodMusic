@@ -24,6 +24,7 @@ class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайз�
         model = Track
         fields = ('id', 'name_trc', 'image_alb', 'name_per')  # is_liked
 
+
 """class AlbumSerializer(serializers.ModelSerializer):
     tracks = TrackSerializer(many=True, read_only=True)
 

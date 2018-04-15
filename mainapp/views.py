@@ -12,6 +12,7 @@ from .model_methods import TrackMethods, LikedTrackMethods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+import math
 
 
 def main_view(request):  # главная
@@ -49,12 +50,44 @@ def like(request):
 def track(request):
     if request.method == "GET":
         gen = request.query_params['genre']
+        if gen == 'fav':
+            likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
+            tracks = []
+            for track in likedtracks:
+                trc = Track.objects.all().get(id=track[0])
+                tracks.append(trc)
+        elif gen == 'rec':
+            likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
+            users = LikedTrack.objects.all().values_list('user_id')
+            idenusers = []
+            for user in users:
+                if user not in idenusers and user != auth.get_user(request).id:
+                    idenusers.append(user)
+            chance = {}
+            for user in idenusers:
+                tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
+                likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
+                         (math.fabs(len(set(likedtracks) | set(tracks))))) / (len(idenusers) - 1)
+                chance[user] = likes
+            chance = sorted(chance.items(), key=lambda item: -item[1])
+            tracks = []
+            for key in chance:
+                tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+            identracks = []
+            for track in tracks:
+                if track not in identracks and track not in likedtracks:
+                    identracks.append(track)
+            tracks = []
+            for track in identracks:
+                trc = Track.objects.all().get(id=track[0])
+                tracks.append(trc)
+        else:
         #print(gen)
         #tracks = Track.objects.all().select_related('alb_id__per_id').values('name_trc', 'alb_id__image_alb',
                                                                                   #'alb_id__per_id__name_per', 'id')
-        tracks = Track.objects.all()
-        if gen != 'all':
-            tracks = tracks.filter(gnr_id=gen)
+            tracks = Track.objects.all().order_by('-rating_trc')
+            if gen != 'all':
+                tracks = tracks.filter(gnr_id=gen)
 
         serializer = NoLinkTrackSerializer(tracks, many=True)
         #json_jn = json.dumps(list(tracks), cls=DjangoJSONEncoder)

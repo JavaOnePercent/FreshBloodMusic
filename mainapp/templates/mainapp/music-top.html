@@ -48,6 +48,8 @@
             </div>
             <div class="music-style">
                 <a class="janr" name="" @click="showGenre('all')">Все</a>
+                <a class="janr" name="" @click="showGenre('rec')">Рекомендации</a>
+                <a class="janr" name="" @click="showGenre('fav')">Избранное</a>
                 {% for gen in genre %}
                     <a class="janr" name="{{gen.id}}" @click="showGenre('{{gen.id}}')">{{gen.name_gnr}}</a>
                 {% endfor %}

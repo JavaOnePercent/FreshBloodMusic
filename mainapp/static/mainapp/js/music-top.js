@@ -88,9 +88,11 @@ Vue.component('compositor-top', {
             })
         },
     },
+
     created: function() {
         this.showBest()
     }
+
 });
 
 Vue.component('main-compilation', {
