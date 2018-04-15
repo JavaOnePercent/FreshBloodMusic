@@ -58,7 +58,7 @@ new Vue({
             console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
             if (track_name_loader && track) {
               this.errorMessage = '';
-              this.$http.post('/add_album/', data).then(function(response){ //csrf token уже подключён перехватчиком, который находится в music-top
+              this.$http.post('/add_album/', data, {headers: {'X-CSRFToken': csrftoken}}).then(function(response){ //csrf token уже подключён перехватчиком, который находится в music-top
                 console.log('Success! Response: ', response.body);
             }, function(error){
             })

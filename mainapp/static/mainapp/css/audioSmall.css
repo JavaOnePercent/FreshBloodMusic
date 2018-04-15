@@ -73,7 +73,7 @@
     opacity: 0.9;
 	z-index: 0;
 	visibility: visible;
-	padding: 0;
+    padding: 0;
 }
 
 #vinyl {
@@ -84,7 +84,11 @@
 	display: none;
 }
 
-#maintoprevlogo {
+.main-to-prev-logo {
+	display: none;
+}
+
+.next-to-main-logo {
     display: none;
 }
 
@@ -306,13 +310,14 @@
 	height: 32px;
 }
 
-#progress {
+/*#progress {
     height: 4px;
     width: 100%;
     bottom: 65px;
     margin: auto;
     position: absolute;
-}
+    transition: all 0.3s ease;
+}*/
 
 .vue-simple-progress {
     position: absolute;
@@ -322,19 +327,25 @@
     width: 100%;
 }
 
-.foreground-progress-bar {
+.vue-slider-my {
+    bottom: 65px;
+}
+
+/*.foreground-progress-bar {
     background: rgb(0, 0, 0);
-    top: 6px;
+    bottom: 65px;
     height: 4px;
-    transition: all 0.5s ease;
+    transition: width 0.5s ease, height 0.2s ease;
     position: absolute;
     z-index: -1;
 }
+.foreground-progress-bar:hover {
+    cursor: pointer;
+}*/
 
 .background-progress-bar {
     background: rgba(0, 0, 0, 0.08);
     height: 100%;
-    transition: all 0.5s ease;
     position: absolute;
     top: 10px;
     z-index: -1;
@@ -356,5 +367,22 @@
     position: absolute;
     right: 5px;
     bottom: 1px;
+}
+
+
+.main-to-prev-logo {
+	display: none;
+}
+
+.next-to-main-logo {
+	display: none;
+}
+
+.prev-envelope {
+	display: none;
+}
+
+.next-envelope {
+	display: none;
 }
 

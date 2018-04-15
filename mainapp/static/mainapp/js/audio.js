@@ -11,7 +11,7 @@ var playerComponent = Vue.component('topPlayer', {
         progressBarComponent,
         audioComponent
     },*/
-
+    store,
     data() {
         var CSSRefs = { small: "/static/mainapp/css/audioSmall.css", full: "/static/mainapp/css/audioFull.css" };
         return {
@@ -19,7 +19,6 @@ var playerComponent = Vue.component('topPlayer', {
             CSSRef: CSSRefs.small,
             isFull: false,
             isHovered: false,
-            progress: 0.0,
             track: {
                 currentID: null,
                 nextID: null,
@@ -37,56 +36,34 @@ var playerComponent = Vue.component('topPlayer', {
             },
             audio: {
                 audioLink: '',
-                playing: false,
-                volume: 100
-            },
-            progressOptions: {
-                playedTime: '',
-                trackLength: ''
             },
             HTTPConfig: '',
+            isTimeout: false
         }
     },
-    created: function() {
+    
+    created() {
         this.loadNextTrack();
-        this.$bus.$on('trackclicked', event => {
+        bus.$on('trackclicked', event => {
             this.playNow(event.id);
         });
     },
-    computed: {
-        progressValue: function() {
-            return this.progress * 100;
-        }
-        
-    },
     methods: {
-        playNow: function(id) {
+        playNow(id) {
             this.track.nextID = id;
             this.loadNextTrack();
         },
-        changeProgress: function() {
-            this.progressOptions.playedTime = this.$refs.audioPlayer.currentTime;
-            this.progressOptions.trackLength = this.$refs.audioPlayer.duration;
-
-            var progress = this.$refs.audioPlayer.progress;
-            this.progress = progress;
-            if(progress === 1)
-                this.loadNextTrack();
-        },
-        changeVolume: function() {
-            this.audio.volume = this.$refs.volumeController.value;
-        },
-        switchPlayerView: function() {
+        switchPlayerView() {
             if(this.isFull)
                 this.CSSRef = this.CSSRefs.small;
             else
                 this.CSSRef = this.CSSRefs.full;
             this.isFull = !this.isFull;
         },
-        onLikePressed: function() {
+        onLikePressed() {
             this.logos.isLiked = !this.logos.isLiked;
         },
-        likeTrack: function() {
+        likeTrack() {
             if(this.logos.isLiked != this.track.isLiked)
             {   
                 var varData = {
@@ -94,51 +71,53 @@ var playerComponent = Vue.component('topPlayer', {
                 };
                 if(this.logos.isLiked)
                     this.$http.put('like', {}, {
-                        headers: {"X-CSRFToken": csrftoken},
+                        //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //добавление
                 else
                     this.$http.delete('like', {
-                        headers: {"X-CSRFToken": csrftoken},
+                        //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //удаление
             }
         },
-        successfulLikeFunc: function (data) {
+        successfulLikeFunc(data) {
             //тут надо обрабатывать статусы
         },
-        onMouseEnter: function() {
+        onMouseEnter() {
             this.isHovered = true;
         },
-        onMouseLeave: function() {
+        onMouseLeave() {
             this.isHovered = false;
         },
-        switchPlaying: function() {
-            this.audio.playing = !this.audio.playing;
+        nextTrackTimeout() {
+            this.isTimeout = false;
         },
-        startPlaying: function() {
-            this.audio.playing = true;
-            
+        loadNextTrack() {
+            if(!this.isTimeout)
+            {
+                this.isTimeout = true;
+                setTimeout(this.nextTrackTimeout, 1000);
+                this.likeTrack();
+                var varData = {
+                    current_track: this.track.currentID,
+                    next_track: this.track.nextID
+                };
+                this.$http.get('next', {
+                    responseType: 'json',
+                    params: varData
+                }).then(this.nextTrackSuccessFunc);
+            }
         },
-        loadNextTrack: function() {
-            this.likeTrack();
-            var varData = {
-                current_track: this.track.currentID,
-                next_track: this.track.nextID
-            };
-            this.$http.get('next', {
-                responseType: 'json',
-                params: varData
-            }).then(this.nextTrackSuccessFunc);
-        },
-        nextTrackSuccessFunc: function (data) {         //функция успеха после получения следующего трека
+        nextTrackSuccessFunc(data) {         //функция успеха после получения следующего трека
             //console.log(data.body)
             var current = data.body.current;
             var next = data.body.next;
 
             this.trackPerformer.trackName = current.name_trc;
             this.trackPerformer.performerName = current.name_per;//
-            this.audio.audioLink = toStatic(current.link_trc);
+            this.audio.audioLink = toStatic(current.link_trc);//toStatic(current.link_trc);
+            //console.log(current.audio_file);
             this.track.currentID = current.id;
             this.track.nextID = next.id;
             document.getElementById('title').innerHTML = current.name_per + " - " + current.name_trc;
@@ -150,17 +129,13 @@ var playerComponent = Vue.component('topPlayer', {
 
             this.track.isLiked = !!(current.is_liked);
             this.logos.isLiked = this.track.isLiked;
-        },
-        mounted() {
-		// Register event listener
-		    
-	    },
+        }
     }
 });
 
 var buttonsComponent = Vue.component('buttons', {
     template: '#buttons',
-    props: [ 'playing', 'isFull' ],
+    props: [ 'isFull' ],
     data() {
         var playSrcs = {play: '/static/mainapp/images/playButton.png', pause: '/static/mainapp/images/pauseButton.png'};
         var dropdownSrcs = {drop: '/static/mainapp/images/dropdown.png', close: '/static/mainapp/images/closeDropdown.png'};
@@ -175,23 +150,32 @@ var buttonsComponent = Vue.component('buttons', {
         }
     },
     methods: {
-        playClick: function() {
-            this.$emit('playclick');
+        playClick() {
+            this.$store.commit('switchPlaying');
         },
-        nextClick: function(){
+        nextClick(){
             this.$emit('nextclick');
+            bus.$emit('nextclick');
         },
-        dropdownClick: function(){
+        dropdownClick(){
             this.$emit('dropdownclick');
         }
     },
+    computed: {
+        playing() {
+            return this.$store.state.playing;
+        },
+        isDragging() {
+            return this.$store.state.isDragging;
+        }
+    },
     watch: {
-       playing: function(pl){
-            (pl) ?
+        playing(pl){
+            (pl || this.isDragging) ?
                 this.buttons[0].imgSrc = this.playSrcs.pause :
                 this.buttons[0].imgSrc = this.playSrcs.play;
         },
-        isFull: function(iF){
+        isFull(iF){
             (iF) ?
                 this.buttons[2].imgSrc = this.dropdownSrcs.close :
                 this.buttons[2].imgSrc = this.dropdownSrcs.drop;
@@ -205,59 +189,192 @@ var logosComponent = Vue.component('logos', {
         'nextLogoLink',
         'prevLogoLink',
         'isLiked',
-        'progress',
-        'isFull'
+        'isFull',
     ],
+    template: '#logos',
     data() {
         return {
             showLike: false,
             showPrev: false,
-            rotationCSS: ''
+            rotationCSS: '',
+            mainToPrevLogoAnimation: '',
+            nextToMainLogoAnimation: '',
+            mainLogoAnimation: '',
+            prevEnvelopeAnimation:'',
+            prevLogoAnimation: '',
+            nextEnvelopeAnimation:'',
+            nextLogoAnimation: '',
+            audio: null,
+            logo: '',
+            nextLogo: '',
+            prevLogo: '',
+            lastRotation: '',
+            wasPlaying: false
+            //duration: 0,
+            //currentTime: 0
         }
     },
+    computed: {
+        currentTime() {
+            return this.$store.state.currentTime;
+        },
+        /*duration() {
+            return this.$store.state.duration;
+        },*/
+        playing() {
+            return this.$store.state.playing;
+        },
+        isDragging() {
+            return this.$store.state.isDragging;
+        }
+    },
+    created() {
+        bus.$on('nextclick', event => {
+            this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
+            this.wasPlaying = this.playing;
+        });
+        bus.$on('playingended', event => {
+            this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
+            this.wasPlaying = true;
+        });
+        bus.$on('startplaying', event => {
+            this.rotate(false, 0);
+            //console.log(this.rotationCSS);
+            if(this.wasPlaying)
+            {
+                this.rotate(false, 0.1/this.audio.duration * 1080);
+                setTimeout(this.rotate, 100, true, 1080, this.audio.duration - this.audio.currentTime);
+            }
+        });
+        /*bus.$on('slidermoved', event => {
+            this.updateRotation(false);
+        });
+        bus.$on('endsliderdragging', event => {
+            //console.log(event.value);
+            
+        });*/
+    },
+    mounted() {
+        this.audio = document.getElementById('audio');
+    },
     watch: {
-        isLiked: function(shL) {
+        isDragging(isDragging) {
+            if(!isDragging)
+            {
+                this.rotate(false, (this.audio.currentTime + 0.1) / this.audio.duration * 1080);
+                setTimeout(this.updateRotation, 100, true);
+            }
+        },
+        currentTime(cur) {
+            if(this.isDragging && this.isFull)
+            {
+                this.rotate(false, cur/this.audio.duration * 1080);
+            }
+        },
+        logoLink() { //переключилось лого, значит запускаем анимацию
+            //this.updateRotation(false);
+            
+            this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
+            this.nextLogoAnimation = 'visibility: hidden;';
+            this.mainLogoAnimation = 'visibility: hidden;';
+            this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg);';
+            setTimeout(this.startAnimation, 100);
+            
+        },
+        isLiked(shL) {
             this.showLike = shL;
         },
-        prevLogoLink: function(pr) {
+        prevLogo(pr) {
             if(pr != '')
                 this.showPrev = true;
         },
-        isFull: function(iF) {
+        isFull(iF) {
             if(!iF) this.rotationCSS = ''
-            else this.rotate(animation=false);
+            else 
+            {
+                this.rotate(false, (this.audio.currentTime+((this.playing) ? 0.1 : 0))/this.audio.duration * 1080);
+                if(this.playing)
+                    setTimeout(this.rotate, 100, true, 1080, this.audio.duration - this.audio.currentTime);
+            }
         },
-        progress: function() {
-            this.rotate(animation=true);
+        playing(playing) {
+            //console.log(this.rotationCSS)
+            if(!this.isDragging)
+                if(this.rotationCSS != 'transform: rotate(0deg);')
+                    this.updateRotation(playing);
+                else
+                {
+                    this.rotate(false, 0.1/this.audio.duration * 1080);
+                    setTimeout(this.updateRotation, 100, playing);
+                }
+            //console.log(this.audio.currentTime + ' ' + this.audio.duration + ' ' + this.rotationCSS);
         }
     },
-    template: '#logos',
+    
     methods: {
-        click: function() {
+        startAnimation() {
+            setTimeout(this.endAnimation, 800);
+            this.mainToPrevLogoAnimation += 'left: -100%; height: 150px; width: 150px; transition: left 0.8s, height 0.3s, width 0.3s;';
+            this.nextToMainLogoAnimation = {right: 0, transition: 'right 0.8s'}; 
+            setTimeout(this.startExpandingNextToMain, 500);
+            
+            this.prevEnvelopeAnimation = {top: '-50%', opacity: '1.0', transition: 'top 0.3s, opacity 0.3s'};
+            this.prevLogoAnimation = 'left: -150%; opacity: 0.0; transition: left 0.5s, opacity 0.5s;';
+            this.nextLogoAnimation = 'right: -150%; opacity: 0.0;';
+            setTimeout(this.moveNextEnvelope, 500);
+        },
+        endAnimation() {
+            
+            this.nextLogo = this.nextLogoLink;
+            this.prevLogo = this.prevLogoLink;
+            this.mainToPrevLogoAnimation = 'visibility:hidden;';
+            this.nextToMainLogoAnimation = 'visibility:hidden;'
+            this.mainLogoAnimation = '';
+            //this.prevEnvelopeAnimation = 'visibility:hidden;';
+            this.prevEnvelopeAnimation.opacity = 0.0;
+            this.prevEnvelopeAnimation.transition = 'opacity 0.1s';
+            setTimeout(this.hidePrevEnvelope, 100);
+            this.prevLogoAnimation = '';
+            this.nextEnvelopeAnimation = 'visibility:hidden;';
+        },
+        hidePrevEnvelope() {
+            this.logo = this.logoLink;
+            this.prevEnvelopeAnimation = 'visibility:hidden;';
+        },
+        startExpandingNextToMain(){
+            this.nextToMainLogoAnimation.transition += ', height 0.3s, width 0.3s';
+            this.nextToMainLogoAnimation.height = '250px';
+            this.nextToMainLogoAnimation.width = '250px';
+        },
+        moveNextEnvelope() {
+            this.nextEnvelopeAnimation.top = '-90%';
+            this.nextEnvelopeAnimation.opacity = '0.0';
+            this.nextEnvelopeAnimation.transition = 'all 0.3s';
+            this.nextLogoAnimation = 'transition: right 0.5s, opacity 0.5s;';
+        },
+        click() {
             this.$emit('likepressed');
         },
-        onMouseEnterMain: function() {
+        onMouseEnterMain() {
             if(this.isLiked === false)
                 this.showLike = true;
         },
-        onMouseLeaveMain: function() {
+        onMouseLeaveMain() {
             if(this.isLiked === false)
                 this.showLike = false;
         },
-        rotate: function(animation) {
+        updateRotation(playing){
             if(this.isFull)
             {
-                var angle = this.progress * 360 * 3;
-                if(animation)
-                {
-                    this.rotationCSS = 'transform: rotate(' + angle + 'deg); transition: transform 0.49s linear;'
-                }
+                if(playing)
+                    this.rotate(true, 1080, time=(this.audio.duration - this.audio.currentTime));
                 else
-                {
-                    this.justSwitched = false;
-                    this.rotationCSS = 'transform: rotate(' + angle + 'deg);'
-                }
+                    this.rotate(false, this.audio.currentTime/this.audio.duration * 1080);
             }
+        },
+        rotate(animation, angle, time=0) {
+            if(this.isFull)
+                this.rotationCSS = 'transform: rotate(' + angle + 'deg);' + ((animation) ? 'transition: transform ' + time + 's linear;' : '');
         }
     }
 });
@@ -271,10 +388,10 @@ var menuMoreComponent = Vue.component('menuMore', {
         }
     },
     methods: {
-        toggleDrop: function() {
+        toggleDrop() {
             this.showMenu = !this.showMenu;
         },
-        closeDrop: function() {
+        closeDrop() {
             this.showMenu = false;
         }
     }
@@ -290,14 +407,14 @@ var trackPerformerComponent = Vue.component('trackPerformer', {
 
 var volumeControllerComponent = Vue.component('volumeController', {
     template: '#volumeController',
-    props: ['isFull', 'defaultValue'],
+    props: ['isFull'],
     data() {
         var smallVolume = {direction: 'vertical', width: 12, height: 150, dotSize: 20, speed: 0.3, tooltip: 'hover'};
         var fullVolume = {direction: 'horizontal', width: 180, height: 12, dotSize: 22, speed: 0.3, tooltip: 'hover'};
         var path = '/static/mainapp/images/';
         var speakerPics = {zero: path + 'speaker0.png', thirty3: path + 'speaker33.png', sixty6: path + 'speaker66.png', hundred: path + 'speaker100.png',};
         return {
-            value: this.defaultValue,
+            value: 100,
             showVolume: false,
             showFullVolume: false,
             sliderprops: smallVolume,
@@ -309,16 +426,17 @@ var volumeControllerComponent = Vue.component('volumeController', {
         }
     },
     watch: {
-        isFull: function(iF){
+        isFull(iF){
             if(iF)
             {
                 this.showVolume = false;
                 this.showFullVolume = true;
             }
         },
-        value: function(value) {
+        value(value) {
             localStorage.setItem("volume", this.value);
-            this.$emit('volumechanged');
+            //this.$emit('volumechanged');
+            this.$store.commit('volume', this.value);
             if(value === 0)
                 this.speakerPic = this.speakerPics.zero;
             else if (value <= 33)
@@ -329,13 +447,13 @@ var volumeControllerComponent = Vue.component('volumeController', {
                 this.speakerPic = this.speakerPics.hundred;
         }
     },
-    created: function() {
+    created() {
         var vol = localStorage.getItem("volume");
         if(vol)
             this.value = Number(vol);
     },
     methods: {
-        clickSpeaker: function() {
+        clickSpeaker() {
             if(this.value > 0)
             {
                 sessionStorage.setItem("volume", this.value);
@@ -350,43 +468,43 @@ var volumeControllerComponent = Vue.component('volumeController', {
                     this.value = 100;
             }
         },
-        refreshFunc: function() {
+        refreshFunc() {
             this.$refs.fullSlider.refresh();
         },
-        mouseLeave: function() {
+        mouseLeave() {
             if(!this.isFull)
             {
                 this.mouseIn = false;
                 this.closeSpeaker();
             }
         },
-        mouseEnter: function() {
+        mouseEnter() {
             if(!this.isFull)
             {
                 this.mouseIn = true;
             }
         },
-        dragEnd: function() {
+        dragEnd() {
             if(!this.isFull)
             {
                 this.dragging = false;
                 this.closeSpeaker();
             }
         },
-        dragStart: function() {
+        dragStart() {
             if(!this.isFull)
             {
                 this.dragging = true;
             }
         },
-        openSpeaker: function() {
+        openSpeaker() {
             if(!this.isFull)
             {
                 this.showVolume = true;
                 this.mouseIn = true;
             }
         },
-        closeSpeaker: function() {
+        closeSpeaker() {
             if(!this.isFull && !this.dragging && !this.mouseIn)
                 this.showVolume = false;
         }
@@ -396,105 +514,324 @@ var volumeControllerComponent = Vue.component('volumeController', {
 var audioComponent = Vue.component('audioPlayer', {
     template: '#audioPlayer',
     props: [
-        'audioLink',
-        'playing',
-        'volume'
+        'audioLink'
     ],
+    /*created() {
+        bus.$on('slidermoved', event => {
+            this.setCurrentTime(event.value);
+        });
+        bus.$on('startsliderdragging', event => {
+            this.$refs.audio.pause();
+        });
+        bus.$on('endsliderdragging', event => {
+            //this.updateProgress();
+            this.$refs.audio.play();
+            this.$emit('startplaying');
+        });
+    },*/
     data() {
         return {
             isFirst: true,
             timer: '',
-            progress: 0.0,
-            currentTime: '00:00',
-            duration: '99:99'
+            //progress: 0.0,
+            duration: 0.0
         }
     },
+    computed: {
+        playing() {
+            return this.$store.state.playing;
+        },
+        isDragging() {
+            return this.$store.state.isDragging;
+        },
+        volume() {
+            return this.$store.state.volume;
+        },
+        newTime: {
+            get() { return this.$store.state.currentTime }
+        },
+        
+    },
     watch: {
-        playing: function(pl){
+        newTime(val) {
+            if(this.$store.state.isDragging)
+            {
+                this.$refs.audio.currentTime = val;
+            }
+        },
+        playing(pl){
             if(pl)
             {
-                this.$el.play();
+                this.$refs.audio.play();
                 this.timer = setInterval(this.updateProgress, 500); //таймер для обновления прогресса воспроизведения
             }
             else
             {
                 clearInterval(this.timer);
-                this.$el.pause();
+                this.$refs.audio.pause();
             }
         },
-        volume: function(vol){
-            this.$el.volume = this.volume / 100;
+        volume(vol){
+            this.$refs.audio.volume = this.volume / 100;
+        },
+        isDragging(isDragging){
+            if(!isDragging)
+            {
+                this.$store.commit('playing', true);
+                this.$refs.audio.play();
+            }
         }
     },
     methods: {
-        startPlaying: function() {
+        /*setCurrentTime() {
+            if(!this.$store.state.isDragging)
+            {
+                this.$store.commit('currentTime', this.$refs.audio.currentTime);
+            } 
+        },*/
+        endPlaying() {
+            bus.$emit('playingended');
+            this.$emit('playingended');
+        },
+        /*setCurrentTime(val) {
+            this.$refs.audio.currentTime = val;
+        },*/
+        startPlaying() {
+            
+            this.duration = this.$refs.audio.duration;
+            this.$store.commit('duration', this.duration);
+            this.updateProgress();
             if(!this.isFirst) {
-                this.$el.play();
-                this.$emit('startplaying');
+                this.$store.commit('playing', true);
+                this.$refs.audio.play();
+                //this.$emit('startplaying');
+                bus.$emit('startplaying');
             }
             else
                 this.isFirst = false;
         },
-        updateProgress: function() {
-            this.$emit('progresschanged')
-            this.progress = this.$el.currentTime / this.$el.duration;
-            this.currentTime = this.$el.currentTime;
-            this.duration = this.$el.duration;
+        updateProgress() {
+            if(!this.$store.state.isDragging)
+            {
+                this.$store.commit('currentTime', this.$refs.audio.currentTime);
+            } 
+            /*this.progress = this.$refs.audio.currentTime / this.$refs.audio.duration;
+            bus.$emit('progresschanged', {
+                progress: this.progress,
+                currentTime: this.$refs.audio.currentTime,
+                duration: this.$refs.audio.duration
+			});*/
         }
     }
 });
 
 Vue.component('progressBar', {
     template: '#progressBar',
-    props: {
-        'val': {
-            default: 0
-        },
-        'playedTime': {
-            default: ''
-        },
-        'trackLength': {
-            default: ''
-        },
-        'isPlayerHovered': {}
+    props: [
+        'isPlayerHovered',
+        'isFull'
+    ],
+    data() {
+        return {
+            lastValue: 0,
+            //duration: 0.0,
+            sliderPropsFull: {
+                width: '100%',
+                height: 20,
+                'dot-height': 20,
+                'dot-width': 25,
+                min: 0,
+                tooltip: 'always',
+                //speed: 0.0,
+                sliderStyle: {
+                    //"backgroundColor": "rgba(0,0,0,0)",
+                    'border-radius': 0,
+                    //"box-shadow": '0 0 0 0',
+                    //'visibility': 'invisible'
+                },
+                processStyle: {
+                    //"border-radius": "30px 0 0 30px",
+                    //"background-color": "rgb(200,200,200)"
+                    "backgroundImage": "-webkit-linear-gradient(left, #ffd319 20%, #ff901f 40%, #ff2975 55%, #f222ff 80%, #8c1eff 90%)"
+                },
+                bgStyle: {
+                    "background-color": 'rgba(0,0,0,0.05)'
+                },
+                'tooltip-dir': 'bottom',
+                'tooltip-style': {
+                    'background-color': 'rgba(0,0,0,0)',
+                    border: '0',
+                    color: 'black',
+                    font: '14px Arial,Helvetica,sans-serif'
+                },
+                value: 0,
+                formatter: (v) => {
+                    mins = Math.floor(v / 60);
+                    secs = (v % 60).toFixed();
+                    return mins + ":" + ((secs < 10) ? '0' + secs : secs);
+                    }
+            },
+            sliderProps: {
+                width: '100%',
+                height: 4,
+                min: 0,
+                tooltip: 'false',
+                'dot-height': 4,
+                'dot-width': 25,
+                //speed: 0.0,
+                sliderStyle: {
+                    "backgroundColor": "rgba(0,0,0,0)"
+                },
+                processStyle: {
+                    "border-radius": "0",
+                    "background-color": "rgb(0,0,0)"
+                },
+                bgStyle: {
+                    "background-color": 'rgba(0,0,0,0)',
+                },
+                'tooltip-dir': 'bottom',
+                'tooltip-style': {
+                    'background-color': 'rgba(0,0,0,0)',
+                    border: '0',
+                    color: 'black',
+                    font: '14px Arial,Helvetica,sans-serif'
+                },
+                value: 0,
+                formatter: (v) => {
+                    mins = Math.floor(v / 60);
+                    secs = (v % 60).toFixed();
+                    return mins + ":" + ((secs < 10) ? '0' + secs : secs);
+                    }
+            }
+        }
     },
+    /*created() {
+        bus.$on('progresschanged', event => {
+            this.progress = event.progress;
+            this.duration = event.duration.toFixed();
+        });
+        bus.$on('startplaying', event => {
+            this.$refs.slider.refresh();
+        });
+    },*/
+    /*mounted() {
+        var el = this.$refs.slider.$refs.wrap;
+        el.setAttribute('style', "width: 100%;");
+    },*/
     computed: {
-        pct() {
-            var pct = this.val
-            pct = pct.toFixed(2)
-            return Math.min(pct, 100)
+        sliderPropsComputed() {
+            if(this.isFull) return this.sliderPropsFull;
+            else return this.sliderProps;
+        },
+        duration() {
+            return this.$store.state.duration;
+        },
+        isDragging() {
+            return this.$store.state.isDragging;
+        },
+        playing() {
+            return this.$store.state.playing;
+        },
+        currentTime: {
+            get() {return this.$store.state.currentTime},
+            set(val) {
+                this.$store.commit('currentTime', val);
+            }
         },
         bar_style() {
-            var style = {
-                'width': this.pct+'%'
-            }
-            return style
-        },
-        showPlayedTime() {
-            return this.isPlayerHovered;
-        },
-        showTrackLength() {
-            return this.isPlayerHovered;
-        },
-        playedTimeTop() {
-            return this.toNormalTime(this.playedTime);
+            var pct = this.currentTime / this.duration * 100;
+            pct = pct.toFixed(2);
+            return 'width: ' + Math.min(pct, 100) + '%;';
         },
         trackLengthTop() {
-            return this.toNormalTime(this.trackLength);
+            return this.toNormalTime(this.duration);
+        },
+        sliderMax() {
+            return Number(this.duration);
+        },
+        transition() {
+            if(this.playing)
+            {
+                return 'transition: all 0.5s;';
+            }
+            else
+            {
+                return '';
+            }
+        }
+        /*sliderValue: {
+            get() {return this.autoValue},
+            set(val) {
+                if(val != this.autoValue)
+                {
+                    this.lastValue = val;
+                    //this.progress = val / this.duration;
+                    bus.$emit('slidermoved', {value: val});
+                }
+            }
+        }*/
+    },
+    watch: {
+        duration() {
+            this.$refs.slider.refresh();
+        },
+        isPlayerHovered() {
+            this.heightChanger();
+        },
+        isDragging(iD) {
+            this.heightChanger();
+            /*if(iD)
+                this.sliderProps.speed = 0;
+            else
+                this.sliderProps.speed = 0.5;*/
         }
     },
+
     methods: {
+        heightChanger() {
+            if (this.isPlayerHovered || this.isDragging)
+            {
+                this.sliderProps.height = 10;
+                this.sliderProps['dot-height'] = 10;
+            }
+            else
+            { 
+                this.sliderProps.height = 4;
+                this.sliderProps['dot-height'] = 4;
+            }
+        },
+        dragStart() {
+            //console.log('start');
+            //bus.$emit('startsliderdragging');
+            this.$store.commit('isDragging', true);
+            this.$store.commit('playing', false);
+        },
+        dragEnd() {
+            //console.log('end');
+            /*bus.$emit('endsliderdragging', {
+                value: this.lastValue
+            });*/
+            this.$store.commit('isDragging', false);
+        },
+        click() {
+            this.$store.commit('isDragging', true);
+            setTimeout(this.dragEnd, 100);
+        },
         toNormalTime(seconds) {
             mins = Math.floor(seconds / 60);
-            secs = (seconds % 60).toFixed()
-            return mins + ":" + ((secs < 10) ? '0' + secs : secs)
-        }
+            secs = (seconds % 60).toFixed();
+            if(mins != NaN && secs != NaN)
+                return mins + ":" + ((secs < 10) ? '0' + secs : secs);
+            else
+                return '';
+        },
+        
     }
 });
 
 new Vue({
     el: '#VueContainer',
     data: {
-		bus: bus // Here we bind our event bus to our $root Vue model.
-	}
+		//bus: bus // Here we bind our event bus to our $root Vue model.
+    }
 });

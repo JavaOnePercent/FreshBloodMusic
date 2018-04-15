@@ -9,35 +9,32 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <title id="title">{{track_name}}</title>
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-    <script src="{% static 'mainapp/js/getCookie.js' %}"></script>
-    <script src="{% static 'mainapp/js/vue.js' %}"></script>
-    <script src="{% static 'mainapp/js/vue-resource.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vue.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vue-resource.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vuex.js' %}"></script>
+    <script src="{% static 'mainapp/js/init.js' %}"></script>
 </head>
 
 <body>
     {% csrf_token %}
     <div id="VueContainer">
-     <div class="header" >
-        <header class="name">
-            BoysBand
-        </header>
-        <div class="radio">
-
+        <div class="header" >
+            <header class="name">
+                BoysBand
+            </header>
+            <div class="radio"></div>
+            <div class="management">
+                    {% if username %}
+                    <a href="loader-music/">Добавить</a>
+                    <!--<a href="performers/">Моя музыка</a>-->
+                    <a href="auth/logout/">Выйти ({{ username }})</a>
+                    {% else %}
+                    <a href="auth/login/">Авторизация</a>
+                    <a href="auth/register">Регистрация</a>
+                    {% endif %}
+            </div>
         </div>
-        <div class="management">
-                {% if username %}
-                <a href="loader-music/">Добавить</a>
-                <!--<a href="performers/">Моя музыка</a>-->
-                <a href="auth/logout/">Выйти ({{ username }})</a>
-                {% else %}
-                <a href="auth/login/">Авторизация</a>
-                <a href="auth/register">Регистрация</a>
-                {% endif %}
-        </div>
-    </div>
         <main-compilation></main-compilation>
-
-
         <top-player></top-player>
     </div>
     <div>

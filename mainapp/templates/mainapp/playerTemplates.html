@@ -7,15 +7,15 @@
             <link id="playerCSS" rel="stylesheet" type="text/css" :href="CSSRef" />
             <div id="player" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
                 <div id="playerContainer">
-                    <buttons :isFull="isFull" @nextclick="loadNextTrack" @playclick="switchPlaying" @dropdownclick="switchPlayerView" :playing="audio.playing"></buttons>
-                    <logos v-bind="logos" @likepressed="onLikePressed" :progress="progress" :isFull="isFull"></logos>
+                    <buttons :isFull="isFull" @nextclick="loadNextTrack" @dropdownclick="switchPlayerView"></buttons>
+                    <logos v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
                     <menu-more></menu-more>
                     <track-performer v-bind="trackPerformer"></track-performer>
-                    <volume-controller ref="volumeController" @volumechanged="changeVolume" :isFull="isFull" :defaultValue="audio.volume"></volume-controller>
-                    <audio-player ref="audioPlayer" v-bind="audio" @startplaying="startPlaying" @progresschanged="changeProgress"></audio-player>
+                    <volume-controller ref="volumeController" :isFull="isFull"></volume-controller>
+                    <audio-player ref="audioPlayer" v-bind="audio" @playingended="loadNextTrack"></audio-player>
                     <!--<img class="Button Player" id="previousButton" src="" draggable="false" />-->
                 </div>
-                <progress-bar v-bind="progressOptions" :val="progressValue" :isPlayerHovered="isHovered"></progress-bar>
+                <progress-bar :isPlayerHovered="isHovered" :isFull="isFull"></progress-bar>
             </div>
         </div>
     </script>
@@ -28,14 +28,17 @@
 
     <script type="text/x-template" id="logos"> <!--компонент для всех лого-->
         <div>
-            <div class="Button" id="mainLogo" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain" >
+            <div class="Button" id="mainLogo" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain" :style="mainLogoAnimation">
                 <img id=vinyl src="{% static 'mainapp/images/redVinyl.png' %}">
-                <img id="logo" :src="logoLink" draggable="false" :style="rotationCSS"/>  <!--src="{% static logo_link %}"-->
+                <img id="logo" :src="logoLink" draggable="false" :style="rotationCSS"/>
                 <img class="Player" id="like" v-show="showLike" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
             </div>
-            <!--<img class="Player" id="maintoprevlogo" src="" draggable="false" />--> <!--src="{% static logo_link %}"-->
-            <img class="Player" :src="prevLogoLink" id="prevlogo" v-show="showPrev" draggable="false" />
-            <img class="Player" id="nextlogo" :src="nextLogoLink" draggable="false" /> <!--src="{% static nextlogo_link %}"-->
+            <img class="Player main-to-prev-logo" :src="logo" draggable="false" :style="mainToPrevLogoAnimation"/>
+            <img class="Player next-to-main-logo" :src="logoLink" draggable="false" :style="nextToMainLogoAnimation"/>
+            <img class="Player prev-envelope" :src="logo" draggable="false" :style="prevEnvelopeAnimation"/>
+            <img class="Player" :src="prevLogo" id="prevlogo" v-show="showPrev" draggable="false" :style="prevLogoAnimation"/>
+            <img class="Player" id="nextlogo" :src="nextLogoLink" draggable="false" :style="nextLogoAnimation"/>
+            <img class="Player next-envelope" :src="nextLogo" draggable="false" :style="nextEnvelopeAnimation"/>
         </div>
     </script>
 
@@ -95,15 +98,17 @@
             <div id="progressBarLine"></div>
         </div>-->
         <div class="vue-simple-progress">
-            <div class="foreground-progress-bar" :style="bar_style"></div>
-            <div class="background-progress-bar" :style="bar_style"></div>
-            <div v-show="showPlayedTime" class="played-time">{{ '{{' }}playedTimeTop}}</div>
-            <div v-show="showTrackLength" class="track-length">{{ '{{' }}trackLengthTop}}</div>
+            <vue-slider-component @drag-end="dragEnd" @drag-start="dragStart" @mouseup.native="click" v-model="currentTime" ref="slider" v-bind="sliderPropsComputed" :max="sliderMax"></vue-slider-component>
+            <!--<div class="foreground-progress-bar" :style="bar_style + height_style"></div>-->
+            <div class="background-progress-bar" :style="bar_style + transition"></div>
+            <!--<div v-show="isPlayerHovered" class="played-time">{{ '{{' }}playedTimeTop}}</div>
+            <div v-show="isPlayerHovered || isFull" class="track-length">{{ '{{' }}trackLengthTop}}</div>-->
         </div>
     </script>
 
     <script type="text/x-template" id="audioPlayer">  <!-- компонент для элемента audio -->
-        <audio id="audio" :src="audioLink" @canplay="startPlaying"></audio>
+        <audio id="audio" ref="audio" :src="audioLink" @loadeddata="startPlaying" @ended="endPlaying" preload> <!-- @timeupdate="setCurrentTime" -->
+        </audio>
     </script>
 
     {% include "mainapp/vue-slider-component/template.html" %} <!-- подрубочка внешнего, скачанного компонента слайдера -->

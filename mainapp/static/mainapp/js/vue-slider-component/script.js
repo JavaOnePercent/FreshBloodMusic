@@ -144,6 +144,12 @@ Vue.component ('vueSliderComponent', {
       }
     },
     computed: {
+      myCSS() {
+        if(this.direction == 'horizontal')
+          return 'vue-slider-my'
+        else
+          return ''
+      },
       dotWidthVal () {
         return typeof this.dotWidth === 'number' ? this.dotWidth : this.dotSize
       },
@@ -265,7 +271,7 @@ Vue.component ('vueSliderComponent', {
           padding: `${this.dotHeightVal / 2}px ${this.dotWidthVal / 2}px`
         } : {
           width: typeof this.width === 'number' ? `${this.width}px` : this.width,
-          padding: `${this.dotHeightVal / 2}px ${this.dotWidthVal / 2}px`
+          //padding: `${this.dotHeightVal / 2}px ${this.dotWidthVal / 2}px`
         }
       },
       sliderStyles () {
@@ -472,12 +478,14 @@ Vue.component ('vueSliderComponent', {
         }
       },
       wrapClick (e) {
+        //this.$emit('mouse-down'); //закодил дебил
         if (this.isDisabled || !this.clickable || this.processFlag) return false
         let pos = this.getPos(e)
         if (this.isRange) {
           this.currentSlider = pos > ((this.position[1] - this.position[0]) / 2 + this.position[0]) ? 1 : 0
         }
-        this.setValueOnPos(pos)
+        this.setValueOnPos(pos, true)
+        this.moveStart(); //закодил дебил
       },
       moveStart (e, index = 0, isProcess) {
         if (this.isDisabled) {

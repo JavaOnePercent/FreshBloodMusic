@@ -42,7 +42,7 @@ class Track(models.Model):
     alb_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albumtrack')
     name_trc = models.CharField(max_length=50)
     gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='genretrack')
-    link_trc = models.CharField(max_length=50)
+    link_trc = models.CharField(max_length=50, default='')
     numplays_trc = models.IntegerField(default=0)
     rating_trc = models.IntegerField(default=0)
     date_trc = models.DateField()
