@@ -157,7 +157,7 @@ html, body
 /*панель топов-композиторов*/
 .compositor-top
 {   
-    z-index: 115;
+    z-index: 70;
     display: flex;
     flex-direction: column;
     color:black;
