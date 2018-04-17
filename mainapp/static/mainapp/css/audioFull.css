@@ -1,15 +1,16 @@
-#playerContainer {
+.player-container {
 	/*width: 450px;
     height: 450px;*/
     width: 600px;
-    height: 600px;
-    top: 0;
-    bottom: 20%;
+    height: 650px;
+    top: 30px;
     right: 0;
     position:absolute;
     left: 0;
     margin: auto;
+    transition: left 0.3s;
 }
+
 #player {
     z-index: 116;
     right: 0;
@@ -152,9 +153,8 @@
     top: 45%;
     width: 50px;
     height: 50px;
-    right: -90%;
+    right: 25px;
     bottom: 0;
-    left: 0;
     margin: auto;
 	position: absolute;
 }
@@ -206,10 +206,8 @@
     z-index: 5;
     width: 50px;
     height: 50px;
-    right: 0;
-    left: -110%;
-    top: 0;
-    bottom: -10%;
+    left: -25px;
+    top: 330px;
     margin: auto;
 	position: absolute;
 }
@@ -349,4 +347,78 @@
     height: 70px;
     left: 0;
     right: 0;
+}
+
+.queue {
+    position: absolute;
+    right: -25px;
+    top: 330px;
+    margin: auto;
+    width: 50px;
+    height: 50px;
+}
+
+.queue-button {
+    width: 50px;
+    height: 50px;
+    left: 0;
+    right: 0;
+    position: absolute;
+    margin: auto;
+}
+
+.queue-button:hover {
+    left: -1px;
+    top: -1px;
+    width: 52px;
+    height: 52px;
+}
+
+.queue-list {
+    position: absolute;
+    margin: auto;
+    width: 250px;
+    left: 150px;
+    top: -200px;
+    z-index: 1000;
+    /*background: rgba(245, 245, 245, 0.95);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08), 0 10px 10px rgba(0,0,0,0.05);*/
+    display: flex;
+    flex-direction: column;
+}
+
+.queue-element {
+    height: 40px;
+    flex-basis: 40px;
+    background: rgba(205, 205, 205, 0.3);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.04);
+    margin: 0px 0 10px 0;
+}
+
+.queue-element:hover {
+    background: rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+}
+
+.queue-img {
+    position: absolute;
+    height: 40px;
+    width: 40px;
+    
+}
+
+.queue-text {
+    position: absolute;
+    left: 55px;
+    height: 40px;
+    line-height: 40px;
+}
+
+.queue-play {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 30px;
+    width: 30px;
 }

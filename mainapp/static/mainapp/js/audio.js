@@ -19,6 +19,7 @@ var playerComponent = Vue.component('topPlayer', {
             CSSRef: CSSRefs.small,
             isFull: false,
             isHovered: false,
+            containerMove: '',
             track: {
                 currentID: null,
                 nextID: null,
@@ -37,6 +38,9 @@ var playerComponent = Vue.component('topPlayer', {
             audio: {
                 audioLink: '',
             },
+            queue: {
+                tracks: []
+            },
             HTTPConfig: '',
             isTimeout: false
         }
@@ -45,13 +49,45 @@ var playerComponent = Vue.component('topPlayer', {
     created() {
         this.loadNextTrack();
         bus.$on('trackclicked', event => {
-            this.playNow(event.id);
+            //this.playNow(event.id);
+            this.getTrackAttributes(event.id);
+            
         });
+        this.getTrackAttributes(3);
+        this.getTrackAttributes(4);
+        this.getTrackAttributes(5);
+        this.getTrackAttributes(6);
+        this.getTrackAttributes(3);
+        this.getTrackAttributes(4);
+        this.getTrackAttributes(5);
+        this.getTrackAttributes(6);
+        this.getTrackAttributes(5);
+        this.getTrackAttributes(6);
     },
     methods: {
-        playNow(id) {
+        /*playNow(id) {
             this.track.nextID = id;
             this.loadNextTrack();
+        },*/
+        moveContainer() {
+            if (this.containerMove === '')
+            {
+                var dist = document.body.offsetWidth / 2 - 675;
+                this.containerMove = (dist < 0) ? ('left: ' + ((dist-10) * 2) + 'px') : '';
+            }
+            else
+                this.containerMove = '';
+        },
+        getTrackAttributes(id) {
+            var varData = {
+                id: id
+            };
+            this.$http.get('track_attr', {
+                responseType: 'json',
+                params: varData
+            }).then(response => {
+                this.queue.tracks.push(response.data);
+            });
         },
         switchPlayerView() {
             if(this.isFull)
@@ -826,6 +862,48 @@ Vue.component('progressBar', {
                 return '';
         },
         
+    }
+});
+
+Vue.component('queue', {
+    template: '#queue',
+    props: ['tracks'],
+    data() {
+        return {
+            showQueue: false,
+            tracksComputed: []
+        }
+    },
+    methods: {
+        image(src) {
+            return toStatic(src);
+        },
+        openQueue() {
+            this.$emit('queue-opened');
+            this.showQueue = !this.showQueue;
+        },
+        mouseEnterElement(index) {
+            this.tracksComputed[index].text = this.tracks[index].name_per;
+            this.tracksComputed[index].style = 'color: white;';
+        },
+        mouseLeaveElement(index) {
+            this.tracksComputed[index].text = this.tracks[index].name_trc;
+            this.tracksComputed[index].style = '';
+        },
+        iterator(item, i, arr) {
+            this.$set(this.tracksComputed, i, {img: item.image_alb, text: item.name_trc, style: ''})
+            //Vue.set(this.tracksComputed[i], 'img', item.image_alb);
+            //Vue.set(this.tracksComputed[i], 'text', item.name_trc);
+        }
+    },
+    watch: {
+        tracks(tracks) {
+            /*for(var i = 0; i < tracks.length - this.tracksComputed.length; i++)
+            {
+                this.tracksComputed.push({});
+            }*/
+            tracks.forEach(this.iterator);
+        }
     }
 });
 

@@ -13,6 +13,13 @@ def get_random(all_tracks):  # возвращает рандомное знач�
 
 class TrackMethods:
     @staticmethod
+    def get(id):
+        try:
+            return Track.objects.all().get(pk=id)
+        except ObjectDoesNotExist:
+            return None
+
+    @staticmethod
     def get_two(parsed_json=None):
         # возвращает два трека рандомно (принимает json, в котором id текущего и следующего трека)
 

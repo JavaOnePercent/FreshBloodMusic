@@ -1,15 +1,3 @@
-Object.defineProperty(Vue.prototype, '$bus', {
-	get() {
-		return this.$root.bus;
-	}
-});
-
-var bus = new Vue({});
-
-Vue.http.interceptors.push(function(request) {
-  request.headers.set('X-CSRFToken', csrftoken);
-}); //эта штука перехватывает все запросы на Vue и преобразует их в запрос с csrf token'ом
-
 Vue.component('app-compilation',{
     template:'#compilation',
     data: function() {
@@ -33,7 +21,7 @@ Vue.component('app-compilation',{
         },
         trackClick: function(index) {
             //this.$emit('trackclicked');
-            this.$bus.$emit('trackclicked', {
+            bus.$emit('trackclicked', {
 				id: this.compilations[index].id
 			});
         }

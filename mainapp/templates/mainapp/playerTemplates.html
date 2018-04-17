@@ -6,15 +6,17 @@
             <link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
             <link id="playerCSS" rel="stylesheet" type="text/css" :href="CSSRef" />
             <div id="player" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-                <div id="playerContainer">
+                <div class="player-container" :style="containerMove">
                     <buttons :isFull="isFull" @nextclick="loadNextTrack" @dropdownclick="switchPlayerView"></buttons>
                     <logos v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
                     <menu-more></menu-more>
                     <track-performer v-bind="trackPerformer"></track-performer>
                     <volume-controller ref="volumeController" :isFull="isFull"></volume-controller>
                     <audio-player ref="audioPlayer" v-bind="audio" @playingended="loadNextTrack"></audio-player>
+                    <queue v-bind="queue" @queue-opened="moveContainer"></queue>
                     <!--<img class="Button Player" id="previousButton" src="" draggable="false" />-->
                 </div>
+                
                 <progress-bar :isPlayerHovered="isHovered" :isFull="isFull"></progress-bar>
             </div>
         </div>
@@ -109,6 +111,21 @@
     <script type="text/x-template" id="audioPlayer">  <!-- компонент для элемента audio -->
         <audio id="audio" ref="audio" :src="audioLink" @loadeddata="startPlaying" @ended="endPlaying" preload> <!-- @timeupdate="setCurrentTime" -->
         </audio>
+    </script>
+
+    <script type="text/x-template" id="queue">  <!-- компонент для элемента audio -->
+        <div class="queue">
+            <img @click="openQueue" class="Button queue-button" src="{% static 'mainapp/images/queue.svg' %}" draggable="false"/>
+            <transition name="queue">
+                <div class="queue-list" v-show="showQueue" @mouseleave="">
+                    <div @mouseenter="mouseEnterElement(index)" @mouseleave="mouseLeaveElement(index)" class="queue-element" v-for="(track, index) in tracksComputed">
+                        <img :src="image(track.img)" class="queue-img"/>
+                        <span :style="track.style" class="queue-text">{{ '{{' }} track.text }}</span>
+                        <img src="{% static 'mainapp/images/playButton.png' %}" class="queue-play">
+                    </div>
+                </div>
+            </transition>
+        </div>
     </script>
 
     {% include "mainapp/vue-slider-component/template.html" %} <!-- подрубочка внешнего, скачанного компонента слайдера -->

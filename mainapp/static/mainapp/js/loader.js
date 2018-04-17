@@ -33,8 +33,8 @@ Vue.directive('focus', {        //дерректива для фокуса вы�
       el.focus()
   }
 })
-var vm = new Vue({
-    el: '#loader-conteiner',
+Vue.component('loader',{
+    template: '#loader',
     data () {
       return {
       track_name_loader: '',
@@ -90,7 +90,7 @@ var vm = new Vue({
         e.stopPropagation();
         e.preventDefault();
         dropAll.style.pointerEvents="all"
-        vm.loaderStyle = 'track-upload'
+        this.loaderStyle = 'track-upload'
       });
      /*$(document).on('dragover', function (e){
         //e.stopPropagation();
@@ -119,7 +119,7 @@ var vm = new Vue({
       function dragenter(e){
         e.stopPropagation();
         e.preventDefault();
-        vm.loaderStyle ='track-upload-drop2'
+        this.loaderStyle ='track-upload-drop2'
         e.dataTransfer.dropEffect = 'copy'
         //document.getElementById('dropbox').classList.add("track-upload-drop")
         //document.getElementById('dropbox').classList.remove("track-upload")   //фу-фу-фу
@@ -130,7 +130,7 @@ var vm = new Vue({
           e.preventDefault();
           //dropAll.style.pointerEvents="all"
           e.dataTransfer.dropEffect = 'copy'
-          vm.loaderStyle ='track-upload-drop2'
+          this.loaderStyle ='track-upload-drop2'
         }
         function dragleaveAll(e){
           e.stopPropagation();
@@ -139,7 +139,7 @@ var vm = new Vue({
           //e.dataTransfer.dropEffect = 'copy'
         if (dragging === 0 & vm.loaderStyle != 'track-upload-drop2') 
           {
-          vm.loaderStyle = 'track-upload'
+          this.loaderStyle = 'track-upload'
           dropAll.style.pointerEvents="all"
           }
         }
@@ -157,7 +157,7 @@ var vm = new Vue({
           dragging++;
           dropAll.style.pointerEvents="none"
           e.dataTransfer.dropEffect = 'none'
-          vm.loaderStyle ='track-upload-drop'
+          this.loaderStyle ='track-upload-drop'
           //document.getElementById('dropbox').classList.add("track-upload-drop")
           //document.getElementById('dropbox').classList.remove("track-upload")
         }
@@ -166,7 +166,7 @@ var vm = new Vue({
         e.preventDefault();
         //e.dataTransfer.dropEffect = 'none'
         if( vm.loaderStyle === 'track-upload-drop2'){
-        vm.loaderStyle='track-upload'   //чтобы убрать мелкое подлагивание поставить "track-upload-drop"
+        this.loaderStyle='track-upload'   //чтобы убрать мелкое подлагивание поставить "track-upload-drop"
         dropAll.style.pointerEvents="all"
         }
         //document.getElementById('dropbox').classList.add("track-upload")
@@ -178,7 +178,7 @@ var vm = new Vue({
         //document.getElementById('dropbox').classList.add("track-upload")
         //document.getElementById('dropbox').classList.remove("track-upload-drop")
         dropAll.style.pointerEvents="all"
-        vm.loaderStyle='track-upload'
+        this.loaderStyle='track-upload'
         var dt = e.dataTransfer;
         var files = dt.files;
         document.getElementById("add").files =  files; 
@@ -221,7 +221,7 @@ var vm = new Vue({
         e.preventDefault();
         for(var i=0;i<e.target.files.length;i++) //пробегаем по файлам
         {
-          if(this.track.length < 2 )  //проверяем количество файлов в массиве 
+          if(this.track.length < 20 )  //проверяем количество файлов в массиве 
           {
             if(e.target.files[i].name.split('.').pop() =="mp3" ) //проверяем формат файла
             {

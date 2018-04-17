@@ -143,5 +143,18 @@ def add_album(request):
 
     return HttpResponse(status=200)
 
+
 def music_group(request):
     return render(request, 'mainapp/musicgroup.html', {'performer': Performer.objects.all()})
+
+
+@api_view(['GET'])
+def track_attr(request):
+    if request.method == "GET":
+        id = request.query_params['id']
+        track = TrackMethods.get(id)
+        if track is not None:
+            serializer = TrackSerializer(track)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

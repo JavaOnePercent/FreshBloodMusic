@@ -15,7 +15,7 @@
     <script src="{% static 'mainapp/js/init.js' %}"></script>
 </head>
 
-<body>
+<body id="body">
     {% csrf_token %}
     <div id="VueContainer">
         <div class="header" >
@@ -34,10 +34,12 @@
                     {% endif %}
             </div>
         </div>
+        <loader></loader>
         <main-compilation></main-compilation>
         <top-player></top-player>
     </div>
     <div>
+        {% include "mainapp/loader-music.html" %}
         {% include "mainapp/music-top.html" %}
         {% include "mainapp/playerTemplates.html" %}
     </div>

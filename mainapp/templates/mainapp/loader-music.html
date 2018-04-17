@@ -1,75 +1,67 @@
+{% block content %}
+{% load staticfiles %}
 
-<!DOCTYPE html>
-<html style="pointer-events: auto" id="body" lang="ru">
-<head>
-    {% load staticfiles %}
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="{% static 'mainapp/css/loader-music.css' %}" type="text/css">
-    <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-    <script src="{% static 'mainapp/js/vue/vue.js' %}"></script>
-    <script src="{% static 'mainapp/js/vue/vue-resource.js' %}"></script>
-</head>
-
-    
+<script type="text/x-template" id="loader">
     <div id="loader-conteiner" class="loader-conteiner">
-    <header class="header">
-        <span>Загрузка музыки</span>
-        <img class="esc" src="/static/mainapp/images/whiteClose.png">
-    </header>
-    <body>
-    {% csrf_token %}
-    <form method="POST">
-        <div class="track-img-loader-conteiner" >
-            <label>Обложка издания:</label>
-            <img :class="imgStyle"  @click="imit" src="/static/mainapp/images/camera.png" alt="обложка">
+        <link rel="stylesheet" href="{% static 'mainapp/css/loader-music.css' %}" type="text/css">
+        <header class="header">
+            <span>Загрузка музыки</span>
+            <img class="esc" src="/static/mainapp/images/whiteClose.png">
+        </header>
+        <form method="POST">
+            <div class="track-img-loader-conteiner" >
+                <label>Обложка издания:</label>
+                <img :class="imgStyle"  @click="imit" src="/static/mainapp/images/camera.png" alt="обложка">
+            </div>
+            <div class="track-name-loader-conteiner">
+                <label for="track-name-loader">Название издания*:</label>
+                <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="40">
+            </div>
+    
+            <div class="track-janr-loader-conteiner">
+                <label for="track-janr-loader">Жанр издания*:</label>
+                <div class="janr" @click="show=!show">{{ '{{' }} janr }}</div>
+                <ul class="janr-drop" v-if="show"  id="dropdown">
+                    <li v-for="(item,index) in menuItems"  @click='menuIndexfunc(index)'>{{ '{{' }} item.name }}
+                        <ul class="janr-drop-menu" v-if="menuIndex==index">
+                            <li v-for="child in item.children" @click="chooseJanr(child.name)"> {{ '{{' }} child.name }}
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+    
+            <div class="description-conteiner">
+                <label for="track-name-loader">Описание издания:</label>
+                <textarea type="text" name="description" maxlength="800"> </textarea>
+            </div>
+    
+    
+            <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
+            <div  class="loader-tracks" v-for="(tracks, index) in track" >
+                <img class="play" src="/static/mainapp/images/playButton.png" alt="play">
+                <input v-focus v-on:keyup.enter="currentEdit=null" v-if="currentEdit===index" id="input" class="track" type="text" v-model='tracks.name' @change="track_Name" @blur="currentEdit=null" maxlength="30" > <!-- а тут менять длину по базе-->
+                <div v-else class="track" style="cursor: pointer"  @click="upgradeName(index)" >{{'{{'}}tracks.name}}</div>
+                <img v-if="currentEdit===index" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
+                <img v-else class="edit" src="/static/mainapp/images/edit.png" @mousedown="upgradeName(index)">
+                <img class="del" src="/static/mainapp/images/xiomi.png" @click="deleteTrack(index)">
+                <hr>
+            </div>
+      
+            <div style="pointer-events: all" id = "dropbox" class="add" :class="loaderStyle">
+                <label>
+                    <input style="display:none" id='add' ref="add" @change="sync_track" type="file" name="track" multiple accept="audio/mpeg" >
+                    Добавить композицию
+                </label>
+            </div>
+    
+            <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "жанр" '  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
+            
+            <div id="error" class="error"><label  >{{'{{'}}errorMessage}} </label></div>
+        </form>
         </div>
-        <div class="track-name-loader-conteiner">
-            <label for="track-name-loader">Название издания*:</label>
-            <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="40">
-        </div>
+</script>
 
-        <div class="track-janr-loader-conteiner">
-            <label for="track-janr-loader">Жанр издания*:</label>
-            <div class="janr" @click="show=!show">{{ '{{' }} janr }}</div>
-            <ul class="janr-drop" v-if="show"  id="dropdown">
-                <li v-for="(item,index) in menuItems"  @click='menuIndexfunc(index)'>{{ '{{' }} item.name }}
-                    <ul class="janr-drop-menu" v-if="menuIndex==index">
-                        <li v-for="child in item.children" @click="chooseJanr(child.name)"> {{ '{{' }} child.name }}
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+<script src="{% static 'mainapp/js/loader.js' %}"></script>
 
-        <div class="description-conteiner">
-            <label for="track-name-loader">Описание издания:</label>
-            <textarea type="text" name="description" maxlength="800"> </textarea>
-        </div>
-
-
-        <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
-        <div  class="loader-tracks" v-for="(tracks, index) in track" >
-            <img class="play" src="/static/mainapp/images/playButton.png" alt="play">
-            <input v-focus v-on:keyup.enter="currentEdit=null" v-if="currentEdit===index" id="input" class="track" type="text" v-model='tracks.name' @change="track_Name" @blur="currentEdit=null" maxlength="30" > <!-- а тут менять длину по базе-->
-            <div v-else class="track" style="cursor: pointer"  @click="upgradeName(index)" >{{'{{'}}tracks.name}}</div>
-            <img v-if="currentEdit===index" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
-            <img v-else class="edit" src="/static/mainapp/images/edit.png" @mousedown="upgradeName(index)">
-            <img class="del" src="/static/mainapp/images/xiomi.png" @click="deleteTrack(index)">
-            <hr>
-        </div>
-  
-        <div style="pointer-events: all" id = "dropbox" class="add" :class="loaderStyle">
-            <label>
-                <input style="display:none" id='add' ref="add" @change="sync_track" type="file" name="track" multiple accept="audio/mpeg" >
-                Добавить композицию
-            </label>
-        </div>
-
-        <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "жанр" '  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
-        
-        <div id="error" class="error"><label  >{{'{{'}}errorMessage}} </label></div>
-    </form>
-    </div>
-    <script src="{% static 'mainapp/js/loader.js' %}"></script>
-
-</body>
+{% endblock %}

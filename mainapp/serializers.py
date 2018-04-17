@@ -16,7 +16,8 @@ class LikedTrackSerializer(serializers.ModelSerializer):
         model = LikedTrack
         fields = ('user_id', 'trc_id')
 
-class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека для метода nextTrack
+
+class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека без ссылки на аудио
     image_alb = serializers.ReadOnlyField(source='alb_id.image_alb')  # картинка альбома
     name_per = serializers.ReadOnlyField(source='alb_id.per_id.name_per')  # имя исполнителя
 
