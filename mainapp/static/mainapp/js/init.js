@@ -33,7 +33,14 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         duration: 0,
         playing: false,
         volume: 100,
-        isDragging: false
+        isDragging: false,
+        showModel: false,
+    },
+    getters:{
+        showModel(state) 
+        {
+            return state.showModel
+        },
     },
     mutations: {
         currentTime (state, val) {
@@ -41,6 +48,10 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         },
         duration (state, val){
             state.duration = val;
+        },
+        showModel(state, val) 
+        {
+            state.showModel = val
         },
         switchPlaying (state) {
             state.playing = !state.playing;

@@ -35,6 +35,7 @@ Vue.directive('focus', {        //дерректива для фокуса вы�
 })
 Vue.component('loader',{
     template: '#loader',
+    store,
     data () {
       return {
       track_name_loader: '',
@@ -50,6 +51,9 @@ Vue.component('loader',{
       show: false,
       menuIndex:null,
       pointerEvents: "pointerEvents",
+      dragging: 0,
+      dropbox:null,
+      dropAll: null,
       menuItems: [
       	{
         	name: 'Item 1',
@@ -75,22 +79,21 @@ Vue.component('loader',{
     },
     //если шо то сносить к чертям
     mounted(){
-      var dragging = 0;
-      var dropbox = document.getElementById("dropbox");
-      var dropAll = document.getElementById("body");   //для того чтобы засечь что элемент на форме
-      dropAll.addEventListener("dragover", dragoverAll, false);
-      dropAll.addEventListener("dragleave", dragleaveAll, false);
-      dropAll.addEventListener("dragenter", dragenterAll, false);
-      dropbox.addEventListener("dragenter", dragenter, false);
-      dropbox.addEventListener("dragover", dragover, false);
-      dropbox.addEventListener("dragleave", dragleave, false);
-      dropbox.addEventListener("drop", drop, false);
+      this.dropbox = document.getElementById("dropbox");
+      this.dropAll = document.getElementById("body");   //для того чтобы засечь что элемент на форме
+      this.dropAll.addEventListener("dragover", this.dragoverAll, false);
+      this.dropAll.addEventListener("dragleave", this.dragleaveAll, false);
+      this.dropAll.addEventListener("dragenter", this.dragenterAll, false);
+      this.dropbox.addEventListener("dragenter", this.dragenter, false);
+      this.dropbox.addEventListener("dragover", this.dragover, false);
+      this.dropbox.addEventListener("dragleave", this.dragleave, false);
+      this.dropbox.addEventListener("drop", this.drop, false);
 
       $(document).on('dragover drop', function (e){
         e.stopPropagation();
         e.preventDefault();
         dropAll.style.pointerEvents="all"
-        this.loaderStyle = 'track-upload'
+        vm.loaderStyle = 'track-upload'
       });
      /*$(document).on('dragover', function (e){
         //e.stopPropagation();
@@ -116,102 +119,109 @@ Vue.component('loader',{
           //dropAll.style.pointerEvents="all"
         //}
       });*/
-      function dragenter(e){
+     
+    },
+
+    //сносить досюда
+    methods: {
+      dragenter(e){
         e.stopPropagation();
         e.preventDefault();
         this.loaderStyle ='track-upload-drop2'
         e.dataTransfer.dropEffect = 'copy'
+        //console.log(vm.loaderStyle)
         //document.getElementById('dropbox').classList.add("track-upload-drop")
         //document.getElementById('dropbox').classList.remove("track-upload")   //фу-фу-фу
-      }
-        function dragover(e)
+      },
+        dragover(e)
         {
           e.stopPropagation();
           e.preventDefault();
           //dropAll.style.pointerEvents="all"
           e.dataTransfer.dropEffect = 'copy'
           this.loaderStyle ='track-upload-drop2'
-        }
-        function dragleaveAll(e){
+        },
+        dragleaveAll(e){
           e.stopPropagation();
           e.preventDefault();
-          dragging--;
+          this.dragging--;
           //e.dataTransfer.dropEffect = 'copy'
-        if (dragging === 0 & vm.loaderStyle != 'track-upload-drop2') 
+        if (this.dragging === 0 & this.loaderStyle != 'track-upload-drop2') 
           {
-          this.loaderStyle = 'track-upload'
-          dropAll.style.pointerEvents="all"
+            this.loaderStyle = 'track-upload'
+          this.dropAll.style.pointerEvents="all"
           }
-        }
-        function dragoverAll(e){
+        },
+        dragoverAll(e){
           e.stopPropagation();
           e.preventDefault();
           e.dataTransfer.dropEffect = 'none' 
           //dropAll.style.pointerEvents="none"
           //e.dataTransfer.dropEffect = 'none'
           //vm.loaderStyle ='track-upload-drop'
-        }
-        function dragenterAll(e){
+        },
+         dragenterAll(e){
           e.stopPropagation();
           e.preventDefault();
-          dragging++;
-          dropAll.style.pointerEvents="none"
+          this.dragging++;
+          this.dropAll.style.pointerEvents="none"
           e.dataTransfer.dropEffect = 'none'
           this.loaderStyle ='track-upload-drop'
           //document.getElementById('dropbox').classList.add("track-upload-drop")
           //document.getElementById('dropbox').classList.remove("track-upload")
-        }
-      function dragleave(e){
+        },
+      dragleave(e){
         e.stopPropagation();
         e.preventDefault();
         //e.dataTransfer.dropEffect = 'none'
-        if( vm.loaderStyle === 'track-upload-drop2'){
-        this.loaderStyle='track-upload'   //чтобы убрать мелкое подлагивание поставить "track-upload-drop"
-        dropAll.style.pointerEvents="all"
+        if( this.loaderStyle === 'track-upload-drop2'){
+          this.loaderStyle='track-upload'   //чтобы убрать мелкое подлагивание поставить "track-upload-drop"
+        this.dropAll.style.pointerEvents="all"
         }
         //document.getElementById('dropbox').classList.add("track-upload")
         //document.getElementById('dropbox').classList.remove("track-upload-drop")
-      }
-      function drop(e) {
+      },
+      drop(e) {
         e.stopPropagation();
         e.preventDefault();
         //document.getElementById('dropbox').classList.add("track-upload")
         //document.getElementById('dropbox').classList.remove("track-upload-drop")
-        dropAll.style.pointerEvents="all"
+        this.dropAll.style.pointerEvents="all"
         this.loaderStyle='track-upload'
         var dt = e.dataTransfer;
         var files = dt.files;
         document.getElementById("add").files =  files; 
-      }
-    },
-    //сносить досюда
-    methods: {
+      },
+      close(){
+        this.$store.commit("showModel",false)
+      },
       sync_photo: function (e) {
         e.preventDefault();
         var preview = document.querySelector('img[alt="обложка"]');  //я знаю это колхоз, но я чот сломался
         var file    = document.querySelector('input[name="photo"]').files[0];
         var reader  = new FileReader();
-        
+    
         this.errorMessage = ''
         this.photo = e.target.files[0];
         reader.onloadend = function () {
         preview.src = reader.result;
         }
+  
         if (file) {
-          if(e.target.files[0].name.split('.').pop() =="jpg"||"png" ) //проверяем формат файла
-            {
+          if(e.target.files[0].name.split('.').pop() =="jpg" ) //проверяем формат файла (переписать)
+          {   
           reader.readAsDataURL(file);
-          this.imgStyle='img';
-            }
-          else 
+          this.imgStyle='Loaderimg';
+        } else {
+          preview.src = "/static/mainapp/images/camera.png";
+          this.imgStyle='camera';
+        }
+        }
+        else 
         {
           preview.src = "/static/mainapp/images/camera.png";
           this.imgStyle='camera';
           this.errorMessage = 'формат картинки только jpg'  //хотя скорее всего эта ошибка не нужна
-        }
-        } else {
-          preview.src = "/static/mainapp/images/camera.png";
-          this.imgStyle='camera';
         }
         //let reader = new FileReader();
         //this.src = reader.readAsDataURL(e.target.files[0]);

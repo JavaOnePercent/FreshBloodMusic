@@ -15,7 +15,7 @@
     <script src="{% static 'mainapp/js/init.js' %}"></script>
 </head>
 
-<body id="body">
+<body  id="body">
     {% csrf_token %}
     <div id="VueContainer">
         <div class="header" >
@@ -25,7 +25,8 @@
             <div class="radio"></div>
             <div class="management">
                     {% if username %}
-                    <a href="loader-music/">Добавить</a>
+                    <img class="uploadButton" src="/static/mainapp/images/upload-button.png" alt="loader" @click='show'>
+                    <!--<a href="loader-music/">Добавить</a>-->
                     <!--<a href="performers/">Моя музыка</a>-->
                     <a href="auth/logout/">Выйти ({{ username }})</a>
                     {% else %}
@@ -34,7 +35,11 @@
                     {% endif %}
             </div>
         </div>
-        <loader></loader>
+        <div v-show="showModel" class="modal" id="myModal" >
+            <div class="modal-content" >
+                <loader></loader>
+            </div>
+        </div>
         <main-compilation></main-compilation>
         <top-player></top-player>
     </div>
