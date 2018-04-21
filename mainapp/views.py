@@ -4,9 +4,11 @@ import re
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import auth
+from django.utils.datastructures import MultiValueDictKeyError
+
 from .models import Performer, Genre, Album, Track, LikedTrack
 from django.http import HttpResponse
-from .compressor import compress_image, compress_audio
+from .uploader import Compressor, save_album
 from .serializers import TrackSerializer, NoLinkTrackSerializer
 from .model_methods import TrackMethods, LikedTrackMethods
 from rest_framework.decorators import api_view
@@ -45,6 +47,7 @@ def like(request):
             return Response(status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def track(request):
@@ -94,12 +97,14 @@ def track(request):
         #return HttpResponse(json_jn, content_type="application/json")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 def best_performer(request):
     if request.method == "GET":
         performer = Performer.objects.order_by('rating_per').reverse()[:3].values_list('name_per', 'image_per')
         json_jn = json.dumps({"performers": list(performer)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
+
 
 @api_view(['GET'])
 def top_month(request):
@@ -108,6 +113,7 @@ def top_month(request):
         json_jn = json.dumps({"month": list(month)}, cls=DjangoJSONEncoder)
         return HttpResponse(json_jn, content_type="application/json")
 
+
 class Names:
     name_track = ""
     image_track = ""
@@ -115,36 +121,28 @@ class Names:
         self.name_track = name_track
         self.image_track = image_track
 
+
 def load_music(request):
     return render(request, 'mainapp/loader-music.html')
+
     
 def profile(request):
     return render(request, 'mainapp/profile.html')
 
-def add_album(request):
-    if request.method == 'POST':
-        path = './mainapp/static/mainapp/album_sources/'
-        album_name = request.POST["name"]
-        os.mkdir(path + album_name)
-        path += album_name + '/'
-        photo = request.FILES["photo"]
-        track = request.FILES["track"]
-        if re.fullmatch(r'image/\S*', photo.content_type):
-            uploadedPic = path + "pic"
-            f = open(uploadedPic, "wb")
-            f.write(photo.read())
-            f.close()
-            compress_image(uploadedPic, path + 'pic.jpg')
-            os.remove(uploadedPic)
-        if re.fullmatch(r'audio/\S*', track.content_type):
-            uploadedAudio = path + "audio"
-            f = open(uploadedAudio, "wb")
-            f.write(track.read())
-            f.close()
-            compress_audio(uploadedAudio, path + 'audio.mp3')
-            os.remove(uploadedAudio)
 
-    return HttpResponse(status=200)
+@api_view(['POST'])
+def album(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
+    if request.method == 'POST':
+        album_name = request.POST["name"]
+        try:
+            photo = request.FILES["photo"]
+        except MultiValueDictKeyError:
+            photo = None
+        tracks = request.FILES.getlist('track')
+
+        save_album(user=auth.get_user(request).id, name=album_name, logo=photo, tracks=tracks)
+
+        return HttpResponse(status=200)
 
 
 def music_group(request):

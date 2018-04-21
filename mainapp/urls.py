@@ -13,7 +13,8 @@ urlpatterns = [
     url(r'^track_attr$', views.track_attr, name='track_attr'),
     url(r'^loader-music/$', views.load_music, name='load_music'),
     url(r'^profile/$', views.profile, name='profile'),
-    url(r'^add_album/$', views.add_album, name='add_album'),
+    # url(r'^add_album/$', views.add_album, name='add_album'),
+    url(r'^album$', views.album, name='album'),
     # url(r'^performer/$', ListView.as_view(queryset=Performer.objects.all(), template_name="mainapp/musicgroup.html")),
     url(r'^performer/(?P<slug>\w+)', DetailView.as_view(model = Performer, template_name = "mainapp/musicgroup.html")),
 ]

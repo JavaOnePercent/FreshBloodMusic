@@ -236,13 +236,14 @@ Vue.component('loader',{
             if(e.target.files[i].name.split('.').pop() =="mp3" ) //проверяем формат файла
             {
               this.errorMessage = ''
-              console.log(e.target.files[i].type)
-              file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "") ,"file": e.target.files[i]};
+              //console.log(e.target.files[i].type)
+              //file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "") ,"file": e.target.files[i]};
               //e.target.reset();
               //e.target.files[i] = null;
-              console.log(e.target.files[i].name)
+              //console.log(e.target.files[i].name)
+              file=e.target.files[i];
               this.track.push(file);
-              console.log(this.track.length)
+              //console.log(this.track.length)
             } else 
             {
               this.errorMessage = 'формат музыки только mp3'  //хотя скорее всего эта ошибка не нужна
@@ -273,13 +274,16 @@ Vue.component('loader',{
           var photo=this.photo
           data = new FormData()
           data.append('photo ', this.photo)
-          data.append('track ', this.track)
+          for(var track of this.track)
+          {
+            data.append('track', track)
+          }
           data.append('name ', this.track_name_loader)
 
           console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
           if (track_name_loader && track) {
             this.errorMessage = '';
-            this.$http.post('/add_album/', data, {headers: {'X-CSRFToken': csrftoken}}).then(function(response){ //csrf token уже подключён перехватчиком, который находится в music-top
+            this.$http.post('album', data).then(function(response){
               console.log('Success! Response: ', response.body);
           }, function(error){
           })

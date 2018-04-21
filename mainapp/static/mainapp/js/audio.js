@@ -53,7 +53,7 @@ var playerComponent = Vue.component('topPlayer', {
             this.getTrackAttributes(event.id);
             
         });
-        this.getTrackAttributes(3);
+        /*this.getTrackAttributes(3);
         this.getTrackAttributes(4);
         this.getTrackAttributes(5);
         this.getTrackAttributes(6);
@@ -62,7 +62,7 @@ var playerComponent = Vue.component('topPlayer', {
         this.getTrackAttributes(5);
         this.getTrackAttributes(6);
         this.getTrackAttributes(5);
-        this.getTrackAttributes(6);
+        this.getTrackAttributes(6);*/
     },
     methods: {
         /*playNow(id) {
@@ -87,6 +87,8 @@ var playerComponent = Vue.component('topPlayer', {
                 params: varData
             }).then(response => {
                 this.queue.tracks.push(response.data);
+                this.track.nextID = id;
+                this.loadNextTrack();
             });
         },
         switchPlayerView() {
@@ -147,6 +149,7 @@ var playerComponent = Vue.component('topPlayer', {
         },
         nextTrackSuccessFunc(data) {         //функция успеха после получения следующего трека
             //console.log(data.body)
+            
             var current = data.body.current;
             var next = data.body.next;
 
@@ -165,6 +168,7 @@ var playerComponent = Vue.component('topPlayer', {
 
             this.track.isLiked = !!(current.is_liked);
             this.logos.isLiked = this.track.isLiked;
+            bus.$emit('next-track-load');
         }
     }
 });
@@ -282,6 +286,14 @@ var logosComponent = Vue.component('logos', {
                 setTimeout(this.rotate, 100, true, 1080, this.audio.duration - this.audio.currentTime);
             }
         });
+        bus.$on('next-track-load', event => {
+            this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
+            this.nextLogoAnimation = 'visibility: hidden;';
+            this.mainLogoAnimation = 'visibility: hidden;';
+            this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg);';
+            setTimeout(this.startAnimation, 100);
+        });
+        
         /*bus.$on('slidermoved', event => {
             this.updateRotation(false);
         });
@@ -310,11 +322,7 @@ var logosComponent = Vue.component('logos', {
         logoLink() { //переключилось лого, значит запускаем анимацию
             //this.updateRotation(false);
             
-            this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
-            this.nextLogoAnimation = 'visibility: hidden;';
-            this.mainLogoAnimation = 'visibility: hidden;';
-            this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg);';
-            setTimeout(this.startAnimation, 100);
+            
             
         },
         isLiked(shL) {
@@ -912,14 +920,14 @@ new Vue({
     store,
         //bus: bus // Here we bind our event bus to our $root Vue model.
     computed: {
-            showModel () {
-                return this.$store.state.showModel
-            }
-        },
-        methods:
-        {
-            show() {
-                this.$store.commit("showModel", true)
-            }
+        showModel () {
+            return this.$store.state.showModel
         }
+    },
+    methods:
+    {
+        show() {
+            this.$store.commit("showModel", true)
+        }
+    }
 });

@@ -1,8 +1,9 @@
 from django.db import models
 
+
 class Performer(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userperformer')
+    user_id = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='userperformer')
     name_per = models.CharField(max_length=30, unique=True)
     rating_per = models.IntegerField(default=0)
     image_per = models.CharField(max_length=50, default='0')
