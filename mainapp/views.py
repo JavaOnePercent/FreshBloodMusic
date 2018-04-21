@@ -117,6 +117,9 @@ class Names:
 
 def load_music(request):
     return render(request, 'mainapp/loader-music.html')
+    
+def profile(request):
+    return render(request, 'mainapp/profile.html')
 
 def add_album(request):
     if request.method == 'POST':

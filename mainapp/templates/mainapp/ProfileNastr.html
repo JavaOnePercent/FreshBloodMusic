@@ -1,0 +1,69 @@
+
+{% load staticfiles %}
+
+<script type="text/x-template" id="nastr">
+<div class="nastr-conteiner">
+<link rel="stylesheet" href="{% static 'mainapp/css/nastr.css' %}" type="text/css">
+<div class="row">
+<form method="POST">
+<div class="mainNastr block">
+    <label>Настройки</label>
+    <hr>
+
+
+</div>
+
+
+
+
+</div>
+</form>
+</div>
+</script>
+
+
+<script type="text/x-template" id="profile">
+
+<div class="ProfileConteiner" id="body">
+        <div class="row">
+            <div class="leftColumn">
+            <div class="ProfileLable Lblock" >
+                <img src="/static/mainapp/images/camera.png" alt="аватарка" class="ProfileImg">
+                <div class="ProfileNastr">
+                    <img src="/static/mainapp/images/settings-cogwheel-button.png" alt="настройки">
+                    <label>Настройки</label>
+                </div>
+            </div>
+            <div class="VK Lblock">
+                <label>Профиль в тентакле</label>
+            </div>
+            <div class="LikeMusic Lblock">
+                <label>Понравившаяся музыка</label>
+            </div>
+            <div class="subscribers Lblock">
+                <label>Подписчики</label>
+            </div>
+            </div>       
+            <div class="rightColumn">
+                <div class="ProfileName Rblock">
+                    <label>Имя артиста</label>
+                </div>
+                <div class="ProfileDescription Rblock">
+                    <label>Описание</label>
+                    <p>Тут описание</p>
+                </div>
+                <div class="favoriteAlbum Rblock">
+                    <label>Любимый Альбом</label>
+                    <p>Тут любимый альбом</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</script>
+
+
+
+
+<script src="{% static 'mainapp/js/profile.js' %}"></script>
+
