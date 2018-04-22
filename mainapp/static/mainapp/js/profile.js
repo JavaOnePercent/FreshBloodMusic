@@ -1,10 +1,10 @@
-Vue.component('ProfileNastr', {
+Vue.component('profileNastr', {
     template:'#nastr',
     data: function() {
         return{
         }
     },
-    methods: {
+    methods: { 
     },
 });
 
@@ -16,21 +16,24 @@ Vue.component('profile', {
         }
     },
     methods: {
+        nastrClick() {
+            this.$emit('nastr-clicked');
+        }
     },
 });
 
 
-/*new Vue ({
-    el: '#body',
+new Vue ({
+    el: '#VueContainer',
     data:
     {
-    NastrShow:false
+        nastrShow: false
     },
     methods: {
         show(){
-            this.NastrShow = !this.NastrShow;
+            this.nastrShow = !this.nastrShow;
         }
 
     }
 
-})*/
+})

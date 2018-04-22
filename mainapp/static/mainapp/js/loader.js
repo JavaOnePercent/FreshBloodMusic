@@ -48,6 +48,7 @@ Vue.component('loader',{
       currentEdit: null,
       trackName: '',
       janr:'жанр',
+      genreID: '',
       show: false,
       menuIndex:null,
       pointerEvents: "pointerEvents",
@@ -55,7 +56,7 @@ Vue.component('loader',{
       dropbox:null,
       dropAll: null,
       menuItems: [
-      	{
+      	/*{
         	name: 'Item 1',
           children: [{name: 'Subitem 1'},{name: 'Subitem 2'},{name: 'Subitem 3'}]
         },
@@ -73,7 +74,7 @@ Vue.component('loader',{
         },
         {
         	name: 'Item 2'
-        },
+        },*/
       ],
       }
     },
@@ -124,6 +125,24 @@ Vue.component('loader',{
 
     //сносить досюда
     methods: {
+      genresButtonClick() {
+        this.show=!this.show;
+        if(this.menuItems.length === 0)
+        {
+          this.$http.get('genre').then(response => {response.body.forEach(this.genresIterator)})
+        }
+      },
+      genresIterator(item, i, arr) {
+        this.$set(this.menuItems, i, {name: item.name_gnr, id: item.id, children: []});
+      },
+      genreClick(index) {
+        this.menuIndexfunc(index);
+        if(this.menuItems[index].children.length === 0)
+          this.$http.get('genre', {params: {id: this.menuItems[index].id}}).then(response => {response.body.forEach(this.stylesIterator)});
+      },
+      stylesIterator(item, i, arr) { 
+        this.$set(this.menuItems[this.menuIndex].children, i, {name: item.name_stl, id: item.id});
+      },
       dragenter(e){
         e.stopPropagation();
         e.preventDefault();
@@ -273,12 +292,13 @@ Vue.component('loader',{
           var track=this.track
           var photo=this.photo
           data = new FormData()
-          data.append('photo ', this.photo)
+          data.append('photo', this.photo)
           for(var track of this.track)
           {
             data.append('track', track)
           }
-          data.append('name ', this.track_name_loader)
+          data.append('name', this.track_name_loader)
+          data.append('gen_id', this.genreID)
 
           console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
           if (track_name_loader && track) {
@@ -309,17 +329,16 @@ Vue.component('loader',{
           },
           menuIndexfunc:function(id)
           {
-            if(this.menuIndex == null)
-            {
-              this.menuIndex=id
-            }
+            if(this.menuIndex === null || id != this.menuIndex)
+              this.menuIndex = id;
             else
-            this.menuIndex=null
+              this.menuIndex = null;
           },
-          chooseJanr:function(name)
+          chooseJanr:function(name, id)
           {
             this.show = !this.show
             this.janr = name;
+            this.genreID = id;
           }
   }
 });

@@ -20,11 +20,11 @@
     
             <div class="track-janr-loader-conteiner">
                 <label for="track-janr-loader">Жанр издания*:</label>
-                <div class="Loaderjanr" @click="show=!show">{{ '{{' }} janr }}</div>
+                <div class="Loaderjanr" @click="genresButtonClick">{{ '{{' }} janr }}</div>
                 <ul class="janr-drop" v-if="show">
-                    <li v-for="(item,index) in menuItems"  @click='menuIndexfunc(index)'>{{ '{{' }} item.name }}
-                        <ul class="janr-drop-menu" v-if="menuIndex==index">
-                            <li v-for="child in item.children" @click="chooseJanr(child.name)"> {{ '{{' }} child.name }}
+                    <li v-for="(item,index) in menuItems"  @click='genreClick(index)'>{{ '{{' }} item.name }}
+                        <ul class="janr-drop-menu" v-if="menuIndex===index">
+                            <li v-for="child in item.children" @click="chooseJanr(child.name, child.id)"> {{ '{{' }} child.name }}
                             </li>
                         </ul>
                     </li>

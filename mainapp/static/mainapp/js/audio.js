@@ -100,10 +100,11 @@ var playerComponent = Vue.component('topPlayer', {
         },
         onLikePressed() {
             this.logos.isLiked = !this.logos.isLiked;
+            this.likeTrack();
         },
         likeTrack() {
-            if(this.logos.isLiked != this.track.isLiked)
-            {   
+            //if(this.logos.isLiked != this.track.isLiked)
+            //{   
                 var varData = {
                     track_id: this.track.currentID
                 };
@@ -117,7 +118,7 @@ var playerComponent = Vue.component('topPlayer', {
                         //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //удаление
-            }
+            //}
         },
         successfulLikeFunc(data) {
             //тут надо обрабатывать статусы
@@ -136,7 +137,7 @@ var playerComponent = Vue.component('topPlayer', {
             {
                 this.isTimeout = true;
                 setTimeout(this.nextTrackTimeout, 1000);
-                this.likeTrack();
+                //this.likeTrack();
                 var varData = {
                     current_track: this.track.currentID,
                     next_track: this.track.nextID
@@ -155,16 +156,16 @@ var playerComponent = Vue.component('topPlayer', {
 
             this.trackPerformer.trackName = current.name_trc;
             this.trackPerformer.performerName = current.name_per;//
-            this.audio.audioLink = toStatic(current.link_trc);//toStatic(current.link_trc);
+            this.audio.audioLink = (current.audio_trc);//toStatic(current.link_trc);
             //console.log(current.audio_file);
             this.track.currentID = current.id;
             this.track.nextID = next.id;
             document.getElementById('title').innerHTML = current.name_per + " - " + current.name_trc;
 
             logo = this.logos.logoLink;
-            this.logos.logoLink = toStatic(current.image_alb);
+            this.logos.logoLink = (current.image_alb);
             this.logos.prevLogoLink = logo;
-            this.logos.nextLogoLink = toStatic(next.image_alb);
+            this.logos.nextLogoLink = (next.image_alb);
 
             this.track.isLiked = !!(current.is_liked);
             this.logos.isLiked = this.track.isLiked;
@@ -318,12 +319,6 @@ var logosComponent = Vue.component('logos', {
             {
                 this.rotate(false, cur/this.audio.duration * 1080);
             }
-        },
-        logoLink() { //переключилось лого, значит запускаем анимацию
-            //this.updateRotation(false);
-            
-            
-            
         },
         isLiked(shL) {
             this.showLike = shL;

@@ -5,113 +5,19 @@
 <head>
     <meta charset="utf-8" />
     <title>Имя Артиста</title>
-    <link rel="stylesheet" href="{% static 'mainapp/css/profile.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'mainapp/css/profile.css' %}" type="text/css"/>
     <script src="{% static 'mainapp/js/vue/vue.js' %}"></script>
 </head>
 
 <body>
-
-<div class="nastr-conteiner">
-<link rel="stylesheet" href="{% static 'mainapp/css/nastr.css' %}" type="text/css">
-    <div class="row">
-        <div class="mainNastr block">
-            <label>Настройки</label>
-            <hr>
-        <div class="N-name str">
-            <label class="line">Ваше имя:</label>
-            <input class="" type="text" name="N-name" v-model='' maxlength="40">
-        </div>
-        <div class="N-Lable str">
-            <label class="line">Аватар:</label>
-            <input type="file" name="lable" multiple accept="image/*" >
-        </div> 
-        <div class="N-Description row">
-            <label class="line">О себе:</label>
-            <textarea class="" type="text" name="N-Description" maxlength="800">
-            </textarea>
-        </div>              
-        </div>
-
-        <div class="N-vk block row">
-            <label class="line">Привязка акканута к ВК:</label>
-            ну а тут можно просто ссылку требовать в инпут 
-        </div>
-
-        <div class="N-style block row">
-            <label>Вид страницы</label>
-            <hr>
-            <div class="str">
-                <label class="line">Фон профиля:</label>
-                <input type="file" name="background" multiple accept="image/*" >
-            </div>
-            <div class="str">
-                <label class="line">Цвет фона:</label>
-                <input type="color">
-            </div>
-            <div class="str">
-                <label class="line">Любимый альбом:</label>
-                поиск по всем альбомам
-            </div>
-        </div>
-
-        <div class="N-subbmit block row">
-            <div class="str" >
-                <button class="N-sub" name="sub"> Сохранить </button>
-                <div class="Cancel">Отмена</div>
-            </div>
-        </div>
-                
-                
-                
-                
+    <div id="VueContainer">
+        <profile-nastr v-show='nastrShow'></profile-nastr>
+        <profile @nastr-clicked="show"></profile>
     </div>
-</div>
 
-<div class="ProfileConteiner" id="body">
-    <div class="row">
-        <div class="leftColumn">
-        <div class="ProfileLable Lblock" >
-            <img src="/static/mainapp/images/camera.png" alt="аватарка" class="ProfileImg">
-            <div class="ProfileNastr">
-                <img src="/static/mainapp/images/settings-cogwheel-button.png" alt="настройки">
-                <label>Настройки</label>
-            </div>
-        </div>
-        <div class="VK Lblock">
-            <label>Профиль в контакте</label>
-        </div>
-        <div class="LikeMusic Lblock">
-            <label>Понравившаяся музыка</label>
-        </div>
-        <div class="subscribers Lblock">
-            <label>Подписчики</label>
-        </div>
-        </div>       
-        <div class="rightColumn">
-            <div class="ProfileName Rblock">
-                <label>Имя артиста</label>
-            </div>
-            <div class="ProfileDescription Rblock">
-                <label>Описание</label>
-                <p>Тут описание</p>
-            </div>
-            <div class="favoriteAlbum Rblock">
-                <label>Любимый Альбом</label>
-                <p>Тут любимый альбом</p>
-            </div>
-        </div>
+    <div>
+        {% include "mainapp/ProfileNastr.html" %}
     </div>
-</div>
-
-
-
-
-
-<div>
-    {% include "mainapp/ProfileNastr.html" %}
-</div>
-
-
 
 </body>
 </html>

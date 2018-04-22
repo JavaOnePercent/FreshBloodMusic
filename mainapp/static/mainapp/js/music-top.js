@@ -11,9 +11,9 @@ Vue.component('app-compilation',{
           this.$http.get('track',{params: {genre: message}}).then(function(response){
               //console.log(JSON.parse(response.bodyText));
               this.compilations = JSON.parse(response.bodyText);
-              this.compilations.forEach(function(item) {
-                  item.image_alb = "/static/mainapp/album_sources/" + item.image_alb;
-              });
+              /*this.compilations.forEach(function(item) {
+                  item.image_alb = "/media/albums/" + item.image_alb;
+              });*/
               //console.log(this.compilations);
                 //alert(this.compilations);
           }, function(error){
@@ -42,10 +42,10 @@ Vue.component('app-music-top', {
         showMonth: function() {
             this.$http.get('top_month/').then(function(response){
                 //console.log(response);
-                this.infotracks = response.data.month;
-                this.infotracks.forEach(function(item, i, arr) {
-                    item[2] = "/static/mainapp/album_sources/" + item[2];
-                });
+                this.infotracks = response.data;
+                /*this.infotracks.forEach(function(item, i, arr) {
+                    item[2] = "/media/albums/" + item[2];
+                });*/
                 //alert(this.infotracks);
             }, function(error){
             })
@@ -67,10 +67,10 @@ Vue.component('compositor-top', {
         showBest: function() {
             this.$http.get('best_performer/').then(function(response){
                 //console.log(response);
-                this.compositors = response.data.performers;
-                this.compositors.forEach(function(item, i, arr) {
+                this.compositors = response.data;
+                /*this.compositors.forEach(function(item, i, arr) {
                     item[1] = "/static/mainapp/performer_sources/" + item[1];
-                });
+                });*/
                 //alert(this.compositors);
             }, function(error){
             })

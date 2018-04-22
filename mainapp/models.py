@@ -6,7 +6,7 @@ class Performer(models.Model):
     user_id = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='userperformer')
     name_per = models.CharField(max_length=30, unique=True)
     rating_per = models.IntegerField(default=0)
-    image_per = models.CharField(max_length=50, default='0')
+    image_per = models.FileField(default=None)
     about_per = models.TextField(null=True, blank=True)
     date_per = models.DateField(null=True, blank=True)
     slug = models.SlugField(max_length=30, null=True, blank=True, unique=True)
@@ -23,15 +23,25 @@ class Genre(models.Model):
         return self.name_gnr
 
 
+class GenreStyle(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='genrestylegenre')
+    name_stl = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name_stl
+
+
 class Album(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     per_id = models.ForeignKey(Performer, on_delete=models.CASCADE, related_name='performeralbum')
     name_alb = models.CharField(max_length=30)
-    gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='genrealbum')
+    stl_id = models.ForeignKey(GenreStyle, on_delete=models.CASCADE, related_name='genrealbum')
     numplays_alb = models.IntegerField(default=0)
     rating_alb = models.IntegerField(default=0)
-    image_alb = models.CharField(max_length=50, default='0')
+    image_alb = models.FileField(upload_to='albums', default=None)
     date_alb = models.DateField()
+    about_alb = models.TextField(default='')
     slug = models.SlugField(max_length=30, null=True, blank=True)
 
     def __str__(self):
@@ -42,8 +52,8 @@ class Track(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     alb_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albumtrack')
     name_trc = models.CharField(max_length=50)
-    gnr_id = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='genretrack')
-    link_trc = models.CharField(max_length=50, default='')
+    # stl_id = models.ForeignKey(GenreStyle, on_delete=models.CASCADE, related_name='genrestyletrack', default=None)
+    audio_trc = models.FileField(upload_to='albums', default=None)
     numplays_trc = models.IntegerField(default=0)
     rating_trc = models.IntegerField(default=0)
     date_trc = models.DateField()

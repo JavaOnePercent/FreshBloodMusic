@@ -17,7 +17,7 @@ const csrftoken = getCookie('csrftoken')
 
 function toStatic(link)
 {
-    return '/static/mainapp/album_sources/' + link;
+    return '/media/albums/' + link;
 }
 
 var bus = new Vue();

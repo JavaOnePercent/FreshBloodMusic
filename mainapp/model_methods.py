@@ -2,8 +2,9 @@ import random
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.fields.files import FieldFile, ImageFieldFile
 
-from mainapp.models import Track, LikedTrack, Album, Performer, Genre
+from mainapp.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle
 
 
 def get_random(all_tracks):  # возвращает рандомное значение из списка
@@ -14,23 +15,36 @@ def get_random(all_tracks):  # возвращает рандомное знач�
 class AlbumMethods:
     @staticmethod
     def create(user, name, genre, date):
-        album = Album(per_id=Performer.objects.get(user_id=user), name_alb=name, gnr_id=Genre.objects.get(pk=2),
-                      image_alb='', date_alb=date)
+        album = Album(per_id=Performer.objects.get(user_id=user), name_alb=name,
+                      stl_id=GenreStyle.objects.get(id=genre), image_alb='', date_alb=date)
         album.save()
-        album.image_alb = str(album.id) + '/logo.jpg'
-        album.save()
+
+        # album.image_alb = str(album.id) + '/logo.jpg'
+        # album.save()
         return album
+
+    @staticmethod
+    def write_image_alb(album, image_alb):
+        field_file = FieldFile(album, Track.audio_trc.field, image_alb)
+        album.image_alb = field_file
+        album.save()
 
 
 class TrackMethods:
     @staticmethod
-    def create(album, name, genre, date):
-        track = Track(alb_id=album, name_trc=name, gnr_id=Genre.objects.get(pk=2), link_trc='',
+    def create(album, name, date):
+        track = Track(alb_id=album, name_trc=name, audio_trc='',
                       date_trc=date)
         track.save()
-        track.link_trc = str(album.id) + '/' + str(track.id) + '.mp3'
-        track.save()
+        # track.link_trc = str(album.id) + '/' + str(track.id) + '.mp3'
+        # track.save()
         return track
+
+    @staticmethod
+    def write_audio(track, audio):
+        field_file = FieldFile(track, Track.audio_trc.field, audio)
+        track.audio_trc = field_file
+        track.save()
 
     @staticmethod
     def get(id):
@@ -62,6 +76,18 @@ class TrackMethods:
                     break
 
         return tracks
+
+
+class GenreMethods:
+    @staticmethod
+    def get():
+        return Genre.objects.all()
+
+
+class GenreStyleMethods:
+    @staticmethod
+    def get(gnr_id):
+        return GenreStyle.objects.filter(gnr_id=gnr_id)
 
 
 class LikedTrackMethods:

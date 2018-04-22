@@ -5,11 +5,11 @@
     <div id="next-page" class="next-page"></div>
     <div id="previous-page" class="previous-page"></div>
     <div class="infotrack" v-for="infotrack in infotracks">
-    <img class="img" :src="infotrack[2]" alt="обложка">
+    <img class="img" :src="infotrack.image_alb" alt="обложка">
     <div class="text">
             <label>Лучшая в этом месяце</label>
-            <p>{{ '{{' }} infotrack[3]}} - {{ '{{' }} infotrack[0]}}</p>
-                <p>Понравилась: {{ '{{' }} infotrack[1]}} пользователям</p>
+            <p>{{ '{{' }} infotrack.name_per}} - {{ '{{' }} infotrack.name_trc}}</p>
+                <p>Понравилась: {{ '{{' }} infotrack.rating_trc}} пользователям</p>
                 <div class="play">
                     <i class="fa fa-play fa-4x" aria-hidden="true"></i>
                 </div>
@@ -28,8 +28,8 @@
     </label>
     <div class="compositors" id="compositors">
         <div class="compositor" v-for="compositor in compositors">
-            <img class="compositor-avatar" :src="compositor[1]" alt="обложка">
-            <label class="compositor-name">{{ '{{' }} compositor[0]}}</label>
+            <img class="compositor-avatar" :src="compositor.image_per" alt="обложка">
+            <label class="compositor-name">{{ '{{' }} compositor.name_per}}</label>
         </div>
     </div>
 </div>

@@ -3,26 +3,29 @@ import os
 import re
 
 from PIL import Image
+from django.core.files.storage import FileSystemStorage
 from pydub import AudioSegment
 
 from mainapp.model_methods import AlbumMethods, TrackMethods
 
 
-def save_album(user, name, logo, tracks):  # сохранение альбома в БД и в файлы
+def save_album(user, name, genre, logo, tracks):  # сохранение альбома в БД и в файлы
     date = datetime.date.today()
-    album = AlbumMethods.create(user=user, name=name, genre=None, date=date)
+    album = AlbumMethods.create(user=user, name=name, genre=genre, date=date)
     Compressor.dir = str(album.id) + '/'
     os.mkdir(Compressor.path + Compressor.dir)
     if logo is not None:
-        Compressor(logo.read(), logo.content_type, 'logo.jpg').compress()
+        image_alb = Compressor(logo.read(), logo.content_type, 'logo.jpg').compress()
+        AlbumMethods.write_image_alb(album, image_alb)
     for track in tracks:
-        tr_id = TrackMethods.create(album=album, name=track.name, genre=None, date=date)
-        Compressor(track.read(), track.content_type, str(tr_id.id) + '.mp3').compress()
+        tr_id = TrackMethods.create(album=album, name=track.name, date=date)
+        audio = Compressor(track.read(), track.content_type, str(tr_id.id) + '.mp3').compress()
+        TrackMethods.write_audio(tr_id, audio)
     Compressor.remove_temp()
 
 
 class Compressor:
-    path = './mainapp/static/mainapp/album_sources/'
+    path = './media/albums/'
     dir = ''
 
     def __init__(self, file_bytes, content_type, name):
@@ -35,6 +38,9 @@ class Compressor:
             self.compress_image()
         elif re.fullmatch(r'audio/\S*', self.type):
             self.compress_audio()
+        # f = open(self.path + self.dir + self.name, "rb")
+        # f.close()
+        return 'albums/' + self.dir + self.name
 
     def compress_image(self):
         src = self.save_temp()

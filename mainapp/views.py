@@ -9,8 +9,9 @@ from django.utils.datastructures import MultiValueDictKeyError
 from .models import Performer, Genre, Album, Track, LikedTrack
 from django.http import HttpResponse
 from .uploader import Compressor, save_album
-from .serializers import TrackSerializer, NoLinkTrackSerializer
-from .model_methods import TrackMethods, LikedTrackMethods
+from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
+    PerformerSerializer, TopTrackSerializer
+from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -85,34 +86,33 @@ def track(request):
                 trc = Track.objects.all().get(id=track[0])
                 tracks.append(trc)
         else:
-        #print(gen)
-        #tracks = Track.objects.all().select_related('alb_id__per_id').values('name_trc', 'alb_id__image_alb',
-                                                                                  #'alb_id__per_id__name_per', 'id')
-            tracks = Track.objects.all().order_by('-rating_trc')
+            # print(gen)
+            # tracks = Track.objects.all().select_related('alb_id__per_id').values('name_trc', 'alb_id__image_alb',
+            # 'alb_id__per_id__name_per', 'id')
+            tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all().order_by('-rating_trc')
             if gen != 'all':
-                tracks = tracks.filter(gnr_id=gen)
+                tracks = tracks.filter(alb_id__stl_id__gnr_id_id=gen)
 
         serializer = NoLinkTrackSerializer(tracks, many=True)
-        #json_jn = json.dumps(list(tracks), cls=DjangoJSONEncoder)
-        #return HttpResponse(json_jn, content_type="application/json")
+        # json_jn = json.dumps(list(tracks), cls=DjangoJSONEncoder)
+        # return HttpResponse(json_jn, content_type="application/json")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def best_performer(request):
     if request.method == "GET":
-        performer = Performer.objects.order_by('rating_per').reverse()[:3].values_list('name_per', 'image_per')
-        json_jn = json.dumps({"performers": list(performer)}, cls=DjangoJSONEncoder)
-        return HttpResponse(json_jn, content_type="application/json")
+        performer = Performer.objects.order_by('rating_per').reverse()[:3]
+        serializer = PerformerSerializer(performer, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def top_month(request):
     if request.method == "GET":
-        month = Track.objects.order_by('rating_trc').reverse()[:1].select_related('alb_id__per_id').values_list('name_trc', 'rating_trc', 'alb_id__image_alb', 'alb_id__per_id__name_per')
-        json_jn = json.dumps({"month": list(month)}, cls=DjangoJSONEncoder)
-        return HttpResponse(json_jn, content_type="application/json")
-
+        month = Track.objects.order_by('rating_trc').reverse()[:1]
+        serializer = TopTrackSerializer(month, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class Names:
     name_track = ""
@@ -125,7 +125,7 @@ class Names:
 def load_music(request):
     return render(request, 'mainapp/loader-music.html')
 
-    
+
 def profile(request):
     return render(request, 'mainapp/profile.html')
 
@@ -134,13 +134,14 @@ def profile(request):
 def album(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
     if request.method == 'POST':
         album_name = request.POST["name"]
+        gen_id = request.POST["gen_id"]
         try:
             photo = request.FILES["photo"]
         except MultiValueDictKeyError:
             photo = None
         tracks = request.FILES.getlist('track')
 
-        save_album(user=auth.get_user(request).id, name=album_name, logo=photo, tracks=tracks)
+        save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks)
 
         return HttpResponse(status=200)
 
@@ -159,3 +160,19 @@ def track_attr(request):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def genre(request):
+    if request.method == "GET":
+        try:
+            gen_id = request.query_params['id']
+        except MultiValueDictKeyError:
+            gen_id = None
+        if gen_id is None:
+            genres = GenreMethods.get()
+            serializer = GenreSerializer(genres, many=True)
+        else:
+            styles = GenreStyleMethods.get(gen_id)
+            serializer = GenreStyleSerializer(styles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
