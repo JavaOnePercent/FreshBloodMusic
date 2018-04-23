@@ -96,7 +96,7 @@ textarea
     width: 220px;
     height: 220px;
 }
-.camera:hover, .img:hover
+.camera:hover, .Loaderimg:hover
 {
 	cursor: pointer;
 	filter: opacity(50%);
@@ -124,7 +124,6 @@ textarea
 }
 .janr-drop
 {
-
 	height: 90px;
 	z-index: 90;
 	width: 224px;
@@ -132,7 +131,6 @@ textarea
 	top: 61.5px;
 	padding: 0;
 	margin: 0;
-
 }
 .janr-drop li
 {

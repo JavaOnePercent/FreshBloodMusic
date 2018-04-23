@@ -10,15 +10,8 @@ html, body
     font-family: Arial,Helvetica,sans-serif;
 }
 /*опастно*/
-.uploadButton
-{
-    pointer-events: all;
-    height: 40px;
-    width: 40px;
-}
  .modal
  {
- 
     pointer-events: all;
     position: fixed;
     z-index: 90000;
@@ -44,7 +37,143 @@ html, body
     max-width: 1143px;
     margin: 0 auto;
 }
+.row
+{
+    margin: 0 auto;
+}
+.row:after
+{
+    content: "";
+    display: table;
+    clear: both;
+}
+/*шапка*/
+.header-conteiner
+{
+    width: 100%;
+    background-color: rgba(255, 254, 255, 0.98);
+    z-index: 120;
+    position: fixed;
+    height: 55px;
+    box-sizing: border-box;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.13), 0 5px 5px rgba(0,0,0,0.11);
+}
 .header
+{
+    padding-left: 15px;
+    padding-right: 15px;
+    left:0;
+    right:0;
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1280px; 
+}
+.name
+{
+    line-height: 55px;
+    box-sizing: border-box;
+    float: left;
+    font-size: 295%;
+    width: 30%;
+}
+.management
+{
+    text-align: center;
+    display: table-cell;
+    vertical-align:middle;
+    line-height: 55px;
+    text-align: right;
+    box-sizing: border-box;
+    float: right;
+    font-size:155%;
+    width: 68%
+}
+.uploadButton
+{
+    display: block;
+    cursor: pointer;
+    float: right;
+    pointer-events: all;
+    height: 55px;
+    width: 30px;
+}
+.drop-menu:hover
+{
+    background-color: rgba(204, 204, 204,0.3);
+}
+.drop-menu
+{
+    position: relative;
+    padding: 0 15px;
+    cursor: pointer;
+    margin-left: 35px;
+    text-align: right;
+    float: right;
+    min-width: 155px;
+    max-width: 80%;
+    line-height: 55px;
+    height: 55px;
+}
+.drop-menu img
+{
+    margin-top: 7.5px;
+    margin-left: 1.8px;
+    float: right;
+    width: 40px;
+    height: 40px;
+}
+.drop-menu ul
+{
+    width: auto; /* 140 px*/
+    background-color: rgb(204, 204, 204);
+    margin: 0;
+    padding: 7px;
+}
+.drop-menu ul:hover ~ .drop-menu
+{
+    background-color: rgba(204, 204, 204,0.3); 
+}
+li a
+{
+    display: block;
+    height: 100%;
+}
+.drop-menu a:hover
+{
+    text-decoration: none;
+}
+.drop-menu li
+{
+    display: block;
+    padding: 0;
+    margin: 0;
+    line-height: 35px;
+}
+
+.drop-menu li:hover
+{
+    background-color: rgba(179, 179, 179,0.8);
+}
+.drop-menu li:first-child
+{
+    border-bottom: 2px solid rgb(153, 153, 153)
+}
+.management a
+{
+    color: #000;
+    font-size:85%;
+    text-decoration: none;
+}
+.management a:hover
+{
+    text-decoration: underline;
+}
+.management a:nth-of-type(n+2)
+{
+    border-left: 1px solid #000; 
+    padding-left:5px; 
+}
+/*.header
 {
     background-color: rgba(255, 254, 255, 0.98);
     top: 0px;
@@ -57,8 +186,8 @@ html, body
     display: flex;
     justify-content: center;
     box-shadow: 0 6px 12px rgba(0,0,0,0.13), 0 5px 5px rgba(0,0,0,0.11);
-}
-.management, .radio, .name
+}*/
+/*.management, .radio, .name
 {
     display: block;
     padding: 0 15px;
@@ -91,10 +220,11 @@ html, body
 {
     border-left: 1px solid #000; 
     padding-left:5px; 
-}
+}*/
+/*конец шапки*/
 .main
 {
-    top:69px;
+    top:55px;
     position: relative;
 }
 /*панель топов*/

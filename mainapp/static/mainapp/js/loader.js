@@ -231,16 +231,16 @@ Vue.component('loader',{
           {   
           reader.readAsDataURL(file);
           this.imgStyle='Loaderimg';
-        } else {
-          preview.src = "/static/mainapp/images/camera.png";
-          this.imgStyle='camera';
-        }
-        }
-        else 
+        }  else 
         {
           preview.src = "/static/mainapp/images/camera.png";
           this.imgStyle='camera';
           this.errorMessage = 'формат картинки только jpg'  //хотя скорее всего эта ошибка не нужна
+        }
+        }
+        else {
+          preview.src = "/static/mainapp/images/camera.png";
+          this.imgStyle='camera';
         }
         //let reader = new FileReader();
         //this.src = reader.readAsDataURL(e.target.files[0]);

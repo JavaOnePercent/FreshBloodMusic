@@ -912,6 +912,9 @@ Vue.component('queue', {
 
 new Vue({
     el: '#VueContainer',
+    data:{
+        menuShow:false,
+    },
     store,
         //bus: bus // Here we bind our event bus to our $root Vue model.
     computed: {
