@@ -5,12 +5,12 @@
     max-width: 1024px;
     margin: 0 auto;
 }
-.row
+.nastr-row
 {
     padding-top: 15px; 
     margin: 0 auto;
 }
-.row:after
+.nastr-row:after
 {
     content: "";
     display: table;
@@ -78,6 +78,6 @@ textarea
     margin-left:80px; 
     width: 20%;
     height: 40px;
-    line-height: 35px;
+    line-height: 40px;
     background-color: rgb(153, 153, 153);
 }

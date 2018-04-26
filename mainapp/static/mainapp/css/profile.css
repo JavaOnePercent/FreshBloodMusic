@@ -9,13 +9,13 @@ html, body
     background-color: rgb(115, 115, 115);
     font-size: 110%;
 }
-.row:after
+.profile-row:after
 {
     content: "";
     display: table;
     clear: both;
 }
-.row
+.profile-row
 {
     padding-top: 15px; 
     margin: 0 auto;

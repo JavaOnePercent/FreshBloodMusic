@@ -53,6 +53,17 @@ class PerformerSerializer(serializers.ModelSerializer):
         fields = ('name_per', 'image_per')
 
 
+class FullPerformerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Performer
+        fields = ('name_per', 'image_per', 'about_per')
+
+
+class AlbumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Performer
+        fields = ('name_alb', 'stl_id', 'image_alb', 'date_alb')
+
 """class AlbumSerializer(serializers.ModelSerializer):
     tracks = TrackSerializer(many=True, read_only=True)
 

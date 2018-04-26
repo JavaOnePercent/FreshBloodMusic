@@ -34,13 +34,11 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         playing: false,
         volume: 100,
         isDragging: false,
-        showModel: false,
-    },
-    getters:{
-        showModel(state) 
-        {
-            return state.showModel
-        },
+        showLoader: false,
+        showProfile: false,
+        performerName: '',
+        performerLogo: '',
+        performerDescription: ''
     },
     mutations: {
         currentTime (state, val) {
@@ -49,9 +47,13 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         duration (state, val){
             state.duration = val;
         },
-        showModel(state, val) 
+        showLoader(state, val) 
         {
-            state.showModel = val
+            state.showLoader = val
+        },
+        showProfile(state, val) 
+        {
+            state.showProfile = !state.showProfile;
         },
         switchPlaying (state) {
             state.playing = !state.playing;
@@ -64,6 +66,15 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         },
         isDragging(state, val){
             state.isDragging = val;
-        }
+        },
+        performerName(state, val) {
+            state.performerName = val;
+        },
+        performerLogo(state, val) {
+            state.performerLogo = val;
+        },
+        performerDescription(state, val) {
+            state.performerDescription = val;
+        },
     }
 })

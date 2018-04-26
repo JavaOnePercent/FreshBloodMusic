@@ -212,7 +212,7 @@ Vue.component('loader',{
         document.getElementById("add").files =  files; 
       },
       close(){
-        this.$store.commit("showModel",false)
+        this.$store.commit("showLoader",false)
       },
       sync_photo: function (e) {
         e.preventDefault();

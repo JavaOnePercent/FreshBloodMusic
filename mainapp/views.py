@@ -1,17 +1,14 @@
-import json
-import os
-import re
-from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.contrib import auth
 from django.utils.datastructures import MultiValueDictKeyError
 
 from .models import Performer, Genre, Album, Track, LikedTrack
 from django.http import HttpResponse
-from .uploader import Compressor, save_album
+from .uploader import Compressor, save_album, save_performer
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
-    PerformerSerializer, TopTrackSerializer
-from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods
+    PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer
+from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods, PerformerMethods, \
+    AlbumMethods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -130,7 +127,7 @@ def profile(request):
     return render(request, 'mainapp/profile.html')
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 def album(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
     if request.method == 'POST':
         album_name = request.POST["name"]
@@ -144,6 +141,11 @@ def album(request):  # нужно сделать отдельный запрос
         save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks)
 
         return HttpResponse(status=200)
+
+    if request.method == "GET":
+        albums = AlbumMethods.get(auth.get_user(request).id)
+        serializer = AlbumSerializer(albums, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 def music_group(request):
@@ -175,4 +177,25 @@ def genre(request):
         else:
             styles = GenreStyleMethods.get(gen_id)
             serializer = GenreStyleSerializer(styles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST', 'GET'])
+def performer(request):
+    if request.method == 'POST':  # создание нового исполнителя
+        name = request.POST["name"]
+        try:
+            label = request.FILES["label"]
+        except MultiValueDictKeyError:
+            label = None
+        description = request.POST["description"]
+
+        save_performer(auth.get_user(request).id, name, label, description)
+
+        return HttpResponse(status=200)
+
+    if request.method == "GET":  # получение исполнителя по пользователю
+        user = auth.get_user(request).id
+        performer = PerformerMethods.get(user)
+        serializer = FullPerformerSerializer(performer)
         return Response(serializer.data, status=status.HTTP_200_OK)

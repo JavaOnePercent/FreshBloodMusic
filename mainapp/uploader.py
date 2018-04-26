@@ -3,35 +3,45 @@ import os
 import re
 
 from PIL import Image
-from django.core.files.storage import FileSystemStorage
 from pydub import AudioSegment
 
-from mainapp.model_methods import AlbumMethods, TrackMethods
+from mainapp.model_methods import AlbumMethods, TrackMethods, PerformerMethods
 
 
 def save_album(user, name, genre, logo, tracks):  # сохранение альбома в БД и в файлы
     date = datetime.date.today()
     album = AlbumMethods.create(user=user, name=name, genre=genre, date=date)
-    Compressor.dir = str(album.id) + '/'
-    os.mkdir(Compressor.path + Compressor.dir)
+    directory = 'albums/' + str(album.id) + '/'
+    os.mkdir(Compressor.path + directory)
     if logo is not None:
-        image_alb = Compressor(logo.read(), logo.content_type, 'logo.jpg').compress()
-        AlbumMethods.write_image_alb(album, image_alb)
+        image_alb = Compressor(logo.read(), logo.content_type, 'logo.jpg', directory).compress()
+        AlbumMethods.add_image(album, image_alb)
     for track in tracks:
         tr_id = TrackMethods.create(album=album, name=track.name, date=date)
-        audio = Compressor(track.read(), track.content_type, str(tr_id.id) + '.mp3').compress()
-        TrackMethods.write_audio(tr_id, audio)
+        audio = Compressor(track.read(), track.content_type, str(tr_id.id) + '.mp3', directory).compress()
+        TrackMethods.add_audio(tr_id, audio)
+    Compressor.remove_temp()
+
+
+def save_performer(user, name, label, description):
+    date = datetime.date.today()
+    performer = PerformerMethods.create(user=user, name=name, description=description, date=date)
+    directory = 'performers/' + str(performer.id) + '/'
+    os.mkdir(Compressor.path + directory)
+    if label is not None:
+        image = Compressor(label.read(), label.content_type, 'logo.jpg', directory).compress()
+        PerformerMethods.add_image(performer, image)
     Compressor.remove_temp()
 
 
 class Compressor:
-    path = './media/albums/'
-    dir = ''
+    path = './media/'
 
-    def __init__(self, file_bytes, content_type, name):
+    def __init__(self, file_bytes, content_type, name, dir):
         self.bytes = file_bytes
         self.type = content_type
         self.name = name
+        self.dir = dir
 
     def compress(self):
         if re.fullmatch(r'image/\S*', self.type):
@@ -40,7 +50,7 @@ class Compressor:
             self.compress_audio()
         # f = open(self.path + self.dir + self.name, "rb")
         # f.close()
-        return 'albums/' + self.dir + self.name
+        return self.dir + self.name
 
     def compress_image(self):
         src = self.save_temp()

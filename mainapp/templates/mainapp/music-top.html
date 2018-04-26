@@ -1,5 +1,37 @@
-
 {% load staticfiles %}
+<script type="text/x-template" id="header-container">
+    <div  class="header-conteiner">
+            <div class="header" >
+                <div class="row">
+                    <div class="name">
+                        BoysBand
+                    </div>
+                    <div class="management">
+                        {% if username %}
+                        
+                        <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
+                            <span>{{ username }}</span>
+                            <img title="загрузить"  class="user" src="/static/mainapp/images/user.svg" alt="user">
+                            <ul class="menu-drop" v-if="menuShow">
+                                <li><a @click="openProfile">Профиль</a></li>
+                                <li><a href="auth/logout/">Выйти</a></li>
+                            </ul>
+                        </div>
+                    
+                        <img class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader" @click='showMenu'>
+                        <!--<a href="loader-music/">Добавить</a>-->
+                        <!--<a href="performers/">Моя музыка</a>-->
+                        
+                        {% else %}
+                        <a href="auth/login/">Авторизация</a>
+                        <a href="auth/register">Регистрация</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+</script>
+
 <script type="text/x-template" id="music-top">
 <div class="music-top">
     <div id="next-page" class="next-page"></div>

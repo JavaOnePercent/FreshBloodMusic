@@ -5,31 +5,31 @@
     <div class="nastr-conteiner">
         <form method="POST">
         <link rel="stylesheet" href="{% static 'mainapp/css/nastr.css' %}" type="text/css"/>
-            <div class="row">
+            <div class="nastr-row">
                 <div class="mainNastr block">
                     <label>Настройки</label>
                     <hr>
                     <div class="N-name str">
                         <label class="line">Ваше имя:</label>
-                        <input class="" type="text" name="N-name" maxlength="40"/>
+                        <input v-model="name" class="" type="text" name="N-name" maxlength="40"/>
                     </div>
                     <div class="N-Lable str">
                         <label class="line">Аватар:</label>
-                        <input type="file" name="lable" multiple accept="image/*" />
+                        <input @change="setLabel" type="file" name="lable" multiple accept="image/*" />
                     </div> 
-                    <div class="N-Description row">
+                    <div class="N-Description nastr-row">
                         <label class="line">О себе:</label>
-                        <textarea class="" type="text" name="N-Description" maxlength="800">
+                        <textarea v-model="description" class="" type="text" name="N-Description" maxlength="800">
                         </textarea>
                     </div>              
                 </div>
         
-                <div class="N-vk block row">
+                <div class="N-vk block nastr-row">
                     <label class="line">Привязка акканута к ВК:</label>
                     ну а тут можно просто ссылку требовать в инпут 
                 </div>
         
-                <div class="N-style block row">
+                <div class="N-style block nastr-row">
                     <label>Вид страницы</label>
                     <hr>
                     <div class="str">
@@ -46,9 +46,9 @@
                     </div>
                 </div>
         
-                <div class="N-subbmit block row">
+                <div class="N-subbmit block nastr-row">
                     <div class="str" >
-                        <button class="N-sub" name="sub"> Сохранить </button>
+                        <button @click.prevent='saveSettings' class="N-sub" name="sub"> Сохранить </button>
                         <div type="reset" class="Cancel" @click="cencleClick">Отмена</div>
                     </div>
                 </div>             
@@ -60,10 +60,11 @@
 
 <script type="text/x-template" id="profile">
     <div class="ProfileConteiner" id="body">
-        <div class="row">
+            <link rel="stylesheet" href="{% static 'mainapp/css/profile.css' %}" type="text/css"/>
+        <div class="profile-row">
             <div class="leftColumn">
             <div class="ProfileLable Lblock" >
-                <img src="/static/mainapp/images/camera.svg" alt="аватарка" class="ProfileImg" />
+                <img :src="logo" alt="аватарка" class="ProfileImg" />
                 <div class="ProfileNastr" @click="nastrClick">
                     <label>Настройки</label>
                     <img src="/static/mainapp/images/settings-cogwheel-button.svg" alt="настройки"/>
@@ -106,11 +107,11 @@
             </div>       
             <div class="rightColumn">
                 <div class="ProfileName Rblock">
-                    <label>Имя артиста</label>
+                    <label>{{ '{{' }} name }}</label>
                 </div>
                 <div class="ProfileDescription Rblock">
                     <label>Описание</label>
-                    <p>Тут описание</p>
+                    <p>{{ '{{' }} description }}</p>
                 </div>
                 <div class="favoriteAlbum Rblock">
                     <label>Любимый Альбом</label>

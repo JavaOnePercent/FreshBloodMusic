@@ -12,6 +12,25 @@ def get_random(all_tracks):  # возвращает рандомное знач�
     return all_tracks[rand]
 
 
+class PerformerMethods:
+    @staticmethod
+    def create(user, name, description, date):
+        performer = Performer(user_id=User.objects.get(pk=user), name_per=name, about_per=description, date_per=date)
+        performer.save()
+        return performer
+
+    @staticmethod
+    def add_image(performer, image):
+        field_file = FieldFile(performer, Performer.image_per.field, image)
+        performer.image_per = field_file
+        performer.save()
+
+    @staticmethod
+    def get(user):
+        performer = Performer.objects.get(user_id=User.objects.get(pk=user))
+        return performer
+
+
 class AlbumMethods:
     @staticmethod
     def create(user, name, genre, date):
@@ -24,10 +43,16 @@ class AlbumMethods:
         return album
 
     @staticmethod
-    def write_image_alb(album, image_alb):
-        field_file = FieldFile(album, Track.audio_trc.field, image_alb)
+    def add_image(album, image_alb):
+        field_file = FieldFile(album, Album.image_alb.field, image_alb)
         album.image_alb = field_file
         album.save()
+
+    @staticmethod
+    def get(user):
+        performer = Performer.objects.get(user_id=user)
+        albums = Album.objects.filter(per_id=Performer.objects.get(pk=performer))
+        return albums
 
 
 class TrackMethods:
@@ -41,7 +66,7 @@ class TrackMethods:
         return track
 
     @staticmethod
-    def write_audio(track, audio):
+    def add_audio(track, audio):
         field_file = FieldFile(track, Track.audio_trc.field, audio)
         track.audio_trc = field_file
         track.save()

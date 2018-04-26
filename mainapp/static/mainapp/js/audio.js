@@ -909,23 +909,3 @@ Vue.component('queue', {
         }
     }
 });
-
-new Vue({
-    el: '#VueContainer',
-    data:{
-        menuShow:false,
-    },
-    store,
-        //bus: bus // Here we bind our event bus to our $root Vue model.
-    computed: {
-        showModel () {
-            return this.$store.state.showModel
-        }
-    },
-    methods:
-    {
-        show() {
-            this.$store.commit("showModel", true)
-        }
-    }
-});

@@ -1,3 +1,21 @@
+Vue.component('header-container',
+{
+    template: '#header-container',
+    data() {
+        return {  
+            menuShow:false,
+        }
+    },
+    methods: {
+        showMenu() {
+            this.$store.commit("showLoader", true)
+        },
+        openProfile() {
+            this.$store.commit("showProfile")
+        }
+    }
+});
+
 Vue.component('app-compilation',{
     template:'#compilation',
     data: function() {
