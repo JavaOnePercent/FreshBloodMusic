@@ -4,7 +4,10 @@ Vue.component('profileNastr', {
         return{
         }
     },
-    methods: { 
+    methods: {
+        cencleClick(){
+            this.$emit('cencle-clicked');
+        } 
     },
 });
 

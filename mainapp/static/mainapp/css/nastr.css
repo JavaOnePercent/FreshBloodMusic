@@ -16,6 +16,8 @@
     display: table;
     clear: both;
 }
+*:focus {outline: none;}
+
 .block
 {
     padding: 1%;
@@ -70,6 +72,7 @@ textarea
 }
 .Cancel
 {
+    cursor: pointer;
     text-align: center;
     float: left;
     margin-left:80px; 

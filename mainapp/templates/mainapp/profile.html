@@ -11,8 +11,8 @@
 
 <body>
     <div id="VueContainer">
-        <profile-nastr v-show='nastrShow'></profile-nastr>
-        <profile @nastr-clicked="show"></profile>
+        <profile-nastr @cencle-clicked="show" v-show='nastrShow'></profile-nastr>
+        <profile @nastr-clicked="show" v-show='!nastrShow'></profile>
     </div>
 
     <div>

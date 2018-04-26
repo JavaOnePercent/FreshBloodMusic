@@ -3,6 +3,7 @@
 
 <script type="text/x-template" id="nastr">
     <div class="nastr-conteiner">
+        <form method="POST">
         <link rel="stylesheet" href="{% static 'mainapp/css/nastr.css' %}" type="text/css"/>
             <div class="row">
                 <div class="mainNastr block">
@@ -48,14 +49,11 @@
                 <div class="N-subbmit block row">
                     <div class="str" >
                         <button class="N-sub" name="sub"> Сохранить </button>
-                        <div class="Cancel">Отмена</div>
+                        <div type="reset" class="Cancel" @click="cencleClick">Отмена</div>
                     </div>
-                </div>
-                        
-                        
-                        
-                        
+                </div>             
             </div>
+        </form>
     </div>
 </script>
 
@@ -65,21 +63,46 @@
         <div class="row">
             <div class="leftColumn">
             <div class="ProfileLable Lblock" >
-                <img src="/static/mainapp/images/camera.png" alt="аватарка" class="ProfileImg" />
+                <img src="/static/mainapp/images/camera.svg" alt="аватарка" class="ProfileImg" />
                 <div class="ProfileNastr" @click="nastrClick">
-                    <img src="/static/mainapp/images/settings-cogwheel-button.png" alt="настройки"/>
                     <label>Настройки</label>
+                    <img src="/static/mainapp/images/settings-cogwheel-button.svg" alt="настройки"/>
                 </div>
             </div>
             <div class="VK Lblock">
-                <label>Профиль в тентакле</label>
+                <label>В контакте</label>
+                <img src="/static/mainapp/images/vk.svg" alt="настройки"/>
             </div>
             <div class="LikeMusic Lblock">
-                <label>Понравившаяся музыка</label>
+                <label title="Понравившаяся музыка">Понравившаяся музыка(+число)</label>
+                <hr>
+                <div class="likedMusic">
+                    <!--<div class="likedMusicHover"></div>-->
+                    <div class="musicLable" style="background-image: url(/static/mainapp/images/camera.svg)"></div>
+                    <div class="musicLablecontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                    музяка-кимизякаfsafasf
+                </div>
+                <div class="likedMusic">
+                    <div class="musicLable" style="background-image: url(/static/mainapp/images/camera.svg)"></div>
+                    <div class="musicLablecontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                    музяка-кимизякаfsafasf
+                </div>
             </div>
-            <div class="subscribers Lblock">
-                <label>Подписчики</label>
-            </div>
+            <!--<div class="subscribers Lblock">
+                <label>Подписки (+число)</label>
+                <hr>
+                <div class="sub-cont">
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                <div class="sub"> чел </div>
+                </div>
+            </div>-->
             </div>       
             <div class="rightColumn">
                 <div class="ProfileName Rblock">
@@ -93,12 +116,64 @@
                     <label>Любимый Альбом</label>
                     <p>Тут любимый альбом</p>
                 </div>
+                <div class="MyAlbums Rblock">
+                    <label>Мои издания</label>
+                    <div class="MyAlbums-conteiner">
+                        <div class="MyAlbum">
+                            <img class="MyAlbum-lable" src="/static/mainapp/images/camera.svg" alt="настройки"/>
+                            <div class="Albom-Description">
+                                <span> Название издания </span>
+                                <label> жанр: </label>
+                                <label> дата выхода: </label>
+                                <span class="more"> подробнее... </span>
+                            </div>
+                            <div class="MyAlbum-music">
+                               <div class="Mymusic-conteiner">
+                                    <div class="MyMusic">
+                                        <!--<div class="likedMusicHover"></div>-->
+                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                                        музяка-кимизякаfsafasf
+                                    </div>
+                                    <div class="MyMusic">
+                                        <!--<div class="likedMusicHover"></div>-->
+                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                                        музяка-кимизякаfsafasf
+                                    </div>
+                                    <div class="MyMusic">
+                                        <!--<div class="likedMusicHover"></div>-->
+                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                                        музяка-кимизякаfsafasf
+                                    </div>
+                               </div>
+                            </div>
+                        </div>    
+                    </div>
+                    <div class="MyAlbums-conteiner">
+                        <div class="MyAlbum">
+                            <img class="MyAlbum-lable" src="/static/mainapp/images/camera.svg" alt="настройки"/>
+                            <div class="Albom-Description">
+                                <span> Название издания </span>
+                                <label> жанр: </label>
+                                <label> дата выхода: </label>
+                                <span class="more"> подробнее... </span>
+                            </div>
+                            <div class="MyAlbum-music">
+                                <div class="Mymusic-conteiner">
+                                    <div class="MyMusic">
+                                        <!--<div class="likedMusicHover"></div>-->
+                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                                        музяка-кимизякаfsafasf
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>    
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
 </script>
-
 
 
 

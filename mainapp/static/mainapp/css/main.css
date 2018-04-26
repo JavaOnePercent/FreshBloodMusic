@@ -104,6 +104,7 @@ html, body
 .drop-menu
 {
     position: relative;
+    display: block;
     padding: 0 15px;
     cursor: pointer;
     margin-left: 35px;
@@ -125,8 +126,10 @@ html, body
 .drop-menu ul
 {
     width: auto; /* 140 px*/
+    margin: 0px;
+    position: relative;
+    display: block;
     background-color: rgb(204, 204, 204);
-    margin: 0;
     padding: 7px;
 }
 .drop-menu ul:hover ~ .drop-menu
