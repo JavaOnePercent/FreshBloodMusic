@@ -1,14 +1,16 @@
 import datetime
 import os
 import re
+import io
 
+from pprint import pprint
 from PIL import Image
 from pydub import AudioSegment
 
 from mainapp.model_methods import AlbumMethods, TrackMethods, PerformerMethods
 
 
-def save_album(user, name, genre, logo, tracks):  # сохранение альбома в БД и в файлы
+def save_album(user, name, genre, logo, tracks, track_name):  # сохранение альбома в БД и в файлы
     date = datetime.date.today()
     album = AlbumMethods.create(user=user, name=name, genre=genre, date=date)
     directory = 'albums/' + str(album.id) + '/'
@@ -16,9 +18,11 @@ def save_album(user, name, genre, logo, tracks):  # сохранение аль�
     if logo is not None:
         image_alb = Compressor(logo.read(), logo.content_type, 'logo.jpg', directory).compress()
         AlbumMethods.add_image(album, image_alb)
-    for track in tracks:
-        tr_id = TrackMethods.create(album=album, name=track.name, date=date)
-        audio = Compressor(track.read(), track.content_type, str(tr_id.id) + '.mp3', directory).compress()
+    pprint(track_name)
+    for i in range(len(tracks)):
+        tr_id = TrackMethods.create(album=album, name=track_name[i], date=date)
+        #pprint(track)
+        audio = Compressor(tracks[i].read(), tracks[i].content_type, str(tr_id.id) + '.mp3', directory).compress()
         TrackMethods.add_audio(tr_id, audio)
     Compressor.remove_temp()
 
@@ -53,21 +57,22 @@ class Compressor:
         return self.dir + self.name
 
     def compress_image(self):
-        src = self.save_temp()
-        im = Image.open(src)
+        #src = self.save_temp()
+        im = Image.open(io.BytesIO(self.bytes))
         im = im.resize((320, 320), Image.BICUBIC)
         im.save(self.path + self.dir + self.name, 'jpeg', quality=95, optimize=True)
 
     def compress_audio(self):
-        src = self.save_temp()
-        sound = AudioSegment.from_mp3(src)
+        #src = self.save_temp()
+        #print(len(self.bytes))
+        sound = AudioSegment.from_mp3(io.BytesIO(self.bytes))
         sound.export(self.path + self.dir + self.name, format="mp3", bitrate="128k")
 
-    def save_temp(self):
+    """def save_temp(self):
         f = open('temp', "wb")
         f.write(self.bytes)
         f.close()
-        return 'temp'
+        return 'temp'"""
 
     @staticmethod
     def remove_temp():

@@ -27,14 +27,14 @@ Vue.component('app-compilation',{
     methods: {
         showGenre: function(message) {
           this.$http.get('track',{params: {genre: message}}).then(function(response){
-              //console.log(JSON.parse(response.bodyText));
-              this.compilations = JSON.parse(response.bodyText);
-              /*this.compilations.forEach(function(item) {
-                  item.image_alb = "/media/albums/" + item.image_alb;
-              });*/
-              //console.log(this.compilations);
-                //alert(this.compilations);
-          }, function(error){
+                this.compilations = JSON.parse(response.bodyText);
+                for(var i = 0; i < this.compilations.length; i++)
+                {
+                    if(this.compilations[i].image_alb === null )
+                    {
+                     this.compilations[i].image_alb = "/static/mainapp/images/cat.jpg"
+                    }
+                }
             })
         },
         trackClick: function(index) {
@@ -93,6 +93,7 @@ Vue.component('compositor-top', {
             }, function(error){
             })
         },
+
     },
 
     created: function() {

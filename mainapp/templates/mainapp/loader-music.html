@@ -45,7 +45,7 @@
                 <img v-if="currentEdit===index" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
                 <img v-else class="edit" src="/static/mainapp/images/edit.png" @mousedown="upgradeName(index)">
                 <img class="del" src="/static/mainapp/images/xiomi.png" @click="deleteTrack(index)">
-                <hr>
+                <hr class="HRloader">
             </div>
       
             <div style="pointer-events: all" id = "dropbox" class="add" :class="loaderStyle">

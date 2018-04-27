@@ -6,8 +6,7 @@ html, body
     margin: 0;
     padding: 0;
     font-family: Arial,Helvetica,sans-serif;
-    background-color: rgb(115, 115, 115);
-    font-size: 110%;
+    background-color: rgb(222, 222, 115);
 }
 .profile-row:after
 {
@@ -22,6 +21,9 @@ html, body
 }
 .ProfileConteiner
 {
+    font-size: 110%;
+    top: 55px;
+    position: relative;
     padding-left: 15px;
     padding-right: 15px;
     margin: 0 auto;
@@ -157,8 +159,6 @@ html, body
     float: left;
 }
 
-
-
 /*то что слева*/
 
 .leftColumn
@@ -178,11 +178,11 @@ html, body
 }
 .ProfileImg
 {
-    margin: 0 auto;
+    /*margin: 0 auto;*/
     display: block;
-    width: 90%;
+    width: 100%;
     height: auto;
-    /*margin-bottom: 2.5%;*/
+    margin-bottom: 2.5%;
 }
 .ProfileNastr
 {

@@ -227,19 +227,21 @@ Vue.component('loader',{
         }
   
         if (file) {
-          if(e.target.files[0].name.split('.').pop() =="jpg" ) //проверяем формат файла (переписать)
+          if(e.target.files[0].type =="image/jpeg" || e.target.files[0].type =="image/png" ) //проверяем формат файла (переписать)
           {   
-          reader.readAsDataURL(file);
-          this.imgStyle='Loaderimg';
-        }  else 
+            reader.readAsDataURL(file);
+            this.imgStyle='Loaderimg';
+          } 
+          else 
+          {
+            preview.src = "/static/mainapp/images/camera.svg";
+            this.imgStyle='camera';
+            this.errorMessage = 'формат картинки только jpg'  //хотя скорее всего эта ошибка не нужна
+          }
+        }
+        else 
         {
-          preview.src = "/static/mainapp/images/camera.png";
-          this.imgStyle='camera';
-          this.errorMessage = 'формат картинки только jpg'  //хотя скорее всего эта ошибка не нужна
-        }
-        }
-        else {
-          preview.src = "/static/mainapp/images/camera.png";
+          preview.src = "/static/mainapp/images/camera.svg";
           this.imgStyle='camera';
         }
         //let reader = new FileReader();
@@ -256,11 +258,11 @@ Vue.component('loader',{
             {
               this.errorMessage = ''
               //console.log(e.target.files[i].type)
-              //file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "") ,"file": e.target.files[i]};
+              file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "") ,"file": e.target.files[i]};
               //e.target.reset();
               //e.target.files[i] = null;
               //console.log(e.target.files[i].name)
-              file=e.target.files[i];
+              //file=e.target.files[i];
               this.track.push(file);
               //console.log(this.track.length)
             } else 
@@ -295,7 +297,8 @@ Vue.component('loader',{
           data.append('photo', this.photo)
           for(var track of this.track)
           {
-            data.append('track', track)
+            data.append('track', track.file)
+            data.append('track_name', track.name)
           }
           data.append('name', this.track_name_loader)
           data.append('gen_id', this.genreID)

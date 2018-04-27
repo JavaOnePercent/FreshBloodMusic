@@ -14,6 +14,8 @@ from rest_framework.response import Response
 from rest_framework import status
 import math
 
+from pprint import pprint
+
 
 def main_view(request):  # главная
     return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
@@ -137,8 +139,10 @@ def album(request):  # нужно сделать отдельный запрос
         except MultiValueDictKeyError:
             photo = None
         tracks = request.FILES.getlist('track')
-
-        save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks)
+        track_name = request.POST.getlist("track_name")
+        pprint(track_name)
+        print(request.POST)
+        save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks, track_name=list(track_name))
 
         return HttpResponse(status=200)
 

@@ -1,5 +1,7 @@
 .nastr-conteiner
 {
+    top: 55px;
+    position: relative;
     padding-left: 15px;
     padding-right: 15px;
     max-width: 1024px;
