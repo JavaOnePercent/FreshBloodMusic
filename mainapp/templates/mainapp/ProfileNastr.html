@@ -47,10 +47,12 @@
                 </div>
         
                 <div class="N-subbmit block nastr-row">
-                    <div class="str" >
-                        <button @click.prevent='saveSettings' class="N-sub" name="sub"> Сохранить </button>
-                        <div type="reset" class="Cancel" @click="cencleClick">Отмена</div>
-                    </div>
+                    
+                        <div class="str" > 
+                            <router-link to="/performers/me"><button @click='saveSettings' class="N-sub" name="sub"> Сохранить </button></router-link>
+                            <router-link to="/performers/me"><div type="reset" class="Cancel" @click="cencleClick">Отмена</div></router-link>
+                        </div>
+                    
                 </div>             
             </div>
         </form>
@@ -65,28 +67,25 @@
             <div class="leftColumn">
             <div class="ProfileLable Lblock" >
                 <img :src="logo" alt="аватарка" class="ProfileImg" />
-                <div class="ProfileNastr" @click="nastrClick">
-                    <label>Настройки</label>
-                    <img src="/static/mainapp/images/settings-cogwheel-button.svg" alt="настройки"/>
-                </div>
+                <router-link to="/settings">
+                    <div class="ProfileNastr" @click="nastrClick">
+                        <label>Настройки</label>
+                        <img src="/static/mainapp/images/settings-cogwheel-button.svg" alt="настройки"/>
+                    </div>
+                </router-link>
             </div>
             <div class="VK Lblock">
                 <label>В контакте</label>
                 <img src="/static/mainapp/images/vk.svg" alt="настройки"/>
             </div>
             <div class="LikeMusic Lblock">
-                <label title="Понравившаяся музыка">Понравившаяся музыка(+число)</label>
+                <label title="Понравившаяся музыка">Понравившаяся музыка({{ '{{' }} likes.length }})</label>
                 <hr>
-                <div class="likedMusic">
+                <div class="likedMusic" v-for="(like, index) in likes">
                     <!--<div class="likedMusicHover"></div>-->
-                    <div class="musicLable" style="background-image: url(/static/mainapp/images/camera.svg)"></div>
+                    <div class="musicLable" :style="backgroundImage(like.logo)"></div>
                     <div class="musicLablecontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
-                    музяка-кимизякаfsafasf
-                </div>
-                <div class="likedMusic">
-                    <div class="musicLable" style="background-image: url(/static/mainapp/images/camera.svg)"></div>
-                    <div class="musicLablecontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
-                    музяка-кимизякаfsafasf
+                    {{ '{{' }} like.performer }} - {{ '{{' }} like.name }}
                 </div>
             </div>
             <!--<div class="subscribers Lblock">
@@ -113,62 +112,34 @@
                     <label>Описание</label>
                     <p>{{ '{{' }} description }}</p>
                 </div>
-                <div class="favoriteAlbum Rblock">
+                <!--<div class="favoriteAlbum Rblock">
                     <label>Любимый Альбом</label>
                     <p>Тут любимый альбом</p>
-                </div>
+                </div>-->
                 <div class="MyAlbums Rblock">
                     <label>Мои издания</label>
-                    <div class="MyAlbums-conteiner">
+
+                    <div class="MyAlbums-conteiner" v-for="(album, index) in albums">
                         <div class="MyAlbum">
-                            <img class="MyAlbum-lable" src="/static/mainapp/images/camera.svg" alt="настройки"/>
+                            <img class="MyAlbum-lable" :src="album.logo" alt="настройки"/>
                             <div class="Albom-Description">
-                                <span> Название издания </span>
-                                <label> жанр: </label>
-                                <label> дата выхода: </label>
+                                <span> {{ '{{' }} album.name }}</span>
+                                <label> жанр: {{ '{{' }} album.genre }}</label>
+                                <label> дата выхода: {{ '{{' }} album.date }}</label>
                                 <span class="more"> подробнее... </span>
                             </div>
                             <div class="MyAlbum-music">
                                <div class="Mymusic-conteiner">
-                                    <div class="MyMusic">
+                                    <div class="MyMusic" v-for="(track, index) in album.tracks">
                                         <!--<div class="likedMusicHover"></div>-->
                                         <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
-                                        музяка-кимизякаfsafasf
-                                    </div>
-                                    <div class="MyMusic">
-                                        <!--<div class="likedMusicHover"></div>-->
-                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
-                                        музяка-кимизякаfsafasf
-                                    </div>
-                                    <div class="MyMusic">
-                                        <!--<div class="likedMusicHover"></div>-->
-                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
-                                        музяка-кимизякаfsafasf
+                                        {{ '{{' }} track.name }}
                                     </div>
                                </div>
                             </div>
                         </div>    
                     </div>
-                    <div class="MyAlbums-conteiner">
-                        <div class="MyAlbum">
-                            <img class="MyAlbum-lable" src="/static/mainapp/images/camera.svg" alt="настройки"/>
-                            <div class="Albom-Description">
-                                <span> Название издания </span>
-                                <label> жанр: </label>
-                                <label> дата выхода: </label>
-                                <span class="more"> подробнее... </span>
-                            </div>
-                            <div class="MyAlbum-music">
-                                <div class="Mymusic-conteiner">
-                                    <div class="MyMusic">
-                                        <!--<div class="likedMusicHover"></div>-->
-                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
-                                        музяка-кимизякаfsafasf
-                                    </div>  
-                                </div>
-                            </div>
-                        </div>    
-                    </div>
+
                 </div>
             </div>
         </div>

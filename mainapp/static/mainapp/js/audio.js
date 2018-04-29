@@ -20,6 +20,7 @@ var playerComponent = Vue.component('topPlayer', {
             isFull: false,
             isHovered: false,
             containerMove: '',
+            performerID: 0,
             track: {
                 currentID: null,
                 nextID: null,
@@ -109,12 +110,12 @@ var playerComponent = Vue.component('topPlayer', {
                     track_id: this.track.currentID
                 };
                 if(this.logos.isLiked)
-                    this.$http.put('like', {}, {
+                    this.$http.put('likes', {}, {
                         //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //добавление
                 else
-                    this.$http.delete('like', {
+                    this.$http.delete('likes', {
                         //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //удаление
@@ -156,6 +157,7 @@ var playerComponent = Vue.component('topPlayer', {
 
             this.trackPerformer.trackName = current.name_trc;
             this.trackPerformer.performerName = current.name_per;//
+            this.performerID = current.per_id;
             this.audio.audioLink = (current.audio_trc);//toStatic(current.link_trc);
             //console.log(current.audio_file);
             this.track.currentID = current.id;
@@ -420,10 +422,10 @@ var logosComponent = Vue.component('logos', {
 
 var menuMoreComponent = Vue.component('menuMore', {
     template: '#menuMore',
+    props: [ 'performerID' ],
     data() {
         return {
-            menuElements: ['На страницу исполнителя', 'Добавить в избранное', 'Пожаловаться'],
-            showMenu: false
+            showMenu: false,
         }
     },
     methods: {

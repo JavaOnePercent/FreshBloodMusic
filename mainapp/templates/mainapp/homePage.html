@@ -12,6 +12,7 @@
     <script src="{% static 'mainapp/js/vue/vue.js' %}"></script>
     <script src="{% static 'mainapp/js/vue/vue-resource.js' %}"></script>
     <script src="{% static 'mainapp/js/vue/vuex.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vue-router.js' %}"></script>
     <script src="{% static 'mainapp/js/init.js' %}"></script>
 </head>
 
@@ -24,9 +25,10 @@
                 <loader></loader>
             </div>
         </div>
-        <profile-nastr @cencle-clicked="nastrShow = !nastrShow;" v-if='nastrShow'></profile-nastr>
+        <router-view></router-view>
+        <!--<profile-nastr @cencle-clicked="nastrShow = !nastrShow;" v-if='nastrShow'></profile-nastr>
         <profile @nastr-clicked="nastrShow = !nastrShow;" v-if='!nastrShow && showProfile'></profile>
-        <main-compilation></main-compilation>
+        <main-compilation></main-compilation>-->
         <top-player></top-player>
     </div>
     <div>

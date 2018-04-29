@@ -14,10 +14,12 @@ def get_random(all_tracks):  # возвращает рандомное знач�
 
 class PerformerMethods:
     @staticmethod
-    def create(user, name, description, date):
-        performer = Performer(user_id=User.objects.get(pk=user), name_per=name, about_per=description, date_per=date)
-        performer.save()
-        return performer
+    def create(id, user, name, description, date):
+        performer = Performer.objects.update_or_create(id=id, defaults={'user_id': User.objects.get(pk=user),
+                                                                        'name_per': name,
+                                                                        'about_per': description,
+                                                                        'date_per': date})
+        return performer[0]
 
     @staticmethod
     def add_image(performer, image):
@@ -116,6 +118,12 @@ class GenreStyleMethods:
 
 
 class LikedTrackMethods:
+    @staticmethod
+    def get(user_id):
+        user = User.objects.get(pk=user_id)
+        likes = LikedTrack.objects.filter(user_id=user)
+        return likes
+
     @staticmethod
     def add_like(track_id, user_id):  # добавление нового лайка в таблицу
         if track_id is not None and user_id is not None:

@@ -34,9 +34,9 @@ class GenreStyle(models.Model):
 
 class Album(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    per_id = models.ForeignKey(Performer, on_delete=models.CASCADE, related_name='performeralbum')
+    per_id = models.ForeignKey(Performer, on_delete=models.CASCADE, related_name='albums')
     name_alb = models.CharField(max_length=30)
-    stl_id = models.ForeignKey(GenreStyle, on_delete=models.CASCADE, related_name='genrealbum')
+    stl_id = models.ForeignKey(GenreStyle, on_delete=models.CASCADE, related_name='style')
     numplays_alb = models.IntegerField(default=0)
     rating_alb = models.IntegerField(default=0)
     image_alb = models.FileField(upload_to='albums', default=None)
@@ -50,7 +50,7 @@ class Album(models.Model):
 
 class Track(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    alb_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albumtrack')
+    alb_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='tracks')
     name_trc = models.CharField(max_length=50)
     # stl_id = models.ForeignKey(GenreStyle, on_delete=models.CASCADE, related_name='genrestyletrack', default=None)
     audio_trc = models.FileField(upload_to='albums', default=None)

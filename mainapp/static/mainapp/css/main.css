@@ -571,3 +571,12 @@ footer
     margin: 0 auto 69px auto;
     text-align: center;
 }
+
+a
+{
+    text-decoration: none;
+}
+
+a:active {color: black;}
+
+a:visited {color: black;}

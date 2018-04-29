@@ -9,7 +9,7 @@
                 <div class="player-container" :style="containerMove">
                     <buttons :isFull="isFull" @nextclick="loadNextTrack" @dropdownclick="switchPlayerView"></buttons>
                     <logos v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
-                    <menu-more></menu-more>
+                    <menu-more :performerID="performerID"></menu-more>
                     <track-performer v-bind="trackPerformer"></track-performer>
                     <volume-controller ref="volumeController" :isFull="isFull"></volume-controller>
                     <audio-player ref="audioPlayer" v-bind="audio" @playingended="loadNextTrack"></audio-player>
@@ -49,9 +49,9 @@
             <img class="Button" id="menuPic" src="{% static 'mainapp/images/menu.png' %}" draggable="false"/>
             <transition name="menu-more">
                 <ul id="menuDropdown" v-show="showMenu" @mouseleave="closeDrop">
-                    <li class="Button" v-for="elem in menuElements">
-                        <p class="menuElements">{{ '{{' }} elem }}</p>
-                    </li>
+                    <li class="Button"><router-link :to="{ name: 'performer', params: { id: this.performerID }}"><p class="menuElements">На страницу исполнителя</p></router-link></li>
+                    <li class="Button"><p class="menuElements">Добавить в избранное</p></li>
+                    <li class="Button"><p class="menuElements">Пожаловаться</p></li>
                 </ul>
             </transition>
         </div>

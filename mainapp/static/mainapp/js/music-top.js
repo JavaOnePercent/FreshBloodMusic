@@ -102,7 +102,7 @@ Vue.component('compositor-top', {
 
 });
 
-Vue.component('main-compilation', {
+var main = Vue.component('main-compilation', {
 	template: '#main',
     data() {
 	    return {

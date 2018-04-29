@@ -1,17 +1,20 @@
+import re
+
 from django.shortcuts import render
 from django.contrib import auth
 from django.utils.datastructures import MultiValueDictKeyError
+from rest_framework.views import APIView
 
 from .models import Performer, Genre, Album, Track, LikedTrack
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from .uploader import Compressor, save_album, save_performer
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
-    PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer
+    PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer
 from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods, PerformerMethods, \
     AlbumMethods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 import math
 
 from pprint import pprint
@@ -31,20 +34,26 @@ def next_track(request):
         return Response({'current': serializer.data[0], 'next': serializer.data[1]}, status=status.HTTP_200_OK)
 
 
-@api_view(['PUT', 'DELETE'])  # обработчик лайков
-def like(request):
+@api_view(['PUT', 'DELETE', 'GET'])  # обработчик лайков
+def likes(request):
     if request.method == 'PUT':  # добавление лайка
         result = LikedTrackMethods.add_like(request.query_params['track_id'], auth.get_user(request).id)
         if result:
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
     elif request.method == 'DELETE':  # удаление лайка
         result = LikedTrackMethods.remove_like(request.query_params['track_id'], auth.get_user(request).id)
         if result:
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "GET":  # получение лайков для пользователя
+        likes = LikedTrackMethods.get(auth.get_user(request).id)
+        serializer = LikedTrackSerializer(likes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -184,22 +193,70 @@ def genre(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST', 'GET'])
-def performer(request):
-    if request.method == 'POST':  # создание нового исполнителя
+class PerformersList(APIView):
+    def post(self, request, format=None):  # создание или изменение исполнителя
         name = request.POST["name"]
         try:
             label = request.FILES["label"]
         except MultiValueDictKeyError:
             label = None
         description = request.POST["description"]
+        id = request.POST["id"]
+        save_performer(id, auth.get_user(request).id, name, label, description)
 
-        save_performer(auth.get_user(request).id, name, label, description)
+        return Response(status=status.HTTP_200_OK)
 
-        return HttpResponse(status=200)
+
+class PerformerDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Performer.objects.get(pk=pk)
+        except Performer.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        if pk == 'me':  # получение исполнителя по пользователю
+            user = auth.get_user(request).id
+            performer = PerformerMethods.get(user)
+            serializer = FullPerformerSerializer(performer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif re.fullmatch(r'[0-9]+', pk):
+            performer = self.get_object(pk)
+            serializer = FullPerformerSerializer(performer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    '''def put(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        serializer = SnippetSerializer(snippet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        snippet = self.get_object(pk)
+        snippet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)'''
+
+
+'''@api_view(['PUT', 'POST', 'GET'])
+def performers(request):
+    if request.method == 'POST' or request.method == 'PUT':  # создание или изменение исполнителя
+        name = request.POST["name"]
+        try:
+            label = request.FILES["label"]
+        except MultiValueDictKeyError:
+            label = None
+        description = request.POST["description"]
+        id = request.POST["id"]
+        save_performer(id, auth.get_user(request).id, name, label, description)
+
+        return Response(status=status.HTTP_200_OK)
 
     if request.method == "GET":  # получение исполнителя по пользователю
         user = auth.get_user(request).id
         performer = PerformerMethods.get(user)
         serializer = FullPerformerSerializer(performer)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)'''

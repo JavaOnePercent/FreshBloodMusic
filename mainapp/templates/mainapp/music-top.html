@@ -3,9 +3,11 @@
     <div  class="header-conteiner">
             <div class="header" >
                 <div class="row">
-                    <div class="name">
-                        BoysBand
-                    </div>
+                    <router-link to="/">
+                        <div class="name">
+                            BoysBand
+                        </div>
+                    </router-link>
                     <div class="management">
                         {% if username %}
                         
@@ -13,7 +15,7 @@
                             <span>{{ username }}</span>
                             <img title="загрузить"  class="user" src="/static/mainapp/images/user.svg" alt="user">
                             <ul class="menu-drop" v-if="menuShow">
-                                <li><a @click="openProfile">Профиль</a></li>
+                                <li><router-link to="/performers/me">Профиль</router-link></li> <!-- <a @click="openProfile">Профиль</a> -->
                                 <li><a href="auth/logout/">Выйти</a></li>
                             </ul>
                         </div>

@@ -27,16 +27,23 @@ def save_album(user, name, genre, logo, tracks, track_name):  # сохранен
     Compressor.remove_temp()
 
 
-def save_performer(user, name, label, description):
+def save_performer(id, user, name, label, description):
     date = datetime.date.today()
-    performer = PerformerMethods.create(user=user, name=name, description=description, date=date)
+    performer = PerformerMethods.create(id=id, user=user, name=name, description=description, date=date)
     directory = 'performers/' + str(performer.id) + '/'
-    os.mkdir(Compressor.path + directory)
+    try_mkdir(Compressor.path + directory)
     if label is not None:
         image = Compressor(label.read(), label.content_type, 'logo.jpg', directory).compress()
         PerformerMethods.add_image(performer, image)
     Compressor.remove_temp()
 
+
+def try_mkdir(directory):
+    try:
+        os.mkdir(directory)
+        return True
+    except FileExistsError:
+        return False
 
 class Compressor:
     path = './media/'

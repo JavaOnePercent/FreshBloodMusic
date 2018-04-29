@@ -38,7 +38,8 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         showProfile: false,
         performerName: '',
         performerLogo: '',
-        performerDescription: ''
+        performerDescription: '',
+        performerID: 0
     },
     mutations: {
         currentTime (state, val) {
@@ -75,6 +76,9 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         },
         performerDescription(state, val) {
             state.performerDescription = val;
+        },
+        performerID(state, val) {
+            state.performerID = val;
         },
     }
 })
