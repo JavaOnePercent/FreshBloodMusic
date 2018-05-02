@@ -1,6 +1,6 @@
 {% load staticfiles %}
 <script type="text/x-template" id="header-container">
-    <div  class="header-conteiner" id="header-container">
+    <div  class="header-conteiner">
             <div class="header" >
                 <div class="row">
                     <router-link to="/">
@@ -71,7 +71,7 @@
 
 <script type="text/x-template" id="compilation">
     <div id="compilation-top">
-    <div class="recommendations" id="recommendations">
+    <div class="recommendations">
             <div class="sortirovka">
                 <label class="sortirovka-name">Рекомендации</label>
                 <div class="sort">
@@ -101,8 +101,8 @@
 </script>
 
 <script type="text/x-template" id="main">
-    <div class="main">
-        <div class="topics" id="topics">
+    <div class="main" id="main">
+        <div class="topics">
             <app-music-top></app-music-top>
             <compositor-top></compositor-top>
         </div>

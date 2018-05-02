@@ -22,38 +22,41 @@ Vue.component('app-compilation',{
         return{
             compilation:[],
             compilations:[],
-            url: 'track',
+            url: 'track?genre=all',
             loading: false
           //hoverClass: 'disk'
         }
     },
     mounted(){
-        document.addEventListener("scroll", this.onScroll, false);
+        document.body.addEventListener("scroll", this.onScroll, false);
     },
     methods: {
         onScroll: function(event) {
-
-            var wrapper = event.target.body;
-            var list = this.$refs.list;
-            var topics = document.getElementById('topics').offsetHeight;
-            var header = document.getElementById('header-container').offsetHeight;
-            var recommendations = document.getElementById('recommendations').offsetHeight;
+            var wrapper = event.target;
+            var list = document.getElementById('main');
             var scrollTop = wrapper.scrollTop;
             var wrapperHeight = wrapper.offsetHeight;
-            var listHeight = list.offsetHeight + topics + header + recommendations;
+            var listHeight = list.offsetHeight;
 
             var diffHeight = listHeight - wrapperHeight;
 
-            //console.log(wrapper);
             //console.log(diffHeight, scrollTop);
             if(diffHeight <= scrollTop && !this.loading) {
-                this.showGenre(2);
+                if(this.url != null)
+                    this.showGenre();
             }
 
         },
-        showGenre: function(message) {
+        showGenre: function(message = null) {
           this.loading = true;
-          this.$http.get(this.url, {params: {genre: message}}).then(function(response){
+          var obj = {}
+          if(message != null)
+          {
+            this.url = 'track';
+            this.compilations = [];
+            obj = {params: {genre: message}}
+          }
+          this.$http.get(this.url, obj/*{params: {genre: message}}*/).then(function(response){
                 this.compilation = response.body.results;
                 for(var i = 0; i < this.compilation.length; i++)
                 {

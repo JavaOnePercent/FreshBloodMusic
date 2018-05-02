@@ -8,6 +8,11 @@ html, body
     margin: 0;
     padding: 0;
     font-family: Arial,Helvetica,sans-serif;
+    position: fixed;
+    overflow-y: scroll;
+}
+html {
+    overflow: hidden;
 }
 /*опастно*/
  .modal

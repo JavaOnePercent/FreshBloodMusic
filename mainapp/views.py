@@ -67,15 +67,54 @@ class PostLimitOffsetPagination(CursorPagination):
     page_size = 12
     ordering = '-rating_trc'
 
+
 class TrackOverview(generics.ListAPIView):
     serializer_class = NoLinkTrackSerializer
     pagination_class = PostLimitOffsetPagination
+
     def get_queryset(self):
         gen = self.request.query_params['genre']
-        queryset = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
-        return queryset
+        request = self.request
+        if gen == 'fav':
+            likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id')
+            tracks = Track.objects.filter(id__in=likedtracks)
+            '''tracks = []
+            for track in likedtracks:
+                trc = Track.objects.all().get(id=track[0])
+                tracks.append(trc)'''
+        elif gen == 'rec':
+            likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
+            users = LikedTrack.objects.all().values_list('user_id')
+            idenusers = []
+            for user in users:
+                if user not in idenusers and user != auth.get_user(request).id:
+                    idenusers.append(user)
+            chance = {}
+            for user in idenusers:
+                tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
+                likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
+                         (math.fabs(len(set(likedtracks) | set(tracks))))) / (len(idenusers) - 1)
+                chance[user] = likes
+            chance = sorted(chance.items(), key=lambda item: -item[1])
+            tracks = []
+            for key in chance:
+                tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+            identracks = []
+            for track in tracks:
+                if track not in identracks and track not in likedtracks:
+                    identracks.append(track)
+            tracks = []
+            for track in identracks:
+                trc = Track.objects.all().get(id=track[0])
+                tracks.append(trc)
+        elif gen != 'all':
+            tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
+        else:
+            tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
+        return tracks
 
-@api_view(['GET'])
+
+'''@api_view(['GET'])
 def track(request):
     if request.method == "GET":
         gen = request.query_params['genre']
@@ -121,7 +160,7 @@ def track(request):
         serializer = NoLinkTrackSerializer(tracks, many=True)
         # json_jn = json.dumps(list(tracks), cls=DjangoJSONEncoder)
         # return HttpResponse(json_jn, content_type="application/json")
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)'''
 
 
 @api_view(['GET'])
