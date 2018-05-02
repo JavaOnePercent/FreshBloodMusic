@@ -20,21 +20,55 @@ Vue.component('app-compilation',{
     template:'#compilation',
     data: function() {
         return{
+            compilation:[],
             compilations:[],
+            url: 'track',
+            loading: false
           //hoverClass: 'disk'
         }
     },
+    mounted(){
+        document.addEventListener("scroll", this.onScroll, false);
+    },
     methods: {
+        onScroll: function(event) {
+
+            var wrapper = event.target.body;
+            var list = this.$refs.list;
+            var topics = document.getElementById('topics').offsetHeight;
+            var header = document.getElementById('header-container').offsetHeight;
+            var recommendations = document.getElementById('recommendations').offsetHeight;
+            var scrollTop = wrapper.scrollTop;
+            var wrapperHeight = wrapper.offsetHeight;
+            var listHeight = list.offsetHeight + topics + header + recommendations;
+
+            var diffHeight = listHeight - wrapperHeight;
+
+            //console.log(wrapper);
+            //console.log(diffHeight, scrollTop);
+            if(diffHeight <= scrollTop && !this.loading) {
+                this.showGenre(2);
+            }
+
+        },
         showGenre: function(message) {
-          this.$http.get('track',{params: {genre: message}}).then(function(response){
-                this.compilations = JSON.parse(response.bodyText);
-                for(var i = 0; i < this.compilations.length; i++)
+          this.loading = true;
+          this.$http.get(this.url, {params: {genre: message}}).then(function(response){
+                this.compilation = response.body.results;
+                for(var i = 0; i < this.compilation.length; i++)
                 {
-                    if(this.compilations[i].image_alb === null )
+                    if(this.compilation[i].image_alb === null )
                     {
-                     this.compilations[i].image_alb = "/static/mainapp/images/cat.jpg"
+                     this.compilation[i].image_alb = "/static/mainapp/images/cat.jpg"
                     }
                 }
+                this.compilations = this.compilations.concat(this.compilation);
+                console.log(this.compilations);
+                this.url = response.body.next;
+                console.log(this.url);
+                this.loading = false;
+            }, function(error){
+                this.loading = false;
             })
         },
         trackClick: function(index) {

@@ -5,7 +5,7 @@ from mainapp.models import Performer
 
 urlpatterns = [
     url(r'^$', views.main_view, name='main_view'), # главная
-    url(r'^track$', views.track, name='track'),
+    url(r'^track$', views.TrackOverview.as_view(), name='track'),
     url(r'^best_performer/$', views.best_performer, name='best_performer'),
     url(r'^top_month/$', views.top_month, name='top_month'),
     url(r'^next$', views.next_track, name='next_track'),  # запрос следующего трека

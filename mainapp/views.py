@@ -16,6 +16,11 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, generics
 import math
+from rest_framework.pagination import (
+    LimitOffsetPagination,
+    PageNumberPagination,
+    CursorPagination,
+    )
 
 from pprint import pprint
 
@@ -57,6 +62,18 @@ def likes(request):
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+class PostLimitOffsetPagination(CursorPagination):
+    page_size = 12
+    ordering = '-rating_trc'
+
+class TrackOverview(generics.ListAPIView):
+    serializer_class = NoLinkTrackSerializer
+    pagination_class = PostLimitOffsetPagination
+    def get_queryset(self):
+        gen = self.request.query_params['genre']
+        queryset = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
+        return queryset
 
 @api_view(['GET'])
 def track(request):
@@ -234,7 +251,6 @@ class PerformerDetail(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     def delete(self, request, pk, format=None):
         snippet = self.get_object(pk)
         snippet.delete()
@@ -252,9 +268,7 @@ def performers(request):
         description = request.POST["description"]
         id = request.POST["id"]
         save_performer(id, auth.get_user(request).id, name, label, description)
-
         return Response(status=status.HTTP_200_OK)
-
     if request.method == "GET":  # получение исполнителя по пользователю
         user = auth.get_user(request).id
         performer = PerformerMethods.get(user)
