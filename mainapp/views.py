@@ -102,11 +102,8 @@ class TrackOverview(generics.ListAPIView):
             identracks = []
             for track in tracks:
                 if track not in identracks and track not in likedtracks:
-                    identracks.append(track)
-            tracks = []
-            for track in identracks:
-                trc = Track.objects.all().get(id=track[0])
-                tracks.append(trc)
+                    identracks.append(track[0])
+            tracks = Track.objects.filter(id__in=identracks)
         elif gen != 'all':
             tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
         else:
