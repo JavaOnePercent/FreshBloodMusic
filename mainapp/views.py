@@ -11,7 +11,7 @@ from .uploader import Compressor, save_album, save_performer
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
     PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer
 from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods, PerformerMethods, \
-    AlbumMethods
+    AlbumMethods, TrackHistoryMethods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -24,9 +24,12 @@ from rest_framework.pagination import (
 
 from pprint import pprint
 
-
 def main_view(request):  # главная
-    return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
+    file = open('./mainapp/static/mainapp/index.html', 'r')
+    index = file.read()
+    file.close()
+    return HttpResponse(index, content_type="text/html")
+    # return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
 
 
 @api_view(['GET'])  # запрос следующего трека
@@ -175,9 +178,11 @@ def top_month(request):
         serializer = TopTrackSerializer(month, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class Names:
     name_track = ""
     image_track = ""
+
     def __init__(self, name_track, image_track):
         self.name_track = name_track
         self.image_track = image_track
@@ -310,3 +315,13 @@ def performers(request):
         performer = PerformerMethods.get(user)
         serializer = FullPerformerSerializer(performer)
         return Response(serializer.data, status=status.HTTP_200_OK)'''
+
+
+@api_view(['PUT'])
+def history(request):
+    if request.method == 'PUT':
+        result = TrackHistoryMethods.create(request.query_params['track_id'], auth.get_user(request).id)
+        if result:
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

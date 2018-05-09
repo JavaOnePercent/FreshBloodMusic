@@ -1,5 +1,3 @@
-
-
 var playerComponent = Vue.component('topPlayer', {
     template: '#topPlayer',
     /*components:{
@@ -30,7 +28,8 @@ var playerComponent = Vue.component('topPlayer', {
                 logoLink: '',
                 nextLogoLink: '',
                 prevLogoLink: '',
-                isLiked: false
+                isLiked: false,
+                nextEnvelopeLogo: ''
             },
             trackPerformer: {
                 trackName: '',
@@ -46,12 +45,19 @@ var playerComponent = Vue.component('topPlayer', {
             isTimeout: false
         }
     },
-    
+    mounted() {
+        window.addEventListener('resize', this.updateContainer);
+    },
     created() {
         this.loadNextTrack();
         bus.$on('trackclicked', event => {
             //this.playNow(event.id);
-            this.getTrackAttributes(event.id);
+            this.pushQueue(event.id);
+            
+        });
+        bus.$on('queue-opened', event => {
+            //this.playNow(event.id);
+            this.moveContainer();
             
         });
         /*this.getTrackAttributes(3);
@@ -70,27 +76,54 @@ var playerComponent = Vue.component('topPlayer', {
             this.track.nextID = id;
             this.loadNextTrack();
         },*/
+        
+        playingEnded() {
+            this.playNextTrack()
+        },
         moveContainer() {
             if (this.containerMove === '')
             {
-                var dist = document.body.offsetWidth / 2 - 675;
-                this.containerMove = (dist < 0) ? ('left: ' + ((dist-10) * 2) + 'px') : '';
+                this.setContainer();
             }
             else
                 this.containerMove = '';
         },
-        getTrackAttributes(id) {
-            var varData = {
-                id: id
-            };
+        updateContainer() {
+            if (this.containerMove != '')
+                this.setContainer();
+        },
+        setContainer() {
+            var dist = document.body.offsetWidth / 2 - 675;
+            this.containerMove = (dist < 0) ? ('left: ' + ((dist-30) * 2) + 'px') : 'left: 0';
+        },
+        pushQueue(id) {
             this.$http.get('track_attr', {
                 responseType: 'json',
-                params: varData
+                params: { id: id }
             }).then(response => {
+                var last = this.queue.tracks[this.queue.tracks.length - 1]
+
+                if(last.auto === true) this.queue.tracks.pop()
+        
                 this.queue.tracks.push(response.data);
-                this.track.nextID = id;
-                this.loadNextTrack();
+                if(last.auto === true) this.queue.tracks.push(last);
+
+                this.logos.nextLogoLink = this.queue.tracks[0].image_alb;
+                this.$refs.logos.refresh(this.queue.tracks[0].image_alb);
+                
+                //this.track.nextID = id;
+                //this.loadNextTrack();
             });
+        },
+        playNextTrack() {
+            //this.queue.tracks[0]
+            first = this.queue.tracks.shift()
+            this.loadNextTrack(first);
+            
+            this.$http.put('history', {}, {
+                responseType: 'json',
+                params: { track_id: first.id }
+            }).then(response => {  });
         },
         switchPlayerView() {
             if(this.isFull)
@@ -133,7 +166,7 @@ var playerComponent = Vue.component('topPlayer', {
         nextTrackTimeout() {
             this.isTimeout = false;
         },
-        loadNextTrack() {
+        loadNextTrack(first = this.queue.tracks[0]) {
             if(!this.isTimeout)
             {
                 this.isTimeout = true;
@@ -141,7 +174,7 @@ var playerComponent = Vue.component('topPlayer', {
                 //this.likeTrack();
                 var varData = {
                     current_track: this.track.currentID,
-                    next_track: this.track.nextID
+                    next_track: (first === undefined) ? '' : first.id
                 };
                 this.$http.get('next', {
                     responseType: 'json',
@@ -155,21 +188,27 @@ var playerComponent = Vue.component('topPlayer', {
             var current = data.body.current;
             var next = data.body.next;
 
-            this.trackPerformer.trackName = current.name_trc;
-            this.trackPerformer.performerName = current.name_per;//
-            this.performerID = current.per_id;
-            this.audio.audioLink = (current.audio_trc);//toStatic(current.link_trc);
-            //console.log(current.audio_file);
-            this.track.currentID = current.id;
-            this.track.nextID = next.id;
-            document.getElementById('title').innerHTML = current.name_per + " - " + current.name_trc;
+            next.auto = true
+            if(this.queue.tracks.length === 0) this.queue.tracks.push(next)
 
             logo = this.logos.logoLink;
-            this.logos.logoLink = (current.image_alb);
+            this.setCurrentTrackAttrs(current);
+            
+            //this.track.nextID = next.id;
+                       
             this.logos.prevLogoLink = logo;
-            this.logos.nextLogoLink = (next.image_alb);
-
-            this.track.isLiked = !!(current.is_liked);
+            this.logos.nextLogoLink = this.queue.tracks[0].image_alb;
+            
+        },
+        setCurrentTrackAttrs(track) {
+            this.trackPerformer.trackName = track.name_trc;
+            this.trackPerformer.performerName = track.name_per;
+            this.performerID = track.per_id;
+            this.audio.audioLink = track.audio_trc;
+            this.track.currentID = track.id;
+            document.getElementById('title').innerHTML = track.name_per + " - " + track.name_trc;
+            this.logos.logoLink = track.image_alb;
+            this.track.isLiked = !!(track.is_liked);
             this.logos.isLiked = this.track.isLiked;
             bus.$emit('next-track-load');
         }
@@ -185,11 +224,8 @@ var buttonsComponent = Vue.component('buttons', {
         return {
             playSrcs: playSrcs,
             dropdownSrcs: dropdownSrcs,
-            buttons: [
-                {id:'playButton', imgSrc: playSrcs.play, click: this.playClick},
-                {id:'nextButton', imgSrc: '/static/mainapp/images/nextButton.png', click: this.nextClick},
-                {id:'dropdown', imgSrc: dropdownSrcs.drop, click: this.dropdownClick}
-            ]
+            playSrc: playSrcs.play,
+            dropdownSrc: dropdownSrcs.drop
         }
     },
     methods: {
@@ -215,13 +251,13 @@ var buttonsComponent = Vue.component('buttons', {
     watch: {
         playing(pl){
             (pl || this.isDragging) ?
-                this.buttons[0].imgSrc = this.playSrcs.pause :
-                this.buttons[0].imgSrc = this.playSrcs.play;
+                this.playSrc = this.playSrcs.pause :
+                this.playSrc = this.playSrcs.play;
         },
         isFull(iF){
             (iF) ?
-                this.buttons[2].imgSrc = this.dropdownSrcs.close :
-                this.buttons[2].imgSrc = this.dropdownSrcs.drop;
+                this.dropdownSrc = this.dropdownSrcs.close :
+                this.dropdownSrc = this.dropdownSrcs.drop;
         }
     }
 });
@@ -249,10 +285,10 @@ var logosComponent = Vue.component('logos', {
             nextLogoAnimation: '',
             audio: null,
             logo: '',
-            nextLogo: '',
             prevLogo: '',
             lastRotation: '',
-            wasPlaying: false
+            wasPlaying: false,
+            nextEnvelopeLogo: ''
             //duration: 0,
             //currentTime: 0
         }
@@ -353,29 +389,36 @@ var logosComponent = Vue.component('logos', {
     },
     
     methods: {
+        refresh(link) {
+            this.nextEnvelopeLogo = link;
+        },
+        nextLogoClick() {
+            bus.$emit('queue-opened');
+        },
         startAnimation() {
             setTimeout(this.endAnimation, 800);
-            this.mainToPrevLogoAnimation += 'left: -100%; height: 150px; width: 150px; transition: left 0.8s, height 0.3s, width 0.3s;';
-            this.nextToMainLogoAnimation = {right: 0, transition: 'right 0.8s'}; 
+            this.mainToPrevLogoAnimation += 'left: -75px; height: 150px; width: 150px; top: 100px; transition: left 0.8s, height 0.3s, width 0.3s, top 0.3s;';
+            this.nextToMainLogoAnimation = {right: '165px', transition: 'right 0.8s'}; 
             setTimeout(this.startExpandingNextToMain, 500);
             
-            this.prevEnvelopeAnimation = {top: '-50%', opacity: '1.0', transition: 'top 0.3s, opacity 0.3s'};
-            this.prevLogoAnimation = 'left: -150%; opacity: 0.0; transition: left 0.5s, opacity 0.5s;';
-            this.nextLogoAnimation = 'right: -150%; opacity: 0.0;';
+            this.prevEnvelopeAnimation = {top: '100px', opacity: '1.0', transition: 'top 0.3s, opacity 0.3s'};
+            this.prevLogoAnimation = 'left: -200px; opacity: 0.0; transition: left 0.5s, opacity 0.5s;';
+            this.nextLogoAnimation = 'right: -200px; opacity: 0.0; transition: all 0.0s';
             setTimeout(this.moveNextEnvelope, 500);
         },
         endAnimation() {
             
-            this.nextLogo = this.nextLogoLink;
+            this.nextEnvelopeLogo = this.nextLogoLink;
             this.prevLogo = this.prevLogoLink;
             this.mainToPrevLogoAnimation = 'visibility:hidden;';
             this.nextToMainLogoAnimation = 'visibility:hidden;'
             this.mainLogoAnimation = '';
             //this.prevEnvelopeAnimation = 'visibility:hidden;';
             this.prevEnvelopeAnimation.opacity = 0.0;
-            this.prevEnvelopeAnimation.transition = 'opacity 0.1s';
-            setTimeout(this.hidePrevEnvelope, 100);
+            this.prevEnvelopeAnimation.transition = 'opacity 0.15s';
+            setTimeout(this.hidePrevEnvelope, 150);
             this.prevLogoAnimation = '';
+            this.nextLogoAnimation = '';
             this.nextEnvelopeAnimation = 'visibility:hidden;';
         },
         hidePrevEnvelope() {
@@ -383,12 +426,13 @@ var logosComponent = Vue.component('logos', {
             this.prevEnvelopeAnimation = 'visibility:hidden;';
         },
         startExpandingNextToMain(){
-            this.nextToMainLogoAnimation.transition += ', height 0.3s, width 0.3s';
-            this.nextToMainLogoAnimation.height = '250px';
-            this.nextToMainLogoAnimation.width = '250px';
+            this.nextToMainLogoAnimation.transition += ', top 0.3s, height 0.3s, width 0.3s';
+            this.nextToMainLogoAnimation.top = '40px';
+            this.nextToMainLogoAnimation.height = '270px';
+            this.nextToMainLogoAnimation.width = '270px';
         },
         moveNextEnvelope() {
-            this.nextEnvelopeAnimation.top = '-90%';
+            this.nextEnvelopeAnimation.top = '0px';
             this.nextEnvelopeAnimation.opacity = '0.0';
             this.nextEnvelopeAnimation.transition = 'all 0.3s';
             this.nextLogoAnimation = 'transition: right 0.5s, opacity 0.5s;';
@@ -451,7 +495,7 @@ var volumeControllerComponent = Vue.component('volumeController', {
     props: ['isFull'],
     data() {
         var smallVolume = {direction: 'vertical', width: 12, height: 150, dotSize: 20, speed: 0.3, tooltip: 'hover'};
-        var fullVolume = {direction: 'horizontal', width: 180, height: 12, dotSize: 22, speed: 0.3, tooltip: 'hover'};
+        //var fullVolume = {direction: 'horizontal', width: 180, height: 12, dotSize: 22, speed: 0.3, tooltip: 'hover'};
         var path = '/static/mainapp/images/';
         var speakerPics = {zero: path + 'speaker0.png', thirty3: path + 'speaker33.png', sixty6: path + 'speaker66.png', hundred: path + 'speaker100.png',};
         return {
@@ -459,7 +503,7 @@ var volumeControllerComponent = Vue.component('volumeController', {
             showVolume: false,
             showFullVolume: false,
             sliderprops: smallVolume,
-            sliderpropsFull: fullVolume,
+            //sliderpropsFull: fullVolume,
             dragging: false,
             mouseIn: false,
             speakerPic: speakerPics.hundred,
@@ -467,13 +511,6 @@ var volumeControllerComponent = Vue.component('volumeController', {
         }
     },
     watch: {
-        isFull(iF){
-            if(iF)
-            {
-                this.showVolume = false;
-                this.showFullVolume = true;
-            }
-        },
         value(value) {
             localStorage.setItem("volume", this.value);
             //this.$emit('volumechanged');
@@ -513,40 +550,25 @@ var volumeControllerComponent = Vue.component('volumeController', {
             this.$refs.fullSlider.refresh();
         },
         mouseLeave() {
-            if(!this.isFull)
-            {
                 this.mouseIn = false;
                 this.closeSpeaker();
-            }
         },
         mouseEnter() {
-            if(!this.isFull)
-            {
                 this.mouseIn = true;
-            }
         },
         dragEnd() {
-            if(!this.isFull)
-            {
                 this.dragging = false;
                 this.closeSpeaker();
-            }
         },
         dragStart() {
-            if(!this.isFull)
-            {
                 this.dragging = true;
-            }
         },
         openSpeaker() {
-            if(!this.isFull)
-            {
                 this.showVolume = true;
                 this.mouseIn = true;
-            }
         },
         closeSpeaker() {
-            if(!this.isFull && !this.dragging && !this.mouseIn)
+            if(!this.dragging && !this.mouseIn)
                 this.showVolume = false;
         }
     }
@@ -677,7 +699,7 @@ Vue.component('progressBar', {
             lastValue: 0,
             //duration: 0.0,
             sliderPropsFull: {
-                width: '100%',
+                width: 750,
                 height: 20,
                 'dot-height': 20,
                 'dot-width': 25,
@@ -743,7 +765,8 @@ Vue.component('progressBar', {
                     secs = (v % 60).toFixed();
                     return mins + ":" + ((secs < 10) ? '0' + secs : secs);
                     }
-            }
+            },
+            widthWatcherInterval: null
         }
     },
     /*created() {
@@ -761,6 +784,8 @@ Vue.component('progressBar', {
     },*/
     computed: {
         sliderPropsComputed() {
+            //console.log(this.$refs.slider.$refs.wrap)
+            //this.widthWatcherInterval = setInterval(this.widthWatcher, 50, this.$refs.slider.$refs.wrap)
             if(this.isFull) return this.sliderPropsFull;
             else return this.sliderProps;
         },
@@ -813,6 +838,9 @@ Vue.component('progressBar', {
         }*/
     },
     watch: {
+        /*isFull() {
+            this.$refs.slider.refresh();
+        },*/
         duration() {
             this.$refs.slider.refresh();
         },
@@ -829,6 +857,9 @@ Vue.component('progressBar', {
     },
 
     methods: {
+        widthWatcher() {
+
+        },
         heightChanger() {
             if (this.isPlayerHovered || this.isDragging)
             {
@@ -873,6 +904,12 @@ Vue.component('progressBar', {
 Vue.component('queue', {
     template: '#queue',
     props: ['tracks'],
+    created() {
+        bus.$on('queue-opened', event => {
+            //this.playNow(event.id);
+            this.openQueue();
+        });
+    },
     data() {
         return {
             showQueue: false,
@@ -880,22 +917,21 @@ Vue.component('queue', {
         }
     },
     methods: {
-        image(src) {
-            return toStatic(src);
-        },
         openQueue() {
-            this.$emit('queue-opened');
             this.showQueue = !this.showQueue;
         },
         mouseEnterElement(index) {
-            this.tracksComputed[index].text = this.tracks[index].name_per;
+            this.tracksComputed[index].text = this.tracks[index].name_per + ' - ' + this.tracks[index].name_trc;
             this.tracksComputed[index].style = 'color: white;';
+            this.tracksComputed[index].img = '/static/mainapp/images/playButton.png';
         },
         mouseLeaveElement(index) {
             this.tracksComputed[index].text = this.tracks[index].name_trc;
             this.tracksComputed[index].style = '';
+            this.tracksComputed[index].img = this.tracks[index].image_alb;
         },
         iterator(item, i, arr) {
+            
             this.$set(this.tracksComputed, i, {img: item.image_alb, text: item.name_trc, style: ''})
             //Vue.set(this.tracksComputed[i], 'img', item.image_alb);
             //Vue.set(this.tracksComputed[i], 'text', item.name_trc);
@@ -907,6 +943,7 @@ Vue.component('queue', {
             {
                 this.tracksComputed.push({});
             }*/
+            this.tracksComputed = [];
             tracks.forEach(this.iterator);
         }
     }

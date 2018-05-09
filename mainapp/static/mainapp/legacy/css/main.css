@@ -493,7 +493,7 @@ li a
 }
 .disk
 {
-    
+    border-radius: 50%;
     margin: 0 auto auto auto;
     transition: 1s transform;
     backface-visibility: hidden;

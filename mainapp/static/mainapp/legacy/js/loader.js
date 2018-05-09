@@ -35,7 +35,6 @@ Vue.directive('focus', {        //дерректива для фокуса вы�
 })
 Vue.component('loader',{
     template: '#loader',
-    store,
     data () {
       return {
       track_name_loader: '',

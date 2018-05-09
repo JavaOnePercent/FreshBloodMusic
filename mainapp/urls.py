@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^performers/(?P<pk>\w+)/$', views.PerformerDetail.as_view()),
     # url(r'^performers$', views.performers, name='performers'),
     url(r'^genre$', views.genre, name='genre'),
+    url(r'^history$', views.history, name='history'),
     # url(r'^performer/$', ListView.as_view(queryset=Performer.objects.all(), template_name="mainapp/musicgroup.html")),
     # url(r'^performer/(?P<slug>\w+)', DetailView.as_view(model = Performer, template_name = "mainapp/musicgroup.html")),
 ]

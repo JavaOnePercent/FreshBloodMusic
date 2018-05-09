@@ -1,6 +1,106 @@
-Vue.component ('vueSliderComponent', {
+<template>
+<div 
+ref="wrap" 
+:class="['vue-slider-component', myCSS, flowDirection, disabledClass, stateClass, { 'vue-slider-has-label': piecewiseLabel }]" 
+v-show="show" 
+:style="wrapStyles"
+@mousedown="wrapClick"
+>
+<div ref="elem" aria-hidden="true" class="vue-slider" :style="[elemStyles, bgStyle]">
+  <template v-if="isRange">
+    <div
+      ref="dot0"
+      :class="[tooltipStatus, 'vue-slider-dot', { 'vue-slider-dot-focus': focusFlag && focusSlider === 0 }]"
+      :style="[dotStyles, sliderStyles[0], focusFlag && focusSlider === 0 ? focusStyles[0] : null]"
+      @mousedown="moveStart($event, 0)"
+      @touchstart="moveStart($event, 0)"
+    >
+      <span :class="['vue-slider-tooltip-' + tooltipDirection[0], 'vue-slider-tooltip-wrap']">
+        <slot name="tooltip" :value="val[0]" :index="0">
+          <span class="vue-slider-tooltip" :style="tooltipStyles[0]">{{ '{{' }} formatter ? formatting(val[0]) : val[0] }}</span>
+        </slot>
+      </span>
+    </div>
+    <div
+      ref="dot1"
+      :class="[tooltipStatus, 'vue-slider-dot', { 'vue-slider-dot-focus': focusFlag && focusSlider === 1 }]"
+      :style="[dotStyles, sliderStyles[1], focusFlag && focusSlider === 1 ? focusStyles[1] : null]"
+      @mousedown="moveStart($event, 1)"
+      @touchstart="moveStart($event, 1)"
+    >
+      <span :class="['vue-slider-tooltip-' + tooltipDirection[1], 'vue-slider-tooltip-wrap']">
+        <slot name="tooltip" :value="val[1]" :index="1">
+          <span class="vue-slider-tooltip" :style="tooltipStyles[1]">{{ '{{' }} formatter ? formatting(val[1]) : val[1] }}</span>
+        </slot>
+      </span>
+    </div>
+  </template>
+  <template v-else>
+    <div
+      ref="dot"
+      :class="[tooltipStatus, 'vue-slider-dot', { 'vue-slider-dot-focus': focusFlag && focusSlider === 0 }]"
+      :style="[dotStyles, sliderStyles, focusFlag && focusSlider === 0 ? focusStyles : null]"
+      @mousedown="moveStart"
+      @touchstart="moveStart"
+    >
+      <span :class="['vue-slider-tooltip-' + tooltipDirection, 'vue-slider-tooltip-wrap']">
+        <slot name="tooltip" :value="val">
+          <span class="vue-slider-tooltip" :style="tooltipStyles">{{ '{{' }} formatter ? formatting(val) : val }}</span>
+        </slot>
+      </span>
+    </div>
+  </template>
+  <ul class="vue-slider-piecewise">
+    <li v-for="(piecewiseObj, index) in piecewiseDotWrap" class="vue-slider-piecewise-item" :style="[piecewiseDotStyle, piecewiseObj.style]" :key="index">
+      <slot
+        name="piecewise"
+        :label="piecewiseObj.label"
+        :index="index"
+        :first="index === 0"
+        :last="index === piecewiseDotWrap.length - 1"
+        :active="piecewiseObj.inRange"
+      >
+        <span
+          v-if="piecewise"
+          class="vue-slider-piecewise-dot"
+          :style="[ piecewiseStyle, piecewiseObj.inRange ? piecewiseActiveStyle : null ]"
+        ></span>
+      </slot>
+
+      <slot
+        name="label"
+        :label="piecewiseObj.label"
+        :index="index"
+        :first="index === 0"
+        :last="index === piecewiseDotWrap.length - 1"
+        :active="piecewiseObj.inRange"
+      >
+        <span
+          v-if="piecewiseLabel"
+          class="vue-slider-piecewise-label"
+          :style="[ labelStyle, piecewiseObj.inRange ? labelActiveStyle : null ]"
+        >
+          {{ '{{' }} piecewiseObj.label }}
+        </span>
+      </slot>
+    </li>
+  </ul>
+  <div 
+    ref="process" 
+    :class="['vue-slider-process', { 'vue-slider-process-dragable': isRange && processDragable }]" 
+    :style="processStyle"
+    @click="processClick"
+    @mousedown="moveStart($event, 0, true)"
+    @touchstart="moveStart($event, 0, true)"
+  ></div>
+</div>
+<input v-if="!isRange && !data" class="vue-slider-sr-only" type="range" v-model="val" :min="min" :max="max" />
+</div>
+</template>
+
+<script>
+export default {
     name: 'VueSliderComponent',
-    template: '#vueSliderComponent',
     props: {
       width: {
         type: [Number, String],
@@ -140,7 +240,8 @@ Vue.component ('vueSliderComponent', {
         focusSlider: 0,
         currentValue: 0,
         currentSlider: 0,
-        isComponentExists: true
+        isComponentExists: true,
+        widthWatcherInterval: null
       }
     },
     computed: {
@@ -355,6 +456,9 @@ Vue.component ('vueSliderComponent', {
       }
     },
     watch: {
+      width(w) {
+        this.widthWatcherInterval = setInterval(this.widthWatcher, 50)
+      },
       value (val) {
         this.flag || this.setValue(val, true)
       },
@@ -388,6 +492,15 @@ Vue.component ('vueSliderComponent', {
       }
     },
     methods: {
+      widthWatcher () {
+        if (this.size !== this.$refs.wrap.offsetWidth)
+        {
+          //console.log(this.size)
+          this.refresh()
+          clearInterval(this.widthWatcherInterval)
+          //console.log(this.size)
+        }
+      },
       bindEvents () {
         document.addEventListener('touchmove', this.moving, {passive: false})
         document.addEventListener('touchend', this.moveEnd, {passive: false})
@@ -774,4 +887,261 @@ Vue.component ('vueSliderComponent', {
       this.isComponentExists = false
       this.unbindEvents()
     }
-});
+}
+</script>
+
+<style scoped>
+    .vue-slider-component {
+    position: absolute;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -o-user-select:none;
+  }
+  .vue-slider-component:hover {
+    cursor: pointer;
+  }
+  .vue-slider-component.vue-slider-disabled {
+    opacity: .5;
+    cursor: not-allowed;
+  }
+  .vue-slider-component.vue-slider-has-label {
+    margin-bottom: 15px;
+  }
+  .vue-slider-component.vue-slider-disabled .vue-slider-dot {
+    cursor: not-allowed;
+  }
+  .vue-slider-component .vue-slider {
+    position: relative;
+    display: block;
+    border-radius: 15px;
+    background-color: /*#ccc*/rgba(204, 204, 204, 0.8);;
+    transition: height 0.1s linear;
+  }
+  .vue-slider-component .vue-slider::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+  }
+  .vue-slider-component .vue-slider-process {
+    position: absolute;
+    border-radius: 15px;
+    background-color: #ff2975;
+    transition: all 0s;
+    z-index: 1;
+  }
+  .vue-slider-component .vue-slider-process.vue-slider-process-dragable {
+    cursor: pointer;
+    z-index: 3;
+  }
+  .vue-slider-component.vue-slider-horizontal .vue-slider-process {
+    width: 0;
+    height: 100%;
+    top: 0;
+    left: 0;
+    will-change: width;
+  }
+  .vue-slider-component.vue-slider-vertical .vue-slider-process {
+    width: 100%;
+    height: 0;
+    bottom: 0;
+    left: 0;
+    will-change: height;
+  }
+  .vue-slider-component.vue-slider-horizontal-reverse .vue-slider-process {
+    width: 0;
+    height: 100%;
+    top: 0;
+    right: 0;
+  }
+  .vue-slider-component.vue-slider-vertical-reverse .vue-slider-process {
+    width: 100%;
+    height: 0;
+    top: 0;
+    left: 0;
+  }
+  .vue-slider-component .vue-slider-dot {
+    position: absolute;
+    border-radius: 50%;
+    background-color: #000;
+    /*box-shadow: 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0.32);*/
+    transition: all 0s;
+    will-change: transform;
+    cursor: pointer;
+    z-index: 4;
+  }
+  .vue-slider-component .vue-slider-dot.vue-slider-dot-focus {
+    box-shadow: 0 0 2px 1px black;
+  }
+  .vue-slider-component.vue-slider-horizontal .vue-slider-dot {
+    left: 0;
+  }
+  .vue-slider-component.vue-slider-vertical .vue-slider-dot {
+    bottom: 0;
+  }
+  .vue-slider-component.vue-slider-horizontal-reverse .vue-slider-dot {
+    right: 0;
+  }
+  .vue-slider-component.vue-slider-vertical-reverse .vue-slider-dot {
+    top: 0;
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap {
+    display: none;
+    position: absolute;
+    z-index: 9;
+  }
+  .vue-slider-component .vue-slider-tooltip {
+    display: block;
+    font-size: 14px;
+    white-space: nowrap;
+    padding: 2px 5px;
+    min-width: 20px;
+    text-align: center;
+    color: #fff;
+    /*border-radius: 5px;*/
+    border: 1px solid black;
+    background-color: black;
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-top {
+    top: -9px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-bottom {
+    /*bottom: -9px;*/
+    left: 50%;
+    transform: translate(15px, 0px);
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-left {
+    top: 50%;
+    left: -9px;
+    transform: translate(-100%, -50%);
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-right {
+    top: 50%;
+    right: -9px;
+    transform: translate(100%, -50%);
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-top .vue-slider-tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border: 6px solid transparent\0;
+    border-top-color: inherit;
+    transform: translate(-50%, 0);
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-bottom .vue-slider-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border: 6px solid transparent\0;
+    border-bottom-color: inherit;
+    transform: translate(-50%, 0);
+    display: none;
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-left .vue-slider-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -10px;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border: 6px solid transparent\0;
+    border-left-color: inherit;
+    transform: translate(0, -50%);
+  }
+  .vue-slider-component .vue-slider-tooltip-wrap.vue-slider-tooltip-right .vue-slider-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    border: 6px solid transparent\0;
+    border-right-color: inherit;
+    transform: translate(0, -50%);
+  }
+  .vue-slider-component .vue-slider-dot.vue-slider-hover:hover .vue-slider-tooltip-wrap {
+    display: block;
+  }
+  .vue-slider-component .vue-slider-dot.vue-slider-always .vue-slider-tooltip-wrap {
+    display: block!important;
+  }
+  .vue-slider-component .vue-slider-piecewise {
+    position: absolute;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    left: 0;
+    top: 0;
+    height: 100%;
+    list-style: none;
+  }
+  .vue-slider-component .vue-slider-piecewise-item {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+  }
+  .vue-slider-component .vue-slider-piecewise-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.16);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    transition: all .3s;
+  }
+  .vue-slider-component .vue-slider-piecewise-item:first-child .vue-slider-piecewise-dot, .vue-slider-component .vue-slider-piecewise-item:last-child .vue-slider-piecewise-dot {
+    visibility: hidden;
+  }
+  .vue-slider-component.vue-slider-horizontal .vue-slider-piecewise-label, .vue-slider-component.vue-slider-horizontal-reverse .vue-slider-piecewise-label {
+    position: absolute;
+    display: inline-block;
+    top: 100%;
+    left: 50%;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #333;
+    transform: translate(-50%, 8px);
+    visibility: visible;
+  }
+  .vue-slider-component.vue-slider-vertical .vue-slider-piecewise-label, .vue-slider-component.vue-slider-vertical-reverse .vue-slider-piecewise-label {
+    position: absolute;
+    display: inline-block;
+    top: 50%;
+    left: 100%;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #333;
+    transform: translate(8px, -50%);
+    visibility: visible;
+  }
+  .vue-slider-component .vue-slider-sr-only {
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    position: absolute !important;
+  }
+</style>
+
+

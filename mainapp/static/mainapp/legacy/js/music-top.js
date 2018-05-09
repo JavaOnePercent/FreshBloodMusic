@@ -66,9 +66,9 @@ Vue.component('app-compilation',{
                     }
                 }
                 this.compilations = this.compilations.concat(this.compilation);
-                console.log(this.compilations);
+                //console.log(this.compilations);
                 this.url = response.body.next;
-                console.log(this.url);
+                //console.log(this.url);
                 this.loading = false;
             }, function(error){
                 this.loading = false;

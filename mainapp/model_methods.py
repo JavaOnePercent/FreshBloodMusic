@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 
-from mainapp.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle
+from mainapp.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle, TrackHistory
 
 
 def get_random(all_tracks):  # возвращает рандомное значение из списка
@@ -87,7 +87,7 @@ class TrackMethods:
         all_tracks = Track.objects.all()
         tracks = []
 
-        if parsed_json["next_track"] != '' and parsed_json["next_track"] != '':
+        if parsed_json["next_track"] != '':
             tracks.append(all_tracks.get(pk=parsed_json["next_track"]))
             while tracks.__len__() == 1:
                 track = get_random(all_tracks)
@@ -152,4 +152,19 @@ class LikedTrackMethods:
         except ObjectDoesNotExist:
             is_liked = False
         return is_liked
+
+
+class TrackHistoryMethods:
+    @staticmethod
+    def create(track_id, user_id):  # добавление записи истории в таблицу
+        if track_id is not None and user_id is not None:
+            track = Track.objects.get(pk=track_id)
+            user = User.objects.get(pk=user_id)
+            count = TrackHistory.objects.filter(user_id=user).order_by('count').last()
+            if count is None:
+                count = 0
+            TrackHistory(user_id=user, trc_id=track, count=count.count+1).save()
+            return True
+        else:
+            return False
 

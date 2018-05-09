@@ -7,13 +7,13 @@
             <link id="playerCSS" rel="stylesheet" type="text/css" :href="CSSRef" />
             <div id="player" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
                 <div class="player-container" :style="containerMove">
-                    <buttons :isFull="isFull" @nextclick="loadNextTrack" @dropdownclick="switchPlayerView"></buttons>
-                    <logos v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
+                    <buttons :isFull="isFull" @nextclick="playNextTrack" @dropdownclick="switchPlayerView"></buttons>
+                    <logos ref="logos" v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
                     <menu-more :performerID="performerID"></menu-more>
                     <track-performer v-bind="trackPerformer"></track-performer>
                     <volume-controller ref="volumeController" :isFull="isFull"></volume-controller>
-                    <audio-player ref="audioPlayer" v-bind="audio" @playingended="loadNextTrack"></audio-player>
-                    <queue v-bind="queue" @queue-opened="moveContainer"></queue>
+                    <audio-player ref="audioPlayer" v-bind="audio" @playingended="playingEnded"></audio-player>
+                    <queue v-bind="queue"></queue>
                     <!--<img class="Button Player" id="previousButton" src="" draggable="false" />-->
                 </div>
                 
@@ -24,28 +24,31 @@
 
     <script type="text/x-template" id="buttons"> <!--общий компонент для обычных кнопок (play, next, dropdown)-->
         <div>
-            <img v-for="button in buttons" :src="button.imgSrc" class="Button" :id="button.id" @click="button.click" draggable="false" />
+            <img src="{% static 'mainapp/images/nextButton.png' %}" class="Button previous-button" @click="" draggable="false" />
+            <img :src="playSrc" class="Button play-button" @click="playClick" draggable="false" />
+            <img src="{% static 'mainapp/images/nextButton.png' %}" class="Button next-button" @click="nextClick" draggable="false" />
+            <img :src="dropdownSrc" class="Button dropdown-button" @click="dropdownClick" draggable="false" />
         </div>
     </script>
 
     <script type="text/x-template" id="logos"> <!--компонент для всех лого-->
         <div>
-            <div class="Button" id="mainLogo" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain" :style="mainLogoAnimation">
+            <div class="Button main-logo" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain" :style="mainLogoAnimation">
                 <img id=vinyl src="{% static 'mainapp/images/redVinyl.png' %}">
                 <img id="logo" :src="logoLink" draggable="false" :style="rotationCSS"/>
                 <img class="Player" id="like" v-show="showLike" src="{% static 'mainapp/images/like.png' %}" draggable="false"/>
             </div>
-            <img class="Player main-to-prev-logo" :src="logo" draggable="false" :style="mainToPrevLogoAnimation"/>
-            <img class="Player next-to-main-logo" :src="logoLink" draggable="false" :style="nextToMainLogoAnimation"/>
-            <img class="Player prev-envelope" :src="logo" draggable="false" :style="prevEnvelopeAnimation"/>
-            <img class="Player" :src="prevLogo" id="prevlogo" v-show="showPrev" draggable="false" :style="prevLogoAnimation"/>
-            <img class="Player" id="nextlogo" :src="nextLogoLink" draggable="false" :style="nextLogoAnimation"/>
-            <img class="Player next-envelope" :src="nextLogo" draggable="false" :style="nextEnvelopeAnimation"/>
+            <img class="main-to-prev-logo" :src="logo" draggable="false" :style="mainToPrevLogoAnimation"/>
+            <img class="next-to-main-logo" :src="logoLink" draggable="false" :style="nextToMainLogoAnimation"/>
+            <img class="prev-envelope" :src="logo" draggable="false" :style="prevEnvelopeAnimation"/>
+            <img class="Button prev-logo" :src="prevLogo" v-show="showPrev" draggable="false" :style="prevLogoAnimation"/>
+            <img class="Button next-logo" @click="nextLogoClick" :src="nextLogoLink" draggable="false" :style="nextLogoAnimation"/>
+            <img class="next-envelope" :src="nextEnvelopeLogo" draggable="false" :style="nextEnvelopeAnimation"/>
         </div>
     </script>
 
     <script type="text/x-template" id="menuMore"> <!--компонент для меню "больше"-->
-        <div id="menu" @click="toggleDrop">
+        <div class="menu" @click="toggleDrop">
             <img class="Button" id="menuPic" src="{% static 'mainapp/images/menu.png' %}" draggable="false"/>
             <transition name="menu-more">
                 <ul id="menuDropdown" v-show="showMenu" @mouseleave="closeDrop">
@@ -58,18 +61,18 @@
     </script>
 
     <script type="text/x-template" id="trackPerformer"> <!-- компонент для имени трека и исполнителя -->
-        <div id="trackPerformerName">
-            <p id="trackname">{{ '{{' }} trackName }}</p>
-            <p id="performername">{{ '{{' }} performerName }}</p>
+        <div class="track-performer-name">
+            <p class="track-name" id="trackname">{{ '{{' }} trackName }}</p>
+            <p class="performer-name" id="performername">{{ '{{' }} performerName }}</p>
         </div>
     </script>
 
     <script type="text/x-template" id="volumeController"> <!-- компонент для контроллера громкости -->
     <div>
-        <div v-show="showVolume || isFull" id="volumeControlZone" @mouseleave="mouseLeave" @mouseenter="mouseEnter">
+        <div v-show="showVolume || isFull" class="volume-control-zone" @mouseleave="mouseLeave" @mouseenter="mouseEnter">
             <transition>
-                <div id="volume" >
-                    <div id="volumeBackground" v-show="showVolume"></div>
+                <div class="volume" >
+                    <div class="volume-background" v-show="showVolume"></div>
                     <!--<div class="Player Button" id="draggingZone"></div>
                     <img class="Button" id = "ball" src="{% static 'mainapp/images/circle.png' %}" draggable="false"/>
                     <div class="Player Button" id="line"></div>
@@ -79,14 +82,12 @@
             </transition>
 
             
-            <div id="fullVolume" @mouseenter="refreshFunc">
+            <!--<div id="fullVolume" @mouseenter="refreshFunc">
                 <vue-slider-component ref="fullSlider" v-model="value" :show="showFullVolume && isFull" v-bind="sliderpropsFull"></vue-slider-component>
-            </div>
+            </div>-->
             
         </div>
-        <div id="speaker" @mouseenter="openSpeaker" @click="clickSpeaker">
-            <img class="Button" id="speakerPic" :src="speakerPic" draggable="false"/>
-        </div>
+        <img @mouseenter="openSpeaker" @click="clickSpeaker" class="Button speaker" id="speakerPic" :src="speakerPic" draggable="false"/>
     </div>
     </script>
     
@@ -115,13 +116,13 @@
 
     <script type="text/x-template" id="queue">  <!-- компонент для элемента audio -->
         <div class="queue">
-            <img @click="openQueue" class="Button queue-button" src="{% static 'mainapp/images/queue.svg' %}" draggable="false"/>
+            <!--<img @click="openQueue" class="Button queue-button" src="{% static 'mainapp/images/queue.svg' %}" draggable="false"/>-->
             <transition name="queue">
                 <div class="queue-list" v-show="showQueue" @mouseleave="">
                     <div @mouseenter="mouseEnterElement(index)" @mouseleave="mouseLeaveElement(index)" class="queue-element" v-for="(track, index) in tracksComputed">
-                        <img :src="image(track.img)" class="queue-img"/>
+                        <img :src="track.img" class="queue-img"/>
                         <span :style="track.style" class="queue-text">{{ '{{' }} track.text }}</span>
-                        <img src="{% static 'mainapp/images/playButton.png' %}" class="queue-play">
+                        <!--<img src="{% static 'mainapp/images/playButton.png' %}" class="queue-play">-->
                     </div>
                 </div>
             </transition>

@@ -3,7 +3,7 @@
     height: 450px;*/
     width: 600px;
     height: 650px;
-    top: 30px;
+    top: 0;
     right: 0;
     position:absolute;
     left: 0;
@@ -25,29 +25,13 @@
     box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.13);
 }
 
-#playButton {
-	top: 45%;
-	width: 70px;
-	height: 70px;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    margin: auto;
-	position: absolute;
-}
-#playButton:hover {
-	width: 72px;
-	height: 72px;
-}
-
-#mainLogo {
-    top: -50%;
-    width: 250px;
-    height: 250px;
+.main-logo {
+    top: 40px;
+    width: 270px;
+    height: 270px;
     border-radius: 50%;
 	box-shadow: 0px 4px 28px rgba(0, 0, 0, .5)/*#64bdf5;*/;
     right: 0;
-    bottom: 0;
     left: 0;
     margin: auto;
 	position: absolute;
@@ -55,9 +39,10 @@
     z-index:15;
     
 }
-#mainLogo:hover {
-	width: 255px;
-	height: 255px;
+.main-logo:hover {
+    top: 37px;
+	width: 276px;
+	height: 276px;
 	box-shadow: 0px 0px 30px #C732B1;
 }
 
@@ -80,119 +65,190 @@
     display: none;
 }
 
-#nextlogo {
-	top: -50%;
-    right: -100%;
+.next-logo {
+	top: 100px;
+    right: -75px;
 	opacity: 0.6;
 	width: 150px;
     height: 150px;
+    transition: opacity 0.2s;
+    position: absolute;
+    margin: auto;
+}
+
+.next-logo:hover {
+    opacity: 1;
 }
 
 .main-to-prev-logo {
-	top: -50%;
+	top: 40px;
     z-index:0;
     width: 250px;
     height: 250px;
     border-radius: 50%;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    left: 165px;
     margin: auto;
     position: absolute;
 }
 
 .next-to-main-logo {
-	top: -50%;
+	top: 100px;
     z-index:0;
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    right: -100%;
-    bottom: 0;
-    left: 0;
+    right: -75px;
     opacity: 1.0;
     margin: auto;
     position: absolute;
 }
 
 .prev-envelope {
-	top: -90%;
-    left: -100%;
+	top: 0px;
+    left: -75px;
 	opacity: 0.0;
 	width: 150px;
     height: 150px;
     z-index: 20;
-    right: 0;
-    bottom: 0;
     margin: auto;
     position: absolute;
 }
 
 .next-envelope {
-	top: -50%;
-    right: -100%;
+	top: 100px;
+    right: -75px;
 	opacity: 0.6;
 	width: 150px;
     height: 150px;
     z-index: 20;
-    left: 0;
-    bottom: 0;
     margin: auto;
     position: absolute;
 }
 
-#prevlogo {
-	top: -50%;
-    left: -100%;
+.prev-logo {
+	top: 100px;
+    left: -75px;
 	opacity: 0.6;
 	width: 150px;
-	height: 150px;
+    height: 150px;
+    transition: opacity 0.2s;
+    position: absolute;
+    margin: auto;
 }
 
-#nextButton {
-    top: 45%;
-    width: 50px;
-    height: 50px;
-    right: 25px;
-    bottom: 0;
+.prev-logo:hover {
+    opacity: 1;
+}
+
+.play-button {
+	top: 452px;
+	width: 50px;
+	height: 50px;
+    left: 0;
+    right: 0;
     margin: auto;
 	position: absolute;
 }
-#nextButton:hover {
+.play-button:hover {
+    top: 451px;
 	width: 52px;
 	height: 52px;
 }
 
-
-#previousButton {
-    width: 12%;
-    height: 12%;
-    top: 40%;
-    left: -90%;
-    visibility: hidden;
+.next-button {
+    top: 457px;
+    width: 40px;
+    height: 40px;
+    right: -230px;
+    left: 0;
+    margin: auto;
+	position: absolute;
 }
-#trackname {
+.next-button:hover {
+    top: 456px;
+    /*right: 164px;*/
+	width: 42px;
+	height: 42px;
+}
+
+.previous-button {
+    top: 457px;
+    width: 40px;
+    height: 40px;
+    left: -230px;
+    right: 0;
+    margin: auto;
+    position: absolute;
+    transform: rotate(180deg)
+}
+
+.speaker {
+    width: 40px;
+    height: 40px;
+    top: 457px;
+    right: -75px;
+    margin: auto;
+	position: absolute;
+}
+
+.volume-control-zone {
+    height: 230px;
+    width: 60px;
+    top: 287px;
+    right: -85px;
+    margin: auto;
+	position: absolute;
+}
+
+.volume {
+    margin: auto;
+	position: absolute;
+    height: 150px;
+    width: 32px;
+    right: 0;
+    left: 0;
+    top: 0;
+}
+
+.volume-background {
+    margin: auto;
+	position: absolute;
+    height: 150px;
+    width: 50px;
+    left: -8px;
+    background: rgba(245, 245, 245, 0.95);/*#323232;*/
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .1), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .5),
+    23px 0 20px -23px rgba(0, 0, 0, .5),
+    0 0 40px rgba(0, 0, 0, .1) inset;
+}
+
+.track-performer-name {
+    text-align:center;
+    height: 62px;
+	top: 350px;
+    right: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
+}
+
+.track-name {
 	font: 28px Arial,Helvetica,sans-serif;
 	color: rgb(0, 0, 0);
-    text-align:center;
     height: 32px;
-	top: 55%;
-    right: 0;
-    left: 0;
+    line-height: 32px;
+    top: 0;
     margin: auto;
-	position: absolute;
 }
 
-#performername {
+.performer-name {
 	font: 20px Arial,Helvetica,sans-serif;
 	color: rgb(89, 89, 89);
-    text-align: center;
     height: 32px;
-	top: 50%;
-    right: 0;
-    left: 0;
+    line-height: 32px;
+    top: 32px;
     margin: auto;
-	position: absolute;
 }
 
 #like {
@@ -202,12 +258,12 @@
     height: 90px;
 }
 
-#menu {
+.menu {
     z-index: 5;
-    width: 50px;
-    height: 50px;
-    left: -25px;
-    top: 330px;
+    width: 40px;
+    height: 40px;
+    left: -75px;
+    top: 457px;
     margin: auto;
 	position: absolute;
 }
@@ -231,22 +287,6 @@
     top: -3%;
 	width: 106%;
 	height: 106%;
-}
-
-#speaker {
-    width: 35px;
-    height: 35px;
-    top: 80%;
-    right: 0;
-    bottom: 0;
-    left: -50%;
-    margin: auto;
-	position: absolute;
-}
-#speakerPic {
-    width: 100%;
-    height: 100%;
-    padding: initial;
 }
 
 #fullVolume {
@@ -316,17 +356,17 @@
 	position: absolute;
 }
 
-#dropdown {
+.dropdown-button {
     margin: auto;
 	position: fixed;
     width: 30px;
     height: 30px;
-    right: 15px;
+    right: 40px;
     top: 84px;
 }
-#dropdown:hover {
+.dropdown-button:hover {
     top: 83px;
-    right: 14px;
+    right: 39px;
 	width: 32px;
 	height: 32px;
 }
@@ -340,11 +380,11 @@
 }
 
 .vue-simple-progress {
-    top: 80%;
+    top: 582px;
     margin: auto;
     position: absolute;
-    width: 90%;
-    height: 70px;
+    width: 750px;
+    height: 20px;
     left: 0;
     right: 0;
 }
@@ -410,8 +450,12 @@
 .queue-text {
     position: absolute;
     left: 55px;
+    width: 195px;
     height: 40px;
     line-height: 40px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .queue-play {

@@ -92,7 +92,7 @@
     <div class="compilation convert" ref="list">
         <div class="music" v-for="(compilation, index) in compilations">
             <img class="cover" :src="compilation.image_alb" alt="обложка" @click="trackClick(index)">
-            <img class="disk" src="{% static 'mainapp/images/disk2.png' %}" alt="disk">
+            <img class="disk" :src="compilation.image_alb" alt="disk">
             <span :title="compilation.name_trc" class="group-name">{{ '{{' }} compilation.name_trc}}</span>
             <span class="music-name" >{{ '{{' }} compilation.name_per}}</span>
         </div>
