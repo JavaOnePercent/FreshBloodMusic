@@ -81,7 +81,16 @@ export default {
                 }
                 this.compilations = this.compilations.concat(this.compilation);
                 //console.log(this.compilations);
-                this.url = response.body.next;
+                if(response.body.next != null)
+                {
+                    var url = document.createElement('a');
+                    url.href = response.body.next;
+                    this.url = url.pathname + url.search;
+                }
+                else 
+                {
+                    this.url = null;
+                }
                 //console.log(this.url);
                 this.loading = false;
             }, function(error){
