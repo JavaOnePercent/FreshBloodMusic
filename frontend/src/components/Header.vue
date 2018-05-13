@@ -8,23 +8,22 @@
                     </div>
                 </router-link>
                 <div class="management">
-                    <div>
+                    <div v-if="username != ''">
                         <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
                             <span>{{ username }}</span>
                             <img title="загрузить"  class="user" src="/static/mainapp/images/user.svg" alt="user">
                             <ul class="menu-drop" v-if="menuShow">
                                 <li><router-link to="/performers/me">Профиль</router-link></li> <!-- <a @click="openProfile">Профиль</a> -->
-                                <li><a href="auth/logout/">Выйти</a></li>
+                                <li><a @click="logout">Выйти</a></li>
                             </ul>
 
                         </div>
                         <img class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader" @click='showMenu'>  
                     </div>
-
-                    <router-link to="/login/">Авторизация</router-link>
+                    <div v-else>
+                    <router-link router-link to="/login">Войти</router-link>
                     <router-link to="/register">Регистрация</router-link>
-
-                    
+                    </div>
                 </div>
             </div>
         </div>
@@ -36,8 +35,7 @@ export default {
   name: 'header-container',
   data() {
         return {  
-            menuShow:false,
-            username: 'cock'
+            menuShow:false
         }
     },
     methods: {
@@ -46,6 +44,17 @@ export default {
         },
         openProfile() {
             this.$store.commit("showProfile")
+        },
+        logout() {
+            var self = this
+            this.$http.get('logout').then(function(response){
+                self.$store.commit("username", '')
+            });
+        }
+    },
+    computed: {
+        username() {
+            return this.$store.state.username
         }
     }
 }

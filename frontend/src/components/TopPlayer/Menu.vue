@@ -1,11 +1,11 @@
 <template>
-    <div class="menu" @click="toggleDrop">
-        <img class="Button menu-pic" src="/static/mainapp/images/menu.png" draggable="false"/>
+    <div :class="isFull ? 'full-menu' : 'menu'" @click="toggleDrop">
+        <img :class="isFull ? 'full-menu-pic' : 'menu-pic'" src="/static/mainapp/images/menu.svg" draggable="false"/>
         <transition name="menu-more">
             <ul class="menu-dropdown" v-show="showMenu" @mouseleave="closeDrop">
-                <li class="Button"><router-link :to="{ name: 'performer', params: { id: this.performerID }}"><p class="menuElements">На страницу исполнителя</p></router-link></li>
-                <li class="Button"><p class="menuElements">Добавить в избранное</p></li>
-                <li class="Button"><p class="menuElements">Пожаловаться</p></li>
+                <li><router-link :to="{ name: 'performer', params: { id: this.performerID }}"><p class="menuElements">На страницу исполнителя</p></router-link></li>
+                <li><p class="menuElements">Добавить в избранное</p></li>
+                <li><p class="menuElements">Пожаловаться</p></li>
             </ul>
         </transition>
     </div>
@@ -14,7 +14,7 @@
 <script>
 export default {
     name: 'menu-more',
-    props: [ 'performerID' ],
+    props: [ 'performerID', 'isFull' ],
     data() {
         return {
             showMenu: false,
@@ -59,6 +59,16 @@ li:hover .menuElements {
     opacity: 0;
 }
 
+.full-menu {
+    z-index: 5;
+    width: 40px;
+    height: 40px;
+    left: -75px;
+    top: 457px;
+    margin: auto;
+	position: absolute;
+}
+
 .menu {
     z-index: 5;
     width: 30px;
@@ -72,18 +82,42 @@ li:hover .menuElements {
 	position: absolute;
 }
 
-.menu-pic {
-    width: 100%;
-    height: 100%;
+.full-menu-pic {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    width: 40px;
+    height: 40px;
     padding: initial;
+    cursor: pointer;
+}
+
+.full-menu-pic:hover {
+    left: -1px;
+	width: 42px;
+	height: 42px;
+}
+
+.menu-pic {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: auto;
+    width: 30px;
+    height: 30px;
+    padding: initial;
+    cursor: pointer;
 }
 
 .menu-pic:hover {
-    position: absolute;
-    left: -3%;
-    top: -3%;
-	width: 106%;
-	height: 106%;
+    left: -1px;
+	width: 32px;
+	height: 32px;
 }
 
 .menu-dropdown {

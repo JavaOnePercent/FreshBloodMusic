@@ -1,16 +1,16 @@
 <template>
     <div>
-        <div class="Button main-logo" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain" :style="mainLogoAnimation">
-            <img class=vinyl src="/static/mainapp/images/redVinyl.png">
-            <img class="logo" :src="logoLink" draggable="false" :style="rotationCSS"/>
-            <img class="Player like" v-show="showLike" src="/static/mainapp/images/like.png" draggable="false"/>
+        <div :class="isFull ? 'full-main-logo' : 'main-logo'" @click="click" @mouseenter="onMouseEnterMain" @mouseleave="onMouseLeaveMain" :style="mainLogoAnimation">
+            <!--<img :class="isFull ? 'full-vinyl' : 'vinyl'" src="/static/mainapp/images/redVinyl.png">-->
+            <img :class="isFull ? 'full-logo' : 'logo'" :src="logoLink" draggable="false" :style="rotationCSS"/>
+            <img :class="isFull ? 'full-like' : 'like'" v-show="showLike" src="/static/mainapp/images/like.svg" draggable="false"/>
         </div>
-        <img class="main-to-prev-logo" :src="logo" draggable="false" :style="mainToPrevLogoAnimation"/>
-        <img class="next-to-main-logo" :src="logoLink" draggable="false" :style="nextToMainLogoAnimation"/>
-        <img class="prev-envelope" :src="logo" draggable="false" :style="prevEnvelopeAnimation"/>
-        <img class="Button prev-logo" :src="prevLogo" v-show="showPrev" draggable="false" :style="prevLogoAnimation"/>
-        <img class="Button next-logo" @click="nextLogoClick" :src="nextLogoLink" draggable="false" :style="nextLogoAnimation"/>
-        <img class="next-envelope" :src="nextEnvelopeLogo" draggable="false" :style="nextEnvelopeAnimation"/>
+        <img :class="isFull ? 'full-main-to-prev-logo' : 'main-to-prev-logo'" :src="logo" draggable="false" :style="mainToPrevLogoAnimation"/>
+        <img :class="isFull ? 'full-next-to-main-logo' : 'next-to-main-logo'" :src="logoLink" draggable="false" :style="nextToMainLogoAnimation"/>
+        <img :class="isFull ? 'full-prev-envelope' : 'prev-envelope'" :src="logo" draggable="false" :style="prevEnvelopeAnimation"/>
+        <img :class="isFull ? 'full-prev-logo' : 'prev-logo'" @click="prevLogoClick" :src="prevLogo" v-show="showPrev" draggable="false" :style="prevLogoAnimation"/>
+        <img :class="isFull ? 'full-next-logo' : 'next-logo'" @click="nextLogoClick" :src="nextLogoLink" draggable="false" :style="nextLogoAnimation"/>
+        <img :class="isFull ? 'full-next-envelope' : 'next-envelope'" :src="nextEnvelopeLogo" draggable="false" :style="nextEnvelopeAnimation"/>
     </div>
 </template>
 
@@ -41,7 +41,8 @@ export default {
             prevLogo: '',
             lastRotation: '',
             wasPlaying: false,
-            nextEnvelopeLogo: ''
+            nextEnvelopeLogo: '',
+            isAnimating: false
             //duration: 0,
             //currentTime: 0
         }
@@ -83,6 +84,7 @@ export default {
             this.nextLogoAnimation = 'visibility: hidden;';
             this.mainLogoAnimation = 'visibility: hidden;';
             this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg);';
+            this.isAnimating = true;
             setTimeout(this.startAnimation, 100);
         });
         
@@ -142,11 +144,20 @@ export default {
     },
     
     methods: {
+        prepareForImmediateAnimating() {
+            this.isAnimating = true;
+            this.nextLogoAnimation = 'visibility: hidden;';
+            this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
+        },
         refresh(link) {
-            this.nextEnvelopeLogo = link;
+            if(!this.isAnimating)
+                this.nextEnvelopeLogo = link;
         },
         nextLogoClick() {
             this.$bus.$emit('queue-opened');
+        },
+        prevLogoClick() {
+            this.$bus.$emit('history-opened');
         },
         startAnimation() {
             setTimeout(this.endAnimation, 800);
@@ -177,6 +188,7 @@ export default {
         hidePrevEnvelope() {
             this.logo = this.logoLink;
             this.prevEnvelopeAnimation = 'visibility:hidden;';
+            this.isAnimating = false;
         },
         startExpandingNextToMain(){
             this.nextToMainLogoAnimation.transition += ', top 0.3s, height 0.3s, width 0.3s';
@@ -219,6 +231,27 @@ export default {
 </script>
 
 <style scoped>
+.full-main-logo {
+    top: 40px;
+    width: 270px;
+    height: 270px;
+    border-radius: 50%;
+	box-shadow: 0px 4px 28px rgba(0, 0, 0, .5)/*#64bdf5;*/;
+    right: 0;
+    left: 0;
+    margin: auto;
+	position: absolute;
+	visibility:visible;
+    z-index:15;
+    
+}
+.full-main-logo:hover {
+    top: 37px;
+	width: 276px;
+	height: 276px;
+	box-shadow: 0px 0px 30px #C732B1;
+}
+
 .main-logo {
     width: 56px;
 	height: 56px;
@@ -230,6 +263,7 @@ export default {
     top: 0;
     bottom: 0;
     margin: auto;
+    cursor: pointer;
 }
 
 .main-logo:hover {
@@ -238,11 +272,39 @@ export default {
 	height: 58px;
 }
 
+.full-like {
+    z-index: 5;
+    opacity: 0.8;
+    width: 90px;
+    height: 90px;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
 .like {
     z-index: 5;
     opacity: 0.8;
     width: 70%;
     height: 70%;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.full-logo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index:0;
+    position: absolute;
+    
 }
 
 .logo {
@@ -255,12 +317,38 @@ export default {
     padding: 0;
 }
 
-.vinyl {
-    display: none;
+.full-next-logo {
+	top: 100px;
+    right: -75px;
+	opacity: 0.6;
+	width: 150px;
+    height: 150px;
+    transition: opacity 0.2s;
+    position: absolute;
+    margin: auto;
+}
+
+.full-next-logo:hover {
+    opacity: 1;
 }
 
 .next-logo {
 	display: none;
+}
+
+.full-prev-logo {
+	top: 100px;
+    left: -75px;
+	opacity: 0.6;
+	width: 150px;
+    height: 150px;
+    transition: opacity 0.2s;
+    position: absolute;
+    margin: auto;
+}
+
+.full-prev-logo:hover {
+    opacity: 1;
 }
 
 .prev-logo {
@@ -272,16 +360,61 @@ export default {
     visibility: hidden;
 }
 
+.full-main-to-prev-logo {
+	top: 40px;
+    z-index:0;
+    width: 270px;
+    height: 270px;
+    border-radius: 50%;
+    left: 165px;
+    margin: auto;
+    position: absolute;
+}
+
 .main-to-prev-logo {
 	display: none;
+}
+
+.full-next-to-main-logo {
+	top: 100px;
+    z-index:0;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    right: -75px;
+    opacity: 1.0;
+    margin: auto;
+    position: absolute;
 }
 
 .next-to-main-logo {
 	display: none;
 }
 
+.full-prev-envelope {
+	top: 0px;
+    left: -75px;
+	opacity: 0.0;
+	width: 150px;
+    height: 150px;
+    z-index: 20;
+    margin: auto;
+    position: absolute;
+}
+
 .prev-envelope {
 	display: none;
+}
+
+.full-next-envelope {
+	top: 100px;
+    right: -75px;
+	opacity: 0.6;
+	width: 150px;
+    height: 150px;
+    z-index: 20;
+    margin: auto;
+    position: absolute;
 }
 
 .next-envelope {

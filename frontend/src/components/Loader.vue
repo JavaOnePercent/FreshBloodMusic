@@ -95,14 +95,22 @@ export default {
         this.dropbox.addEventListener("dragleave", this.dragleave, false);
         this.dropbox.addEventListener("drop", this.drop, false);
 
-        $(document).on('dragover drop', function (e){
+        /*$(document).on('dragover drop', function (e){
             e.stopPropagation();
             e.preventDefault();
             dropAll.style.pointerEvents="all"
             vm.loaderStyle = 'track-upload'
-        });
+        });*/
     },
-
+    beforeDestroy () {
+        this.dropAll.removeEventListener("dragover", this.dragoverAll, false);
+        this.dropAll.removeEventListener("dragleave", this.dragleaveAll, false);
+        this.dropAll.removeEventListener("dragenter", this.dragenterAll, false);
+        this.dropbox.removeEventListener("dragenter", this.dragenter, false);
+        this.dropbox.removeEventListener("dragover", this.dragover, false);
+        this.dropbox.removeEventListener("dragleave", this.dragleave, false);
+        this.dropbox.removeEventListener("drop", this.drop, false);
+    },
     //сносить досюда
     methods: {
         genresButtonClick() {
@@ -144,6 +152,14 @@ export default {
             //dropAll.style.pointerEvents="all"
             e.dataTransfer.dropEffect = 'copy'
             this.loaderStyle ='track-upload-drop2'
+            this.dragoverdrop(e)
+        },
+
+        dragoverdrop (e){
+            e.stopPropagation();
+            e.preventDefault();
+            dropAll.style.pointerEvents="all"
+            vm.loaderStyle = 'track-upload'
         },
 
         dragleaveAll(e){
@@ -199,7 +215,8 @@ export default {
             this.loaderStyle='track-upload'
             var dt = e.dataTransfer;
             var files = dt.files;
-            document.getElementById("add").files =  files; 
+            document.getElementById("add").files =  files;
+            this.dragoverdrop(e)
         },
 
         close(){

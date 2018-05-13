@@ -61,6 +61,14 @@ export default {
                     document.getElementById('password2').style.backgroundColor="rgba(255,255,255,0.92)"
                     this.errorMessPass2 = ''
                 }
+                else
+                {
+                    if(this.password2!='')
+                    {
+                    document.getElementById('password2').style.backgroundColor="rgba(255, 179, 179,0.98)"
+                    this.errorMessPass2 ="Пароли отличаются"
+                    }
+                }
             }
         },
        diffrentPass(e){
@@ -77,13 +85,16 @@ export default {
             }
         },
         sendRegistration() {
-                if(this.username && this.password1 && this.password2 ) 
+            if(this.username && this.password1 && this.password2 ) 
             {
                 var data = new FormData();
                 data.append('username', this.username);
                 data.append('email', this.email);
                 data.append('password', this.password1);
-                this.$http.post('auth/register', data).then(function(response){  
+                var self = this;
+                this.$http.post('register', data).then(function(response){
+                    self.$store.commit('username', response.data.username)
+                    self.$router.push('performers/me')
                 });
             }
 

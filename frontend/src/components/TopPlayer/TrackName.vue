@@ -1,7 +1,7 @@
 <template>
-    <div class="track-performer-name">
-        <p class="track-name">{{ trackName }}</p>
-        <p class="performer-name">{{ performerName }}</p>
+    <div :class="isFull ? 'full-track-performer-name' : 'track-performer-name'">
+        <p :class="isFull ? 'full-track-name' : 'track-name'">{{ trackName }}</p>
+        <p :class="isFull ? 'full-performer-name' : 'performer-name'">{{ performerName }}</p>
     </div>
 </template>
 
@@ -10,33 +10,74 @@ export default {
     name: 'track-performer',
     props: [
         'trackName',
-        'performerName'
+        'performerName',
+        'isFull'
     ]
 }
 </script>
 
 <style scoped>
-.track-name {
-	font: 20px Arial,Helvetica,sans-serif;
-	color: rgb(0, 0, 0);/* #e8e8e8;*/
-	text-align: right;
-	width: 60%;
-	height: 32px;
-    right: 296px;
+
+.full-track-performer-name {
+    text-align:center;
+    height: 62px;
+	top: 350px;
+    right: 0;
+    left: 0;
     margin: auto;
 	position: absolute;
-	line-height: 32px;
 }
+
+.track-performer-name {
+    text-align: right;
+    height: 64px;
+	top: 0px;
+    right: 296px;
+    /*max-width: 300px;*/
+    margin: auto;
+	position: absolute;
+}
+
+.full-track-name {
+	font: 28px Arial,Helvetica,sans-serif;
+	color: rgb(0, 0, 0);
+    height: 32px;
+    line-height: 32px;
+    top: 0;
+    margin: auto;
+}
+
+.track-name {
+	font: 20px Arial,Helvetica,sans-serif;
+	color: rgb(0, 0, 0);
+    height: 32px;
+    line-height: 32px;
+    top: 0;
+    margin: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.full-performer-name {
+	font: 20px Arial,Helvetica,sans-serif;
+	color: rgb(89, 89, 89);
+    height: 32px;
+    line-height: 32px;
+    top: 32px;
+    margin: auto;
+}
+
 .performer-name {
 	font: 18px Arial,Helvetica,sans-serif;
 	color: rgb(89, 89, 89);
-	text-align: right;
-	width: 60%;
-	height: 32px;
-	top: 32px;
-    right: 296px;
+    height: 32px;
+    line-height: 32px;
+    top: 32px;
     margin: auto;
-	position: absolute;
-	line-height: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+
 </style>

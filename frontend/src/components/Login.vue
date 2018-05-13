@@ -45,8 +45,11 @@ export default {
                 var data = new FormData();
                 data.append('username', this.username);
                 data.append('password', this.password);
-                this.$http.post('auth/register', data).then(function(response){   
-            });
+                var self = this;
+                this.$http.post('login', data).then(function(response){
+                    self.$store.commit('username', response.data.username)
+                    self.$router.push('performers/me')
+                });
             }
             if(!this.username)
             {

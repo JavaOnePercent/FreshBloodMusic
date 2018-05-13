@@ -1,8 +1,10 @@
 import re
 
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.utils.datastructures import MultiValueDictKeyError
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from rest_framework.views import APIView
 
 from .models import Performer, Genre, Album, Track, LikedTrack
@@ -30,6 +32,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.template.context_processors import csrf
 
 
+@ensure_csrf_cookie
 def main_view(request):  # главная
     file = open('./mainapp/static/mainapp/index.html', 'r')
     index = file.read()
@@ -332,40 +335,36 @@ def history(request):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+@csrf_exempt
+@api_view(['POST', 'GET'])
 def login(request):
-    args = {}
-    args.update(csrf(request))
-    if request.POST:
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        user = auth.authenticate(username = username, password = password)
+    if request.method == 'GET':
+        return Response({'username': auth.get_user(request).username}, status=status.HTTP_200_OK)
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return redirect('/')
+            return Response({'username': auth.get_user(request).username}, status=status.HTTP_200_OK)
         else:
-            args['login_error'] = "Пользователь не найден"
-            return render(request, 'loginsys/login.html', args)
-    else:
-        return render(request, 'loginsys/login.html', args)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET'])
 def logout(request):
     auth.logout(request)
-    return redirect("/")
+    return Response(status=status.HTTP_200_OK)
 
+
+@csrf_exempt
+@api_view(['POST'])
 def register(request):
-    args = {}
-    args.update(csrf(request))
-    args['form'] = UserCreationForm()
-    if request.POST:
-        newuser_form = UserCreationForm(request.POST)
-        if newuser_form.is_valid():
-            newuser_form.save()
-            username = request.POST.get('username', '')
-            # email = request.POST.get('email', '')
-            password = request.POST.get('password2', '')
-            newuser = auth.authenticate(username = username, password = password)
-            auth.login(request, newuser)
-            return redirect('/')
-        else:
-            args['form'] = newuser_form
-    # return render(request, 'frontend/src/components/Registration.vue', args)
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        newuser = User.objects.create_user(username, '1@1.ru', password).save()
+        user = auth.authenticate(username=username, password=password)
+        auth.login(request, user)
+        return Response({'username': auth.get_user(request).username}, status=status.HTTP_200_OK)

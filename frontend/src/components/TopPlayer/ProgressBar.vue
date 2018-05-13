@@ -1,8 +1,7 @@
 <template>
-    <div class="vue-simple-progress">
+    <div :class="isFull ? 'full-vue-simple-progress' : 'vue-simple-progress'" >
         <vue-slider-component @drag-end="dragEnd" @drag-start="dragStart" @mouseup.native="click" v-model="currentTime" ref="slider" v-bind="sliderPropsComputed" :max="sliderMax"></vue-slider-component>
-        <!--<div class="foreground-progress-bar" :style="bar_style + height_style"></div>-->
-        <div class="background-progress-bar" :style="bar_style + transition"></div>
+        <div v-if="!isFull" class="background-progress-bar" :style="bar_style + transition"></div>
         <!--<div v-show="isPlayerHovered" class="played-time">{{ '{{' }}playedTimeTop}}</div>
         <div v-show="isPlayerHovered || isFull" class="track-length">{{ '{{' }}trackLengthTop}}</div>-->
     </div>
@@ -55,8 +54,8 @@ export default {
                 },
                 value: 0,
                 formatter: (v) => {
-                    mins = Math.floor(v / 60);
-                    secs = (v % 60).toFixed();
+                    var mins = Math.floor(v / 60);
+                    var secs = (v % 60).toFixed();
                     return mins + ":" + ((secs < 10) ? '0' + secs : secs);
                     }
             },
@@ -73,7 +72,8 @@ export default {
                 },
                 processStyle: {
                     "border-radius": "0",
-                    "background-color": "rgb(0,0,0)"
+                    //"background-color": "#f222ff"
+                    "backgroundImage": "-webkit-linear-gradient(left, #ffd319 20%, #ff901f 40%, #ff2975 55%, #f222ff 80%, #8c1eff 90%)"
                 },
                 bgStyle: {
                     "background-color": 'rgba(0,0,0,0)',
@@ -87,23 +87,19 @@ export default {
                 },
                 value: 0,
                 formatter: (v) => {
-                    mins = Math.floor(v / 60);
-                    secs = (v % 60).toFixed();
+                    var mins = Math.floor(v / 60);
+                    var secs = (v % 60).toFixed();
                     return mins + ":" + ((secs < 10) ? '0' + secs : secs);
                     }
             },
             widthWatcherInterval: null
         }
     },
-    /*created() {
-        bus.$on('progresschanged', event => {
-            this.progress = event.progress;
-            this.duration = event.duration.toFixed();
+    created() {
+        this.$bus.$on('queue-opened', event => {
+            setTimeout(this.refreshSlider, 400)
         });
-        bus.$on('startplaying', event => {
-            this.$refs.slider.refresh();
-        });
-    },*/
+    },
     /*mounted() {
         var el = this.$refs.slider.$refs.wrap;
         el.setAttribute('style', "width: 100%;");
@@ -183,6 +179,9 @@ export default {
     },
 
     methods: {
+        refreshSlider() {
+            this.$refs.slider.refresh();
+        },
         widthWatcher() {
 
         },
@@ -229,6 +228,30 @@ export default {
 </script>
 
 <style scoped>
+
+.full-vue-simple-progress {
+    top: 75%;
+    margin: auto;
+    position: absolute;
+    width: 750px;
+    height: 20px;
+    left: 0;
+    right: 0;
+    transition: left 0.3s, right 0.3s;
+}
+
+.vue-simple-progress {
+    position: absolute;
+    height: 75px;
+    top: -10px;
+    z-index: -2;
+    width: 100%;
+}
+
+.vue-slider-my {
+    bottom: 65px;
+}
+
 .background-progress-bar {
     background: rgba(0, 0, 0, 0.08);
     height: 100%;

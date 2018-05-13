@@ -1,24 +1,16 @@
 <template>
     <div>
-        <div v-show="showVolume || isFull" class="volume-control-zone" @mouseleave="mouseLeave" @mouseenter="mouseEnter">
+        <div :class="isFull ? 'full-volume-control-zone' : 'volume-control-zone'" @mouseleave="mouseLeave" :style="!isFull ? controlZoneStyle : ''">
             <transition>
-                <div class="volume" >
+                <div :class="isFull ? 'full-volume' : 'volume'" v-show="showVolume">
                     <div class="volume-background" v-show="showVolume"></div>
-                    <!--<div class="Player Button" id="draggingZone"></div>
-                    <img class="Button" id = "ball" src="{% static 'mainapp/images/circle.png' %}" draggable="false"/>
-                    <div class="Player Button" id="line"></div>
-                    <div id="fillingLine"></div>-->
                     <vue-slider-component @drag-end="dragEnd" @drag-start="dragStart" v-model="value" :show="showVolume" ref="slider" v-bind="sliderprops"></vue-slider-component>
                 </div>
             </transition>
-
             
-            <!--<div id="fullVolume" @mouseenter="refreshFunc">
-                <vue-slider-component ref="fullSlider" v-model="value" :show="showFullVolume && isFull" v-bind="sliderpropsFull"></vue-slider-component>
-            </div>-->
-            
+            <img @mouseenter="openSpeaker" @click="clickSpeaker" :class="isFull ? 'full-speaker' : 'speaker'" :src="speakerPic" draggable="false"/>
         </div>
-        <img @mouseenter="openSpeaker" @click="clickSpeaker" class="Button speaker" :src="speakerPic" draggable="false"/>
+        
     </div>
 </template>
 
@@ -35,7 +27,7 @@ export default {
         var smallVolume = {direction: 'vertical', width: 12, height: 150, dotSize: 20, speed: 0.3, tooltip: 'hover'};
         //var fullVolume = {direction: 'horizontal', width: 180, height: 12, dotSize: 22, speed: 0.3, tooltip: 'hover'};
         var path = '/static/mainapp/images/';
-        var speakerPics = {zero: path + 'speaker0.png', thirty3: path + 'speaker33.png', sixty6: path + 'speaker66.png', hundred: path + 'speaker100.png',};
+        var speakerPics = {zero: path + 'speaker0.svg', thirty3: path + 'speaker33.svg', sixty6: path + 'speaker66.svg', hundred: path + 'speaker100.svg',};
         return {
             value: 100,
             showVolume: false,
@@ -45,7 +37,8 @@ export default {
             dragging: false,
             mouseIn: false,
             speakerPic: speakerPics.hundred,
-            speakerPics: speakerPics
+            speakerPics: speakerPics,
+            controlZoneStyle: 'height: 59px;'
         }
     },
     watch: {
@@ -61,6 +54,9 @@ export default {
                 this.speakerPic = this.speakerPics.sixty6;
             else
                 this.speakerPic = this.speakerPics.hundred;
+        },
+        isFull() {
+            this.refreshFunc()
         }
     },
     created() {
@@ -85,35 +81,41 @@ export default {
             }
         },
         refreshFunc() {
-            this.$refs.fullSlider.refresh();
+            this.$refs.slider.refresh();
         },
         mouseLeave() {
-                this.mouseIn = false;
-                this.closeSpeaker();
+            this.mouseIn = false;
+            this.closeSpeaker();
         },
         mouseEnter() {
-                this.mouseIn = true;
+            this.mouseIn = true;
         },
         dragEnd() {
-                this.dragging = false;
-                this.closeSpeaker();
+            this.dragging = false;
+            this.closeSpeaker();
         },
         dragStart() {
-                this.dragging = true;
+            this.dragging = true;
         },
         openSpeaker() {
-                this.showVolume = true;
-                this.mouseIn = true;
+            this.controlZoneStyle = '';
+            this.showVolume = true;
+            this.mouseIn = true;
+            
         },
         closeSpeaker() {
             if(!this.dragging && !this.mouseIn)
+            {
                 this.showVolume = false;
+                this.controlZoneStyle = 'height: 59px;';
+            }
         }
     }
 }
 </script>
 
 <style scoped>
+
 .volume-background {
     margin: auto;
 	position: absolute;
@@ -128,25 +130,52 @@ export default {
     0 0 40px rgba(0, 0, 0, .1) inset;
 }
 
+.full-speaker {
+    width: 40px;
+    height: 40px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+	position: absolute;
+    cursor: pointer;
+}
+
+.full-speaker:hover {
+    width: 42px;
+    height: 42px;
+    bottom: -1px;
+}
+
 .speaker {
     width: 30px;
     height: 30px;
-    right: 90px;
+    right: 0px;
+    left: 0;
     padding: 0;
     position: absolute;
     bottom: 18px;
     margin: auto;
     line-height: 0;
-    z-index: 25
+    cursor: pointer;
+    z-index: 25;
 }
 
 .speaker:hover {
 	width: 32px;
 	height: 32px;
     bottom: 17px;
-    right: 89px;
 }
 
+.full-volume {
+    margin: auto;
+	position: absolute;
+    height: 155px;
+    width: 34px;
+    right: 0;
+    left: 0;
+    bottom:55px;
+}
 
 .volume {
     margin: auto;
@@ -158,6 +187,15 @@ export default {
     bottom:75px;
 }
 
+.full-volume-control-zone {
+    height: 210px;
+    width: 60px;
+    top: 287px;
+    right: -85px;
+    margin: auto;
+	position: absolute;
+}
+
 .volume-control-zone {
     margin: auto;
 	position: absolute;
@@ -167,4 +205,5 @@ export default {
     height: 236px;
     z-index: 20;
 }
+
 </style>

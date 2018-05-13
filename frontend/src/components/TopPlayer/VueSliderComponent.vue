@@ -17,7 +17,7 @@ v-show="show"
     >
       <span :class="['vue-slider-tooltip-' + tooltipDirection[0], 'vue-slider-tooltip-wrap']">
         <slot name="tooltip" :value="val[0]" :index="0">
-          <span class="vue-slider-tooltip" :style="tooltipStyles[0]">{{ '{{' }} formatter ? formatting(val[0]) : val[0] }}</span>
+          <span class="vue-slider-tooltip" :style="tooltipStyles[0]">{{ formatter ? formatting(val[0]) : val[0] }}</span>
         </slot>
       </span>
     </div>
@@ -30,7 +30,7 @@ v-show="show"
     >
       <span :class="['vue-slider-tooltip-' + tooltipDirection[1], 'vue-slider-tooltip-wrap']">
         <slot name="tooltip" :value="val[1]" :index="1">
-          <span class="vue-slider-tooltip" :style="tooltipStyles[1]">{{ '{{' }} formatter ? formatting(val[1]) : val[1] }}</span>
+          <span class="vue-slider-tooltip" :style="tooltipStyles[1]">{{ formatter ? formatting(val[1]) : val[1] }}</span>
         </slot>
       </span>
     </div>
@@ -45,7 +45,7 @@ v-show="show"
     >
       <span :class="['vue-slider-tooltip-' + tooltipDirection, 'vue-slider-tooltip-wrap']">
         <slot name="tooltip" :value="val">
-          <span class="vue-slider-tooltip" :style="tooltipStyles">{{ '{{' }} formatter ? formatting(val) : val }}</span>
+          <span class="vue-slider-tooltip" :style="tooltipStyles">{{ formatter ? formatting(val) : val }}</span>
         </slot>
       </span>
     </div>
@@ -80,7 +80,7 @@ v-show="show"
           class="vue-slider-piecewise-label"
           :style="[ labelStyle, piecewiseObj.inRange ? labelActiveStyle : null ]"
         >
-          {{ '{{' }} piecewiseObj.label }}
+          {{ piecewiseObj.label }}
         </span>
       </slot>
     </li>

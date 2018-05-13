@@ -48,59 +48,86 @@ Vue.http.interceptors.push(function(request) {
 }); //эта штука перехватывает все запросы на Vue и преобразует их в запрос с csrf token'ом
 
 const store = new Vuex.Store({ //глобальное хранилище vuex
-  state: {
-      currentTime: 0,
-      duration: 0,
-      playing: false,
-      volume: 100,
-      isDragging: false,
-      showLoader: false,
-      showProfile: false,
-      performerName: '',
-      performerLogo: '',
-      performerDescription: '',
-      performerID: 0
-  },
-  mutations: {
-      currentTime (state, val) {
-          state.currentTime = val;
-      },
-      duration (state, val){
-          state.duration = val;
-      },
-      showLoader(state, val) 
-      {
-          state.showLoader = val
-      },
-      showProfile(state) 
-      {
-          state.showProfile = !state.showProfile;
-      },
-      switchPlaying (state) {
-          state.playing = !state.playing;
-      },
-      playing(state, val){
-          state.playing = val;
-      },
-      volume (state, val){
-          state.volume = val;
-      },
-      isDragging(state, val){
-          state.isDragging = val;
-      },
-      performerName(state, val) {
-          state.performerName = val;
-      },
-      performerLogo(state, val) {
-          state.performerLogo = val;
-      },
-      performerDescription(state, val) {
-          state.performerDescription = val;
-      },
-      performerID(state, val) {
-          state.performerID = val;
-      },
-  }
+    state: {
+        currentTime: 0,
+        duration: 0,
+        playing: false,
+        volume: 100,
+        isDragging: false,
+        showLoader: false,
+        showProfile: false,
+        performerName: '',
+        performerLogo: '',
+        performerDescription: '',
+        performerID: 0,
+        queueTracks: [],
+        historyTracks: [],
+        username: ''
+    },
+    mutations: {
+        currentTime (state, val) {
+            state.currentTime = val;
+        },
+        duration (state, val){
+            state.duration = val;
+        },
+        showLoader(state, val) 
+        {
+            state.showLoader = val
+        },
+        showProfile(state) 
+        {
+            state.showProfile = !state.showProfile;
+        },
+        switchPlaying (state) {
+            state.playing = !state.playing;
+        },
+        playing(state, val){
+            state.playing = val;
+        },
+        volume (state, val){
+            state.volume = val;
+        },
+        isDragging(state, val){
+            state.isDragging = val;
+        },
+        performerName(state, val) {
+            state.performerName = val;
+        },
+        performerLogo(state, val) {
+            state.performerLogo = val;
+        },
+        performerDescription(state, val) {
+            state.performerDescription = val;
+        },
+        performerID(state, val) {
+            state.performerID = val;
+        },
+        pushQueueTracks(state, val) {
+            var last = state.queueTracks[state.queueTracks.length - 1]
+
+            if(last.auto === true) state.queueTracks.pop()
+
+            state.queueTracks.push(val);
+            if(last.auto === true) state.queueTracks.push(last);
+        },
+        removeFirstQueueTracks(state) {
+            state.queueTracks.shift()
+        },
+        pushHistoryTracks(state, val) {
+            state.historyTracks.unshift(val)
+            for(var i = 9; i < state.historyTracks.length; i++)
+            {
+                state.historyTracks.pop()
+            }
+        },
+        removeFirstHistoryTracks(state) {
+            state.historyTracks.shift()
+        },
+        username(state, val) {
+            state.username = val;
+        }
+    }
 })
 
 const router = new VueRouter({

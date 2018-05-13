@@ -1,9 +1,9 @@
 <template>
     <div>
-        <img src="/static/mainapp/images/nextButton.png" class="Button previous-button" draggable="false" />
-        <img :src="playSrc" class="Button play-button" @click="playClick" draggable="false" />
-        <img src="/static/mainapp/images/nextButton.png" class="Button next-button" @click="nextClick" draggable="false" />
-        <img :src="dropdownSrc" class="Button dropdown-button" @click="dropdownClick" draggable="false" />
+        <img src="/static/mainapp/images/previousButton.svg" :class="isFull ? 'full-previous-button' : 'previous-button'" draggable="false" />
+        <img :src="playSrc" :class="isFull ? 'full-play-button' : 'play-button'" @click="playClick" draggable="false" />
+        <img src="/static/mainapp/images/nextButton.svg" :class="isFull ? 'full-next-button' : 'next-button'" @click="nextClick" draggable="false" />
+        <img :src="dropdownSrc" :class="isFull ? 'full-dropdown-button' : 'dropdown-button'" @click="dropdownClick" draggable="false" />
     </div>
 </template>
 
@@ -12,8 +12,8 @@ export default {
     name: 'buttons',
     props: [ 'isFull' ],
     data() {
-        var playSrcs = {play: '/static/mainapp/images/playButton.png', pause: '/static/mainapp/images/pauseButton.png'};
-        var dropdownSrcs = {drop: '/static/mainapp/images/dropdown.png', close: '/static/mainapp/images/closeDropdown.png'};
+        var playSrcs = {play: '/static/mainapp/images/playButton.svg', pause: '/static/mainapp/images/pauseButton.svg'};
+        var dropdownSrcs = {drop: '/static/mainapp/images/dropdown.svg', close: '/static/mainapp/images/closeDropdown.svg'};
         return {
             playSrcs: playSrcs,
             dropdownSrcs: dropdownSrcs,
@@ -57,36 +57,128 @@ export default {
 </script>
 
 <style scoped>
+
+.full-play-button {
+	top: 452px;
+	width: 50px;
+	height: 50px;
+    left: 0;
+    right: 0;
+    margin: auto;
+	position: absolute;
+    cursor: pointer;
+}
+
+.full-play-button:hover {
+    top: 451px;
+	width: 52px;
+	height: 52px;
+}
+
 .play-button {
 	width: 30px;
 	height: 30px;
-    left: 30px;
-    margin: auto;
-	position: absolute;
-    z-index: 10;
-    top: 0;
-    bottom: 0;
-}
-.play-button:hover {
-    left: 29px;
-	width: 32px;
-	height: 32px;
-}
-.next-button {
-    width: 30px;
-    height: 30px;
     left: 90px;
     margin: auto;
 	position: absolute;
     z-index: 10;
     top: 0;
     bottom: 0;
+    cursor: pointer;
 }
-.next-button:hover {
+
+.play-button:hover {
     left: 89px;
 	width: 32px;
 	height: 32px;
 }
+
+.full-previous-button {
+    top: 457px;
+    width: 40px;
+    height: 40px;
+    left: -230px;
+    right: 0;
+    margin: auto;
+    position: absolute;
+    cursor: pointer;
+}
+
+.full-previous-button:hover {
+    top: 456px;
+	width: 42px;
+	height: 42px;
+}
+
+.previous-button {
+    width: 30px;
+    height: 30px;
+    left: 30px;
+    margin: auto;
+	position: absolute;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+}
+
+.previous-button:hover {
+    left: 29px;
+	width: 32px;
+	height: 32px;
+}
+
+.full-next-button {
+    top: 457px;
+    width: 40px;
+    height: 40px;
+    right: -230px;
+    left: 0;
+    margin: auto;
+	position: absolute;
+    cursor: pointer;
+}
+.full-next-button:hover {
+    top: 456px;
+    /*right: 164px;*/
+	width: 42px;
+	height: 42px;
+}
+
+.next-button {
+    width: 30px;
+    height: 30px;
+    left: 150px;
+    margin: auto;
+	position: absolute;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+    cursor: pointer;
+}
+
+.next-button:hover {
+    left: 149px;
+	width: 32px;
+	height: 32px;
+}
+
+.full-dropdown-button {
+    margin: auto;
+	position: fixed;
+    width: 30px;
+    height: 30px;
+    right: 40px;
+    top: 84px;
+    cursor: pointer;
+}
+.full-dropdown-button:hover {
+    top: 83px;
+    right: 39px;
+	width: 32px;
+	height: 32px;
+}
+
 .dropdown-button {
     margin: auto;
 	position: absolute;
@@ -95,10 +187,13 @@ export default {
     right: 30px;
     top: 0;
     bottom: 0;
+    cursor: pointer;
 }
+
 .dropdown-button:hover {
     right: 29px;
 	width: 32px;
 	height: 32px;
 }
+
 </style>

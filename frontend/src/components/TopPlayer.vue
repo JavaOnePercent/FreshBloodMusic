@@ -2,19 +2,19 @@
     <div>
         <!--<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
         <link id="playerCSS" rel="stylesheet" type="text/css" :href="CSSRef" />-->
-        <div class="player" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
-            <div class="player-container" :style="containerMove">
+        <div :class="isFull ? 'full-player' : 'player'" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+            <div :class="isFull ? 'full-player-container' : 'player-container'" :style="containerMove">
                 <buttons :isFull="isFull" @nextclick="playNextTrack" @dropdownclick="switchPlayerView"></buttons>
                 <logos ref="logos" v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
-                <menu-more :performerID="performerID"></menu-more>
-                <track-performer v-bind="trackPerformer"></track-performer>
+                <menu-more :performerID="performerID" :isFull="isFull"></menu-more>
+                <track-performer v-bind="trackPerformer" :isFull="isFull"></track-performer>
                 <volume-controller ref="volumeController" :isFull="isFull"></volume-controller>
-                <audio-player ref="audioPlayer" v-bind="audio" @playingended="playingEnded"></audio-player>
-                <queue v-bind="queue"></queue>
+                <audio-player ref="audioPlayer" v-bind="audio" @playingended="playingEnded" :isFull="isFull"></audio-player>
+                <queue :isFull="isFull"></queue>
                     <!--<img class="Button Player" id="previousButton" src="" draggable="false" />-->
             </div>
                 
-            <progress-bar :isPlayerHovered="isHovered" :isFull="isFull"></progress-bar>
+            <progress-bar :isPlayerHovered="isHovered" :isFull="isFull" :style="containerMove"></progress-bar>
         </div>
     </div>
 </template>
@@ -51,6 +51,7 @@ export default {
             containerMove: '',
             performerID: 0,
             track: {
+                current: null,
                 currentID: null,
                 nextID: null,
                 isLiked: false
@@ -69,9 +70,6 @@ export default {
             audio: {
                 audioLink: '',
             },
-            queue: {
-                tracks: []
-            },
             HTTPConfig: '',
             isTimeout: false
         }
@@ -88,44 +86,60 @@ export default {
         });
         this.$bus.$on('queue-opened', event => {
             //this.playNow(event.id);
-            this.moveContainer();
+            this.moveContainer('left');
             
         });
+        this.$bus.$on('history-opened', event => {
+            //this.playNow(event.id);
+            this.moveContainer('right');
+            
+        });
+    },
+    computed: {
+        queueTracks: {
+            get() {
+                return this.$store.state.queueTracks
+            }
+        }
+    },
+    watch: {
+        queueTracks() {
+            if(this.queueTracks[0])
+            {
+                this.logos.nextLogoLink = this.queueTracks[0].image_alb;
+                this.$refs.logos.refresh(this.queueTracks[0].image_alb);
+            }
+        }
     },
     methods: {        
         playingEnded() {
             this.playNextTrack()
         },
-        moveContainer() {
+        moveContainer(prop) {
             if (this.containerMove === '')
             {
-                this.setContainer();
+                this.setContainer(prop);
             }
             else
                 this.containerMove = '';
         },
         updateContainer() {
             if (this.containerMove != '')
-                this.setContainer();
+                this.setContainer('left');
         },
-        setContainer() {
+        setContainer(prop) {
             var dist = document.body.offsetWidth / 2 - 675;
-            this.containerMove = (dist < 0) ? ('left: ' + ((dist-30) * 2) + 'px') : 'left: 0';
+            this.containerMove = (dist < 0) ? (prop + ': ' + ((dist-30) * 2) + 'px') : 'left: 0';
         },
         pushQueue(id) {
             this.$http.get('track_attr', {
                 responseType: 'json',
                 params: { id: id }
             }).then(response => {
-                var last = this.queue.tracks[this.queue.tracks.length - 1]
+                this.$store.commit('pushQueueTracks', response.data)
 
-                if(last.auto === true) this.queue.tracks.pop()
-        
-                this.queue.tracks.push(response.data);
-                if(last.auto === true) this.queue.tracks.push(last);
-
-                this.logos.nextLogoLink = this.queue.tracks[0].image_alb;
-                this.$refs.logos.refresh(this.queue.tracks[0].image_alb);
+                //this.logos.nextLogoLink = this.queueTracks[0].image_alb;
+                //this.$refs.logos.refresh(this.queueTracks[0].image_alb);
                 
                 //this.track.nextID = id;
                 //this.loadNextTrack();
@@ -133,8 +147,11 @@ export default {
         },
         playNextTrack() {
             //this.queue.tracks[0]
-            var first = this.queue.tracks.shift()
+            this.$store.commit('pushHistoryTracks', this.track.current)
+            var first =  this.queueTracks[0]
             this.loadNextTrack(first);
+            this.$refs.logos.prepareForImmediateAnimating();
+            this.$store.commit('removeFirstQueueTracks')
             
             this.$http.put('history', {}, {
                 responseType: 'json',
@@ -142,10 +159,6 @@ export default {
             }).then(response => {  });
         },
         switchPlayerView() {
-            /*if(this.isFull)
-                this.CSSRef = this.CSSRefs.small;
-            else
-                this.CSSRef = this.CSSRefs.full;*/
             this.isFull = !this.isFull;
         },
         onLikePressed() {
@@ -182,7 +195,7 @@ export default {
         nextTrackTimeout() {
             this.isTimeout = false;
         },
-        loadNextTrack(first = this.queue.tracks[0]) {
+        loadNextTrack(first = this.queueTracks[0]) {
             if(!this.isTimeout)
             {
                 this.isTimeout = true;
@@ -204,8 +217,10 @@ export default {
             var current = data.body.current;
             var next = data.body.next;
 
+            this.track.current = current
+
             next.auto = true
-            if(this.queue.tracks.length === 0) this.queue.tracks.push(next)
+            if(this.queueTracks.length === 0) this.queueTracks.push(next)
 
             var logo = this.logos.logoLink;
             this.setCurrentTrackAttrs(current);
@@ -213,7 +228,7 @@ export default {
             //this.track.nextID = next.id;
                        
             this.logos.prevLogoLink = logo;
-            this.logos.nextLogoLink = this.queue.tracks[0].image_alb;
+            this.logos.nextLogoLink = this.queueTracks[0].image_alb;
             
         },
         setCurrentTrackAttrs(track) {
@@ -233,6 +248,20 @@ export default {
 </script>
 
 <style scoped>
+.full-player-container {
+	/*width: 450px;
+    height: 450px;*/
+    width: 600px;
+    height: 650px;
+    top: 0;
+    bottom: 20%;
+    right: 0;
+    position:absolute;
+    left: 0;
+    margin: auto;
+    transition: left 0.3s, right 0.3s;
+}
+
 .player-container {
 	width: 100%;
     height: 65px;
@@ -240,6 +269,21 @@ export default {
     position:absolute;
     left: 0;
     margin: auto;
+}
+
+.full-player {
+    z-index: 116;
+    right: 0;
+    left: 0;
+    margin: auto;
+    top: 55px;
+    /*height: 450px;*/
+    /*width: 70%;*/
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.13);
+    background-color: rgba(245, 245, 245, 0.95);
 }
 
 .player {

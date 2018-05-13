@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <header-container></header-container>
-        <div v-show="showLoader" class="modal" id="myModal" >
+        <div v-if="showLoader" class="modal" id="myModal" >
             <div class="modal-content">
                 <loader></loader>
             </div>
@@ -28,6 +28,12 @@ export default {
         mainCompilation,
         loader,
         topPlayer
+    },
+    created() {
+        var self = this
+        this.$http.get('login').then(function(response){
+            self.$store.commit("username", response.data.username)
+        });
     },
     computed: {
         showLoader () {
