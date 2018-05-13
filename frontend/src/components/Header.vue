@@ -8,20 +8,23 @@
                     </div>
                 </router-link>
                 <div class="management">
-                        
-                    <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
-                        <span>{{ username }}</span>
-                        <img title="загрузить"  class="user" src="/static/mainapp/images/user.svg" alt="user">
-                        <ul class="menu-drop" v-if="menuShow">
-                            <li><router-link to="/performers/me">Профиль</router-link></li> <!-- <a @click="openProfile">Профиль</a> -->
-                            <li><a href="auth/logout/">Выйти</a></li>
-                        </ul>
+                    <div>
+                        <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
+                            <span>{{ username }}</span>
+                            <img title="загрузить"  class="user" src="/static/mainapp/images/user.svg" alt="user">
+                            <ul class="menu-drop" v-if="menuShow">
+                                <li><router-link to="/performers/me">Профиль</router-link></li> <!-- <a @click="openProfile">Профиль</a> -->
+                                <li><a href="auth/logout/">Выйти</a></li>
+                            </ul>
+
+                        </div>
+                        <img class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader" @click='showMenu'>  
                     </div>
+
+                    <router-link to="/login/">Авторизация</router-link>
+                    <router-link to="/register">Регистрация</router-link>
+
                     
-                    <img class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader" @click='showMenu'>
-                        
-                        <!--<a href="auth/login/">Авторизация</a>
-                        <a href="auth/register">Регистрация</a>-->
                 </div>
             </div>
         </div>
@@ -69,7 +72,7 @@ export default {
     position: fixed;
     height: 55px;
     box-sizing: border-box;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.13), 0 5px 5px rgba(0,0,0,0.11);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08), 0 1px 2.5px rgba(0,0,0,0.07);
 }
 .header
 {
@@ -83,6 +86,7 @@ export default {
 }
 .name
 {
+    color: #000;
     line-height: 55px;
     box-sizing: border-box;
     float: left;
@@ -189,5 +193,9 @@ li a
 {
     border-left: 1px solid #000; 
     padding-left:5px; 
+}
+.management a:nth-of-type(n+1)
+{
+    padding-right:5px; 
 }
 </style>

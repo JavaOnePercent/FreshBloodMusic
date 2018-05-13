@@ -7,6 +7,8 @@ import Vuex from 'vuex'
 import profile from './components/Profile.vue'
 import settings from './components/Settings.vue'
 import main from './components/Main.vue'
+import registration from './components/Registration.vue'
+import login from './components/Login.vue'
 
 Vue.use(VueRouter)
 
@@ -103,9 +105,11 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
 
 const router = new VueRouter({
   routes: [
-      { path: '/performers/:id', name: 'performer', component: profile },
-      { path: '/settings', component: settings },
-      { path: '/', component: main },
+        { path: '/register', component: registration },
+        { path: '/login', component: login },
+        { path: '/performers/:id', name: 'performer', component: profile },
+        { path: '/settings', component: settings },
+        { path: '/', component: main },
   ],
   linkActiveClass: 'router-link-noob',
   linkExactActiveClass: 'router-link-noob'

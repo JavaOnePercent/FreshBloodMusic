@@ -552,8 +552,6 @@ background-color: rgb(129, 129, 129);
 {
 	position: absolute
 }
-
-
 .loader-tracks
 {
 	display: block;
@@ -642,7 +640,6 @@ background-color: rgb(129, 129, 129);
 .loader:hover{
 	background-color:  rgba(0, 230, 57,0.5)
 }
-
 /*кнопка загрузки*/
 .track-upload
 {

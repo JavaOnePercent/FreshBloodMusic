@@ -41,6 +41,7 @@ export default {
 html, body
 {
     /*font-family:"Rex Bold";*/
+    display: inline-block;
     height: 100%;
     width: 100%;
     margin: 0;

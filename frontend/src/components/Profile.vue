@@ -175,6 +175,7 @@ html, body
 }
 .ProfileConteiner
 {
+    background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(0, 85, 255,0.2));
     font-size: 110%;
     top: 55px;
     position: relative;

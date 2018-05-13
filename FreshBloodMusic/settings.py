@@ -35,7 +35,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'mainapp.apps.MainappConfig',
-    'loginsys',
+    # 'loginsys',
     'mymusic',
     'django.contrib.admin',
     'django.contrib.auth',
