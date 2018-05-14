@@ -1,4 +1,5 @@
 import re
+from datetime import date, timedelta
 
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
@@ -7,7 +8,8 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from rest_framework.views import APIView
 
-from .models import Performer, Genre, Album, Track, LikedTrack
+from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory
+from django.db.models import Q
 from django.http import HttpResponse, Http404
 from .uploader import Compressor, save_album, save_performer
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
@@ -77,15 +79,15 @@ def likes(request):
 
 class PostLimitOffsetPagination(CursorPagination):
     page_size = 12
-    ordering = '-rating_trc'
-
+    ordering = ''
 
 class TrackOverview(generics.ListAPIView):
     serializer_class = NoLinkTrackSerializer
     pagination_class = PostLimitOffsetPagination
 
     def get_queryset(self):
-        gen = self.request.query_params['genre']
+        gen = self.request.query_params['gen']
+        bool = self.request.query_params['bool']
         request = self.request
         if gen == 'fav':
             likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id')
@@ -96,6 +98,7 @@ class TrackOverview(generics.ListAPIView):
                 tracks.append(trc)'''
         elif gen == 'rec':
             likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
+            historytracks = TrackHistory.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
             users = LikedTrack.objects.all().values_list('user_id')
             idenusers = []
             for user in users:
@@ -113,14 +116,44 @@ class TrackOverview(generics.ListAPIView):
                 tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
             identracks = []
             for track in tracks:
-                if track not in identracks and track not in likedtracks:
+                if track not in identracks and track not in historytracks and track not in likedtracks:
                     identracks.append(track[0])
             tracks = Track.objects.filter(id__in=identracks)
         elif gen != 'all':
             tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
         else:
             tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
+        if bool == 'popular':
+            PostLimitOffsetPagination.ordering = '-rating_trc'
+        elif bool == 'time':
+            PostLimitOffsetPagination.ordering = '-date_trc'
         return tracks
+
+def gettrack(authuser): #для Димы
+    likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
+    historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
+    users = LikedTrack.objects.all().values_list('user_id')
+    idenusers = []
+    for user in users:
+        if user not in idenusers and user != authuser:
+            idenusers.append(user)
+    chance = {}
+    for user in idenusers:
+        tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
+        likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
+                 (math.fabs(len(set(likedtracks) | set(tracks))))) / (len(idenusers) - 1)
+        chance[user] = likes
+    chance = sorted(chance.items(), key=lambda item: -item[1])
+    tracks = []
+    for key in chance:
+        tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+    identracks = []
+    for track in tracks:
+        if track not in identracks and track not in historytracks and track not in likedtracks:
+            identracks.append(track[0])
+    tracks = Track.objects.filter(id__in=identracks)[:1]
+    return tracks
+
 
 
 '''@api_view(['GET'])
@@ -181,9 +214,13 @@ def best_performer(request):
 
 
 @api_view(['GET'])
-def top_month(request):
+def top(request):
     if request.method == "GET":
-        month = Track.objects.order_by('rating_trc').reverse()[:1]
+        per = request.query_params['per']
+        if per == 'month':
+            month = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=31))[:1]
+        elif per == 'week':
+            month = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=7))[:1]
         serializer = TopTrackSerializer(month, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -258,7 +295,6 @@ def genre(request):
             styles = GenreStyleMethods.get(gen_id)
             serializer = GenreStyleSerializer(styles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class PerformersList(APIView):
     def post(self, request, format=None):  # создание или изменение исполнителя

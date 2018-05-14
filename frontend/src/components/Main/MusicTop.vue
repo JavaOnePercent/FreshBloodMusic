@@ -1,11 +1,11 @@
 <template>
   <div class="music-top">
-    <div id="next-page" class="next-page"></div>
-    <div id="previous-page" class="previous-page"></div>
+    <button id="next-page" class="next-page" @click="showMonth()"></button>
+    <button id="previous-page" class="previous-page" @click="showMonth()"></button>
     <div class="infotrack" :key="index" v-for="(infotrack, index) in infotracks">
     <img class="img" :src="infotrack.image_alb" alt="обложка">
     <div class="text">
-            <label>Лучшая в этом месяце</label>
+            <label>{{ label }}</label>
             <p>{{ infotrack.name_per}} - {{ infotrack.name_trc}}</p>
                 <p>Понравилась: {{ infotrack.rating_trc}} пользователям</p>
                 <div class="play">
@@ -24,12 +24,23 @@ export default {
     name: 'music-top',
     data: function() {
         return{
-          infotracks: []
+          infotracks: [],
+          // count: 0,
+          period: 'week',
+          label: 'Лучший трек этой недели',
         }
     },
     methods: {
         showMonth: function() {
-            this.$http.get('top_month/').then(function(response){
+            if(this.period == 'week') {
+                this.period = 'month';
+                this.label = 'Лучший трек этого месяца';
+            }
+            else if(this.period == 'month') {
+                this.period = 'week';
+                this.label = 'Лучший трек этой недели';
+            }
+            this.$http.get('top', {params: {per: this.period}}).then(function(response){
                 //console.log(response);
                 this.infotracks = response.data;
                 /*this.infotracks.forEach(function(item, i, arr) {
@@ -38,6 +49,8 @@ export default {
                 //alert(this.infotracks);
             }, function(error){
             })
+            // this.count = this.count + 1;
+            // console.log(this.count);
         },
     },
     created: function() {

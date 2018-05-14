@@ -72,8 +72,8 @@ class LikedTrack(models.Model):
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userliked')
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackliked')
 
-    def __str__(self):
-        return self.id
+    def __int__(self):
+        return self.trc_id
 
 
 class TrackHistory(models.Model):
@@ -82,5 +82,5 @@ class TrackHistory(models.Model):
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackhistory')
     count = models.IntegerField(default=1)
 
-    def __str__(self):
-        return self.id
+    def __int__(self):
+        return self.trc_id

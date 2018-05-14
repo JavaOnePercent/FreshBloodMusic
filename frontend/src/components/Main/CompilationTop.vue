@@ -5,17 +5,17 @@
                 <label class="sortirovka-name">Рекомендации</label>
                 <div class="sort">
                     <label>Отсортировать по:</label>
-                    <a class="time" id="button">времени</a>
-                    <a class="topic" id="button">популярности</a>
+                    <a class="time" id="button" @click="showGenre(genre, 'time')">времени</a>
+                    <a class="topic" id="button" @click="showGenre(genre, 'popular')">популярности</a>
                 </div>
             </div>
             <div class="music-style">
                 <a class="janr" name="" @click="showGenre('all')">Все</a>
                 <a class="janr" name="" @click="showGenre('rec')">Рекомендации</a>
                 <a class="janr" name="" @click="showGenre('fav')">Избранное</a>
-                    <!--{% for gen in genre %}
-                        <a class="janr" name="{{gen.id}}" @click="showGenre('{{gen.id}}')">{{gen.name_gnr}}</a>
-                    {% endfor %}-->
+                <div class="gen" :key="index" v-for="(gen, index) in genreandstyles">
+                    <a class="janr" :name="gen.id" @click="showGenre(gen.id)">{{gen.name_gnr}}</a>
+                </div>
             </div>
         </div>
         <div class="compilation convert" ref="list">
@@ -36,8 +36,11 @@ export default {
         return{
             compilation:[],
             compilations:[],
-            url: 'track?genre=all',
-            loading: false
+            genreandstyles:[],
+            url: 'track?genre=all&bool=0',
+            loading: false,
+            sort: '',
+            genre: '',
           //hoverClass: 'disk'
         }
     },
@@ -61,26 +64,31 @@ export default {
             }
 
         },
-        showGenre: function(message = null) {
+        showGenre: function(message1 = null, message2 = null) {
           this.loading = true;
-          var obj = {}
-          if(message != null)
+          var obj = {};
+          this.sort = 'popular';
+          if(message1 != null)
           {
             this.url = 'track';
             this.compilations = [];
-            obj = {params: {genre: message}}
+            this.genre = message1;
+            if(message2 != null)
+                this.sort = message2;
+
+            obj = {params: {gen: this.genre, bool: this.sort}}
           }
           this.$http.get(this.url, obj/*{params: {genre: message}}*/).then(function(response){
                 this.compilation = response.body.results;
                 for(var i = 0; i < this.compilation.length; i++)
                 {
-                    if(this.compilation[i].image_alb === null )
+                    if(this.compilation[i].image_alb === null)
                     {
                      this.compilation[i].image_alb = "/static/mainapp/images/cat.jpg"
                     }
                 }
                 this.compilations = this.compilations.concat(this.compilation);
-                //console.log(this.compilations);
+                // console.log(this.compilations);
                 if(response.body.next != null)
                 {
                     var url = document.createElement('a');
@@ -102,10 +110,18 @@ export default {
             this.$bus.$emit('trackclicked', {
 				id: this.compilations[index].id
 			});
+        },
+        //для Илюши
+        getGengeAndStyles: function (message = null) {
+            this.$http.get('genre').then(function(response){
+                this.genreandstyles = response.data;
+            }, function(error){
+            })
         }
     },
     created: function() {
-        this.showGenre('all')
+        this.showGenre('all'),
+        this.getGengeAndStyles()
     }
 }
 </script>
