@@ -75,7 +75,7 @@ html {
  }
  .modal-content
  {
-    margin: 0 auto;
+    margin: 0 auto 100px auto;
  }
 .modal::-webkit-scrollbar {
     display: none;

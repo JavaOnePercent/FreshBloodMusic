@@ -35,7 +35,7 @@
     
             <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
             <div  class="loader-tracks" :key="index" v-for="(tracks, index) in track" >
-                <img class="Loaderplay" src="/static/mainapp/images/playButton.png" alt="play">
+                <img class="Loaderplay" src="/static/mainapp/images/playButton.svg" alt="play">
                 <input v-focus v-on:keyup.enter="currentEdit=null" v-if="currentEdit===index" id="input" class="track" type="text" v-model='tracks.name' @change="track_Name" @blur="currentEdit=null" maxlength="30" > <!-- а тут менять длину по базе-->
                 <div v-else class="track" style="cursor: pointer"  @click="upgradeName(index)" >{{tracks.name}}</div>
                 <img v-if="currentEdit===index" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
@@ -51,7 +51,8 @@
                 </label>
             </div>
             <div id="error" class="error"><label  >{{errorMessage}} </label></div>
-            <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "жанр" '  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
+            <div class="loading" v-if="loader"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>
+            <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "жанр" & !loader'  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
             
 
         </form>
@@ -59,8 +60,21 @@
 </template>
 
 <script>
+// directive('focus', {        //дерректива для фокуса вызов v-focus
+//   inserted: function (el) {
+//       el.focus()
+//   }
+// })
 export default {
     name: 'loader',
+    directives: {
+    focus: {
+        // определение директивы
+        inserted: function (el) {
+        el.focus()
+        }
+    }
+    },
     data () {
         return {
             track_name_loader: '',
@@ -81,6 +95,7 @@ export default {
             dropbox:null,
             dropAll: null,
             menuItems: [],
+            loader:false,
         }
     },
     //если шо то сносить к чертям
@@ -319,7 +334,9 @@ export default {
             console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
             if (track_name_loader && track) {
                 this.errorMessage = '';
+                this.loader=true;
                 this.$http.post('album', data).then(function(response){
+                    this.loader=false
                 console.log('Success! Response: ', response.body);})
             }
             else {
@@ -400,7 +417,6 @@ textarea
 
 .loader-conteiner
 {
-
 	font-size: 160%;
 	display:block;
 	position: relative;
@@ -408,7 +424,7 @@ textarea
 	height: auto;
 	max-width: 800px;
 	padding-bottom: 185px;
-	margin: 100px auto  ;
+	margin: 100px auto ;
 	margin-bottom: 0;
 }
 
@@ -580,6 +596,7 @@ background-color: rgb(129, 129, 129);
 }
 .Loaderplay
 {
+    cursor: pointer;
 	position: absolute;
 	display: block;
 	width: 40px;
@@ -623,7 +640,7 @@ background-color: rgb(129, 129, 129);
 	border: 0;
 	height: 1px;
 	background-color: #000;
-	background-image: -webkit-linear-gradient(left, #fff, #000, #fff);
+	background-image: -webkit-linear-gradient(left, rgba(255, 255, 255, 0.8), #000, rgba(255, 255, 255, 0.8));
 }
 .error
 {
@@ -720,6 +737,259 @@ background-color: rgb(129, 129, 129);
 	padding: 8px 4px;
 	color: rgb(0, 0, 0);
 	text-align: center;
+}
+.loading
+{
+    margin: 0 22px;
+    width: 6%;
+    position: relative;
+    top: 170px;
+}
+
+.cssload-loader {
+	display: block;
+	margin:0 auto;
+	width: 35px;
+	height: 35px;
+	position: relative;
+	border: 5px solid rgb(0,0,0);
+	animation: cssload-loader 2.3s infinite ease;
+		-o-animation: cssload-loader 2.3s infinite ease;
+		-ms-animation: cssload-loader 2.3s infinite ease;
+		-webkit-animation: cssload-loader 2.3s infinite ease;
+		-moz-animation: cssload-loader 2.3s infinite ease;
+}
+
+.cssload-loader-inner {
+	vertical-align: top;
+	display: inline-block;
+	width: 100%;
+	background-color: rgb(70, 70, 70);
+	animation: cssload-loader-inner 2.3s infinite ease-in;
+		-o-animation: cssload-loader-inner 2.3s infinite ease-in;
+		-ms-animation: cssload-loader-inner 2.3s infinite ease-in;
+		-webkit-animation: cssload-loader-inner 2.3s infinite ease-in;
+		-moz-animation: cssload-loader-inner 2.3s infinite ease-in;
+}
+
+@keyframes cssload-loader {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-o-keyframes cssload-loader {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-ms-keyframes cssload-loader {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-webkit-keyframes cssload-loader {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-moz-keyframes cssload-loader {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes cssload-loader-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-o-keyframes cssload-loader-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-ms-keyframes cssload-loader-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-webkit-keyframes cssload-loader-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-moz-keyframes cssload-loader-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
 }
 
 </style>

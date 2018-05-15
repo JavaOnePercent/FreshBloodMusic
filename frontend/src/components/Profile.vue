@@ -21,7 +21,7 @@
                 <div class="likedMusic" :key="index" v-for="(like, index) in likes">
                     <!--<div class="likedMusicHover"></div>-->
                     <div class="musicLable" :style="backgroundImage(like.logo)"></div>
-                    <div class="musicLablecontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                    <div class="musicLablecontrol" style="background-image: url(/play-arrow.svg)"></div>
                     {{ like.performer }} - {{ like.name }}
                 </div>
             </div>
@@ -69,7 +69,7 @@
                                <div class="Mymusic-conteiner">
                                     <div class="MyMusic" :key="index" v-for="(track, index) in album.tracks">
                                         <!--<div class="likedMusicHover"></div>-->
-                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
+                                        <div class="MyMusiccontrol" style="background-image: url(/play-arrow.svg)"></div>
                                         {{ track.name }}
                                     </div>
                                </div>
@@ -114,7 +114,7 @@ export default {
         receiveData() {
             var id = this.$route.params.id;
             this.$http.get('performers/' + id).then(function(response){
-                //console.log(response.body)
+                console.log(response.body)
                 for(var i = 0; i < response.body.albums.length; i++)
                 {
                     var tracks = [];
@@ -128,6 +128,10 @@ export default {
                                                 date: response.body.albums[i].date_alb,
                                                 tracks: tracks});
                 }
+                //  if(response.body.image_per === null )
+                //     {
+                //         response.body.image_per = "/static/mainapp/images/cat.jpg"
+                //     }
                 this.$store.commit('performerID', response.body.id);
                 this.$store.commit('performerName', response.body.name_per);
                 this.$store.commit('performerLogo', response.body.image_per);
@@ -175,6 +179,7 @@ html, body
 }
 .ProfileConteiner
 {
+    padding-bottom: 69px; 
     background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(0, 85, 255,0.2));
     font-size: 110%;
     top: 55px;
@@ -191,14 +196,14 @@ html, body
     background-color: #fff;
     display: block;
     box-sizing: border-box;
-    margin-bottom: 3%;
+    margin-bottom: 2%;
     box-shadow: 0 5px 12px rgba(0,0,0,0.15), 0 3px 3px rgba(0,0,0,0.12);
 }
 /*то что справа*/
 .rightColumn
 {
     float: left;
-    width: 73%;
+    width: 73.5%;
 }
 .ProfileName
 {
@@ -319,7 +324,7 @@ html, body
 .leftColumn
 {
     float: left;
-    margin-right: 2%; 
+    margin-right: 1.5%; 
     width: 25%;
 }
 .Lblock
@@ -341,6 +346,7 @@ html, body
 }
 .ProfileNastr
 {
+    color: black;
     font-size: 110%;
     line-height: 43px;
     text-align: center;
@@ -349,6 +355,10 @@ html, body
     height: 43px;
     position: relative;
     display: block;
+}
+a
+{
+    text-decoration: none;
 }
 .ProfileNastr:hover
 {
@@ -397,6 +407,10 @@ html, body
     max-height: 316.38px;
     overflow: hidden;
 }
+.likedMusic:hover
+{
+    background-color: rgb(235, 235, 235)
+}
 .likedMusic:hover  .musicLable
 {
     opacity: 0.1;
@@ -419,7 +433,8 @@ html, body
 }
 .musicLablecontrol
 {
-    margin-left: 8px; 
+    background-image: url(/playButton.svg);
+    margin-left: 4.5px; 
     margin-top: 10px;
     z-index: 110;
     display: block;
@@ -450,7 +465,7 @@ html, body
     text-overflow: ellipsis;
     line-height: 50.59px;
     padding: 1.8px;
-    background-color: rgb(204, 204, 204);
+    /* background-color: rgb(204, 204, 204); */
     margin-top: 5px;
 }
 .subscribers

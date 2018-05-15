@@ -42,9 +42,32 @@ export default {
 </script>
 
 <style scoped>
+@media (max-width: 985px) {
+    .compositor-top
+    {
+        display: block;
+        height: 100%;
+        float: left;
+        text-align: center;
+        color: white;
+        width: 330px;
+    }
+}
+
+@media (min-width: 984px) {
+    .compositor-top
+    {
+        display: block;
+        height: 100%;
+        float: left;
+        text-align: center;
+        color: white;
+        width: 35%;
+    }
+}
 .compositor-top
 {   
-    z-index: 70;
+    z-index: 90;
     display: flex;
     flex-direction: column;
     color:black;

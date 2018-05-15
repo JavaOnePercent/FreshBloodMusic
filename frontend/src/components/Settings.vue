@@ -115,6 +115,7 @@ export default {
     padding-right: 15px;
     max-width: 1024px;
     margin: 0 auto;
+    padding-bottom:69px; 
 }
 .nastr-row
 {

@@ -1,20 +1,29 @@
 <template>
     <div id="compilation-top">
         <div class="recommendations">
-            <div class="sortirovka">
-                <label class="sortirovka-name">Рекомендации</label>
-                <div class="sort">
-                    <label>Отсортировать по:</label>
-                    <a class="time" id="button" @click="showGenre(genre, 'time')">времени</a>
-                    <a class="topic" id="button" @click="showGenre(genre, 'popular')">популярности</a>
+            <div class="sortirovka-conteiner">
+                <div class="sortirovka">
+                    <label class="sortirovka-name">Рекомендации</label>
+                    <div class="sort">
+                        <label>Отсортировать по:</label>
+                        <a class="time" id="button" @click="showGenre(genre, 'time')" @mousedown="checkSort">времени</a>
+                        <a class="topic" id="button" @click="showGenre(genre, 'popular')" @mousedown="checkSort">популярности</a>
+                    </div>
                 </div>
             </div>
-            <div class="music-style">
-                <a class="janr" name="" @click="showGenre('all')">Все</a>
-                <a class="janr" name="" @click="showGenre('rec')">Рекомендации</a>
-                <a class="janr" name="" @click="showGenre('fav')">Избранное</a>
-                <div class="gen" :key="index" v-for="(gen, index) in genreandstyles">
-                    <a class="janr" :name="gen.id" @click="showGenre(gen.id)">{{gen.name_gnr}}</a>
+            <div class="music-style-conteiner">
+                <div class="music-style">
+                    <a class="janr" name="" @click="showGenre('all')">Все</a>
+                    <a class="janr" name="" @click="showGenre('rec')">Рекомендации</a>
+                    <a class="janr" name="" @click="showGenre('fav')">Избранное</a>
+                    <div class="gen janr" :key="index" v-for="(gen, index) in genreandstyles">
+                        <a  :name="gen.id" @click="showGenre(gen.id)">{{gen.name_gnr}}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="janrStyles-conteiner">
+                <div class="janrStyles">
+                    <a class="janr" name="" @click="showGenre('all')">Все</a>
                 </div>
             </div>
         </div>
@@ -48,6 +57,18 @@ export default {
         document.body.addEventListener("scroll", this.onScroll, false);
     },
     methods: {
+        checkSort(e)
+        {
+            e.preventDefault();
+            if(e.target.style.backgroundColor=="rgba(192, 192, 192, 0.8)")
+            {
+                e.target.style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1"
+            }
+            else
+            {
+                e.target.style="background-color: rgba(192,192,192,0.8);border-bottom: 2px solid currentColor;line-height: 0.85";
+            }
+        },
         onScroll: function(event) {
             var wrapper = event.target;
             var list = document.getElementById('main');
@@ -114,6 +135,7 @@ export default {
         //для Илюши
         getGengeAndStyles: function (message = null) {
             this.$http.get('genre').then(function(response){
+                console.log(response.data)
                 this.genreandstyles = response.data;
             }, function(error){
             })
@@ -130,41 +152,68 @@ export default {
 /*Рекомендации и сортировка*/
 .recommendations
 {
-    height: 80px;
+    height: auto;
     width: 100%;
     margin: 0 auto;
     position: relative;
     display: flex;
     flex-direction: column;
 }
-.recommendations .sortirovka, .recommendations .music-style
+.recommendations .music-style, .recommendations .janrStyles
 {
     flex-basis: 100px;
     display: flex;
     height: 40px;
     font-size: 20px;
-    justify-content: center;
+    justify-content: flex-start;
     line-height:40px;
 }
 /*сортировка*/
+.sortirovka-conteiner
+{
+    top: 0px;
+    left: 0px;
+    height: 40px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    justify-content: center;
+}
+.sortirovka
+{
+    position: relative;
+    height: 40px;
+    padding-left: 15px;
+    padding-right: 15px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1143px; 
+    min-width: 915px; 
+}
 .sortirovka-name, .sort
 {
     flex-basis: 305px;
-    padding: 0 15px;
 }
 .sortirovka-name
 {
+    line-height: 40px;
+    float: left;
+    width: 30%;
     font-size: 30px;
 }
 .sort
 {
-    flex-grow: 0.4;
+    font-size: 20px;
+    line-height: 40px;
+    width: 70%;
+    float: left;
 }
 .sort a
 {
+    margin-right:5px; 
     padding: 6px;
 }
-.sort a:hover
+.sort a:hover, .sort a:active
 {
     cursor: pointer;
     background-color: rgba(192,192,192,0.8);
@@ -184,10 +233,58 @@ export default {
     margin-right:5px; 
 }
 /*рекомендации*/
+.music-style-conteiner
+{
+    background-color: rgb(85, 85, 85);
+    top: 0px;
+    left: 0px;
+    height: 40px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    justify-content: center;
+}
 .music-style
 {
-    color: white;
     background-color: rgb(85, 85, 85);
+    position: relative;
+    height: 40px;
+    /* padding-left: 15px;
+    padding-right: 15px; */
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1143px; 
+    min-width: 915px; 
+    color: white;
+
+}
+.janrStyles-conteiner
+{
+    box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
+    -webkit-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
+    -moz-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
+    background-color: rgb(55, 55, 55);
+    top: 0px;
+    left: 0px;
+    height: 40px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    justify-content: center;
+}
+
+.janrStyles
+{
+    justify-content:unset;
+    position: relative;
+    height: 40px;
+    /* padding-left: 15px;
+    padding-right: 15px; */
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1143px; 
+    min-width: 915px; 
+    color: white;
 }
 .janr
 {
@@ -198,13 +295,18 @@ export default {
     cursor: pointer;
     background-color: rgba(192,192,192,0.8);
     border-bottom: 2px solid currentColor;
-    line-height: 1.5;
+    line-height: 1.6;
     box-shadow: 0 6px 12px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
+}
+.janr:focus
+{
+    background-color: rgba(192,192,192,0.8);
 }
 /*подборка*/
 
 .compilation
 {
+    min-width: 915px; 
     max-width: 1143px;
     margin: 0 auto;
     position: relative;

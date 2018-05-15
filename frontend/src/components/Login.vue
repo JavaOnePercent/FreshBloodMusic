@@ -31,6 +31,12 @@ export default {
             e.preventDefault();
             if(e.target.value.lenght != 0){
                 e.target.style="background-color: rgba(255,255,255,0.92)";
+                if(this.errorMessUser=="Кажется, вы ошиблись")
+                {
+                    this.errorMessUser=''
+                    document.getElementById('username').style.backgroundColor="rgba(255,255,255,0.92)"
+                    document.getElementById('password').style.backgroundColor="rgba(255,255,255,0.92)"
+                }
             }
             if(e.target.name == 'username')
             {
@@ -49,7 +55,11 @@ export default {
                 this.$http.post('login', data).then(function(response){
                     self.$store.commit('username', response.data.username)
                     self.$router.push('performers/me')
-                });
+                },function(error){
+                    document.getElementById('username').style.backgroundColor="rgba(255, 179, 179,0.98)"
+                    document.getElementById('password').style.backgroundColor="rgba(255, 179, 179,0.98)"
+                    this.errorMessUser='Кажется, вы ошиблись'
+            });
             }
             if(!this.username)
             {
@@ -68,7 +78,7 @@ export default {
             }
             else
             {
-                document.getElementById('password').style.backgroundColor="rgba(255,255,255,0.92);"
+                document.getElementById('password').style.backgroundColor="rgba(255,255,255,0.92)"
                 this.errorMessPass = ''
             }
         }

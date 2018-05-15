@@ -46,12 +46,9 @@ export default {
             }
             if(e.target.name == 'username')
             {
-
-                this.$http.get('/register').then(function(response){   //Проверочка на юзера
-                console.log(response);
-                })
-                
-
+                // this.$http.get('register').then(function(response){   //Проверочка на юзера
+                // console.log(response);
+                // })
                 this.errorMessUser=''
             }
             else {
@@ -95,7 +92,10 @@ export default {
                 this.$http.post('register', data).then(function(response){
                     self.$store.commit('username', response.data.username)
                     self.$router.push('performers/me')
-                });
+                },function(error){
+                    document.getElementById('username').style.backgroundColor="rgba(255, 179, 179,0.98)"
+                    this.errorMessUser='Это имя занято'
+            });
             }
 
             if(!this.username)
