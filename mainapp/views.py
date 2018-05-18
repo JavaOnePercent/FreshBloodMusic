@@ -57,14 +57,16 @@ def next_track(request):
 def likes(request):
     if request.method == 'PUT':  # добавление лайка
         result = LikedTrackMethods.add_like(request.query_params['track_id'], auth.get_user(request).id)
-        if result:
+        counter = LikedTrackMethods.add_increment(request.query_params['track_id'])
+        if result and counter:
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':  # удаление лайка
         result = LikedTrackMethods.remove_like(request.query_params['track_id'], auth.get_user(request).id)
-        if result:
+        counter = LikedTrackMethods.add_decrement(request.query_params['track_id'])
+        if result and counter:
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -104,10 +106,12 @@ class TrackOverview(generics.ListAPIView):
             for user in idenusers:
                 tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
                 likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                         (math.fabs(len(set(likedtracks) | set(tracks))))) / len(idenusers)
+                         (math.fabs(len(set(likedtracks) | set(tracks)))))
                 chance[user] = likes
             chance = sorted(chance.items(), key=lambda item: -item[1])
-            tracks = LikedTrack.objects.all().filter(user_id__in=chance).values_list('trc_id')
+            tracks = []
+            for key in chance:
+                tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
             identracks = []
             for track in tracks:
                 if track not in identracks and track not in historytracks and track not in likedtracks:
@@ -136,10 +140,12 @@ def gettrack(authuser): #для Димы
     tracks = LikedTrack.objects.all().filter(user_id__in=idenusers).values_list('trc_id')
     for user in idenusers:
         likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                 (math.fabs(len(set(likedtracks) | set(tracks))))) / len(idenusers)
+                 (math.fabs(len(set(likedtracks) | set(tracks)))))
         chance[user] = likes
     chance = sorted(chance.items(), key=lambda item: -item[1])
-    tracks = LikedTrack.objects.all().filter(user_id__in=chance).values_list('trc_id')
+    tracks = []
+    for key in chance:
+        tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
     identracks = []
     for track in tracks:
         if track not in identracks and track not in historytracks and track not in likedtracks:

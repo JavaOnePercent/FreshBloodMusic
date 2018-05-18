@@ -3,6 +3,7 @@ import random
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.files import FieldFile, ImageFieldFile
+from django.db.models import F
 
 from mainapp.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle, TrackHistory
 
@@ -133,6 +134,30 @@ class LikedTrackMethods:
             return True
         else:
             return False
+    @staticmethod
+    def add_increment(track_id):
+        if track_id is not None:
+            track = Track.objects.get(pk=track_id)
+            performer = Performer.objects.get(pk=track.alb_id.per_id.id)
+            Track.objects.filter(pk=track_id).update(rating_trc=F('rating_trc') + 1)
+            Performer.objects.filter(pk=performer.id).update(rating_per=F('rating_per') + 1)
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def add_decrement(track_id):
+        if track_id is not None:
+            track = Track.objects.get(pk=track_id)
+            performer = Performer.objects.get(pk=track.alb_id.per_id.id)
+            if track.rating_trc > 0:
+                Track.objects.filter(pk=track_id).update(rating_trc=F('rating_trc') - 1)
+            if performer.rating_per > 0:
+                Performer.objects.filter(pk=performer.id).update(rating_per=F('rating_per') - 1)
+            return True
+        else:
+            return False
+
 
     @staticmethod
     def remove_like(track_id, user_id):  # удаление лайка из таблицы
