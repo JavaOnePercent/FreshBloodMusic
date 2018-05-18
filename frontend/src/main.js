@@ -142,7 +142,7 @@ const router = new VueRouter({
   linkExactActiveClass: 'router-link-noob'
 });
 
-new Vue({
+var root = new Vue({
     data: {
         bus: new Vue({})
     },
@@ -150,3 +150,7 @@ new Vue({
     router,
     render: h => h(App)
 }).$mount('#app')
+
+// router.beforeEach((to, from, next) => {
+//     root.bus.$emit('page-changed')
+// })

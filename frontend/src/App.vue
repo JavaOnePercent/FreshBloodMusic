@@ -55,6 +55,7 @@ html, body
     font-family: Arial,Helvetica,sans-serif;
     position: fixed;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 html {
     overflow: hidden;

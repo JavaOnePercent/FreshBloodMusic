@@ -94,6 +94,10 @@ export default {
             this.moveContainer('right');
             
         });
+        this.$bus.$on('page-changed', event => {
+            console.log('piska')
+            this.isFull = false;
+        });
     },
     computed: {
         queueTracks: {

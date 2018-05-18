@@ -92,7 +92,7 @@ export default {
     position: absolute;
     /*background: linear-gradient(0deg, rgba(0, 255, 0, .2), rgba(0, 85, 255,0.2)), url(/RegistrationFon.jpg); */
     /*background: linear-gradient(0deg, rgba(204, 105, 39, 0.3), rgba(0, 85, 255,0.3)), url(/308943842556095.jpg);*/
-    background: linear-gradient(0deg, rgba(204, 105, 39, 0.3), rgba(0, 85, 255,0.3)), url(/77491359960545_tumblr_ocp55as7o51qkprgpo1_1280.gif);
+    background: linear-gradient(0deg, rgba(204, 105, 39, 0.3), rgba(0, 85, 255,0.3)), url(/static/mainapp/77491359960545_tumblr_ocp55as7o51qkprgpo1_1280.gif);
     background-position:center; 
     background-size: cover;
     height: 100%;

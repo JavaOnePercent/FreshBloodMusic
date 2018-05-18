@@ -216,13 +216,14 @@ def best_performer(request):
 @api_view(['GET'])
 def top(request):
     if request.method == "GET":
-        per = request.query_params['per']
-        if per == 'month':
-            month = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=31))[:1]
-        elif per == 'week':
-            month = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=7))[:1]
-        serializer = TopTrackSerializer(month, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        #per = request.query_params['per']
+        #if per == 'month':
+        month = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=31))[:1]
+        #elif per == 'week':
+        week = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=7))[:1]
+        month = month.union(week)
+        monthS = TopTrackSerializer(month, many=True)
+        return Response({'month': monthS.data[0], 'week': monthS.data[1]}, status=status.HTTP_200_OK)
 
 
 class Names:
@@ -242,6 +243,7 @@ def profile(request):
     return render(request, 'mainapp/profile.html')
 
 
+@csrf_exempt
 @api_view(['POST', 'GET'])
 def album(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
     if request.method == 'POST':
