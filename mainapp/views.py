@@ -99,63 +99,53 @@ class TrackOverview(generics.ListAPIView):
         elif gen == 'rec':
             likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
             historytracks = TrackHistory.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
-            users = LikedTrack.objects.all().values_list('user_id')
-            idenusers = []
-            for user in users:
-                if user not in idenusers and user != auth.get_user(request).id:
-                    idenusers.append(user)
+            idenusers = LikedTrack.objects.all().filter(~Q(user_id=auth.get_user(request).id)).values_list('user_id', flat=True).distinct()
             chance = {}
             for user in idenusers:
                 tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
                 likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                         (math.fabs(len(set(likedtracks) | set(tracks))))) / (len(idenusers) - 1)
+                         (math.fabs(len(set(likedtracks) | set(tracks))))) / len(idenusers)
                 chance[user] = likes
             chance = sorted(chance.items(), key=lambda item: -item[1])
-            tracks = []
-            for key in chance:
-                tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+            tracks = LikedTrack.objects.all().filter(user_id__in=chance).values_list('trc_id')
             identracks = []
             for track in tracks:
                 if track not in identracks and track not in historytracks and track not in likedtracks:
                     identracks.append(track[0])
-            tracks = Track.objects.filter(id__in=identracks)
+            tracks = Track.objects.all().filter(id__in=[l for l in identracks])
+            # tracks = []
+            # for track in identracks:
+            #     trc = Track.objects.all().filter(id=track)
+            #     tracks.append(trc)
+            PostLimitOffsetPagination.ordering = 'id'
         elif gen != 'all':
             tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
         else:
             tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
-        if bool == 'popular':
+        if bool == 'popular' and gen != 'rec':
             PostLimitOffsetPagination.ordering = '-rating_trc'
-        elif bool == 'time':
+        elif bool == 'time' and gen != 'rec':
             PostLimitOffsetPagination.ordering = '-date_trc'
         return tracks
 
 def gettrack(authuser): #для Димы
     likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
     historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
-    users = LikedTrack.objects.all().values_list('user_id')
-    idenusers = []
-    for user in users:
-        if user not in idenusers and user != authuser:
-            idenusers.append(user)
+    idenusers = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('user_id', flat=True).distinct()
     chance = {}
+    tracks = LikedTrack.objects.all().filter(user_id__in=idenusers).values_list('trc_id')
     for user in idenusers:
-        tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
         likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                 (math.fabs(len(set(likedtracks) | set(tracks))))) / (len(idenusers) - 1)
+                 (math.fabs(len(set(likedtracks) | set(tracks))))) / len(idenusers)
         chance[user] = likes
     chance = sorted(chance.items(), key=lambda item: -item[1])
-    tracks = []
-    for key in chance:
-        tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+    tracks = LikedTrack.objects.all().filter(user_id__in=chance).values_list('trc_id')
     identracks = []
     for track in tracks:
         if track not in identracks and track not in historytracks and track not in likedtracks:
             identracks.append(track[0])
-    tracks = Track.objects.filter(id__in=identracks)[:1]
+    tracks = Track.objects.all().filter(id=identracks[0])
     return tracks
-
-
-
 '''@api_view(['GET'])
 def track(request):
     if request.method == "GET":
