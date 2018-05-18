@@ -116,12 +116,15 @@ class TrackOverview(generics.ListAPIView):
             for track in tracks:
                 if track not in identracks and track not in historytracks and track not in likedtracks:
                     identracks.append(track[0])
-            tracks = Track.objects.all().filter(id__in=[l for l in identracks])
+            # tracks = Track.objects.all().filter(id__in=[l for l in identracks])
             # tracks = []
             # for track in identracks:
             #     trc = Track.objects.all().filter(id=track)
             #     tracks.append(trc)
-            PostLimitOffsetPagination.ordering = 'id'
+            ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
+            tracks = Track.objects.filter(pk__in=identracks).extra(
+                select={'ordering': ordering}, order_by=('ordering',))
+            PostLimitOffsetPagination.ordering = 'id' #минус жизнь
         elif gen != 'all':
             tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
         else:
