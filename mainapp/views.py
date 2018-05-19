@@ -35,6 +35,10 @@ from django.template.context_processors import csrf
 
 
 @ensure_csrf_cookie
+def get_token(request):
+    return HttpResponse(status=status.HTTP_200_OK)
+
+
 def main_view(request):  # главная
     file = open('./mainapp/static/mainapp/index.html', 'r')
     index = file.read()
@@ -81,6 +85,7 @@ def likes(request):
 
 class PostLimitOffsetPagination(PageNumberPagination):
     page_size = 12
+
 
 class TrackOverview(generics.ListAPIView):
     serializer_class = NoLinkTrackSerializer
@@ -129,9 +134,10 @@ class TrackOverview(generics.ListAPIView):
                 tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
             else:
                 tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
-            if bool == 'popular' and gen != 'rec':
-                tracks = tracks.order_by('-rating_trc')
-            elif bool == 'time' and gen != 'rec':
+            if gen != 'rec' and gen != 'fav':
+                if bool == 'popular':
+                    tracks = tracks.order_by('-rating_trc')
+            elif bool == 'time':
                 tracks = tracks.order_by('-date_trc')
             return tracks
         elif sty != '' and gen == '':
@@ -141,6 +147,7 @@ class TrackOverview(generics.ListAPIView):
             elif bool == 'time':
                 tracks = tracks.order_by('-date_trc')
             return tracks
+
 
 def gettrack(authuser): #для Димы
     likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
@@ -249,7 +256,6 @@ def profile(request):
     return render(request, 'mainapp/profile.html')
 
 
-@csrf_exempt
 @api_view(['POST', 'GET'])
 def album(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
     if request.method == 'POST':
@@ -303,6 +309,7 @@ def genre(request):
             styles = GenreStyleMethods.get(gen_id)
             serializer = GenreStyleSerializer(styles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PerformersList(APIView):
     def post(self, request, format=None):  # создание или изменение исполнителя
@@ -380,7 +387,6 @@ def history(request):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@csrf_exempt
 @api_view(['POST', 'GET'])
 def login(request):
     if request.method == 'GET':
@@ -402,7 +408,6 @@ def logout(request):
     return Response(status=status.HTTP_200_OK)
 
 
-@csrf_exempt
 @api_view(['POST'])
 def register(request):
     if request.method == 'POST':

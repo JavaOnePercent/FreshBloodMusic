@@ -34,6 +34,8 @@ export default {
         this.$http.get('login').then(function(response){
             self.$store.commit("username", response.data.username)
         });
+        this.$http.get('token').then(function(response){
+        });
     },
     computed: {
         showLoader () {

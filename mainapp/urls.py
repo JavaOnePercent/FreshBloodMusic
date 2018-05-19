@@ -5,6 +5,7 @@ from mainapp.models import Performer
 
 urlpatterns = [
     url(r'^$', views.main_view, name='main_view'), # главная
+    url(r'^token$', views.get_token, name='get_token'),  # token
     url(r'^track$', views.TrackOverview.as_view(), name='track'),
     url(r'^best_performer/$', views.best_performer, name='best_performer'),
     url(r'^top$', views.top, name='top'),

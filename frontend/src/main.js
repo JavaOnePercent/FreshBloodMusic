@@ -103,13 +103,23 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         performerID(state, val) {
             state.performerID = val;
         },
+        updateQueueTracks(state, val) {
+            state.queueTracks = val;
+        },
         pushQueueTracks(state, val) {
-            var last = state.queueTracks[state.queueTracks.length - 1]
+            if(state.queueTracks.length > 0)
+            { 
+                var last = state.queueTracks[state.queueTracks.length - 1]
 
-            if(last.auto === true) state.queueTracks.pop()
+                if(last.auto === true) state.queueTracks.pop()
 
-            state.queueTracks.push(val);
-            if(last.auto === true) state.queueTracks.push(last);
+                state.queueTracks.push(val);
+                if(last.auto === true) state.queueTracks.push(last);
+            }
+            else state.queueTracks.push(val);
+        },
+        unshiftQueueTracks(state, val) {
+            state.queueTracks.unshift(val)
         },
         removeFirstQueueTracks(state) {
             state.queueTracks.shift()
@@ -142,7 +152,7 @@ const router = new VueRouter({
   linkExactActiveClass: 'router-link-noob'
 });
 
-var root = new Vue({
+new Vue({
     data: {
         bus: new Vue({})
     },
@@ -150,7 +160,3 @@ var root = new Vue({
     router,
     render: h => h(App)
 }).$mount('#app')
-
-// router.beforeEach((to, from, next) => {
-//     root.bus.$emit('page-changed')
-// })

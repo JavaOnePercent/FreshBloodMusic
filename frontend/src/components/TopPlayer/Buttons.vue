@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img src="/static/mainapp/images/previousButton.svg" :class="isFull ? 'full-previous-button' : 'previous-button'" draggable="false" />
+        <img src="/static/mainapp/images/previousButton.svg" :class="isFull ? 'full-previous-button' : 'previous-button'" @click="prevClick" draggable="false" />
         <img :src="playSrc" :class="isFull ? 'full-play-button' : 'play-button'" @click="playClick" draggable="false" />
         <img src="/static/mainapp/images/nextButton.svg" :class="isFull ? 'full-next-button' : 'next-button'" @click="nextClick" draggable="false" />
         <img :src="dropdownSrc" :class="isFull ? 'full-dropdown-button' : 'dropdown-button'" @click="dropdownClick" draggable="false" />
@@ -24,6 +24,10 @@ export default {
     methods: {
         playClick() {
             this.$store.commit('switchPlaying');
+        },
+        prevClick() {
+            this.$emit('prev-click');
+            this.$bus.$emit('prev-click');
         },
         nextClick(){
             this.$emit('nextclick');

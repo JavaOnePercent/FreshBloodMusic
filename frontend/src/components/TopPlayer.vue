@@ -4,7 +4,7 @@
         <link id="playerCSS" rel="stylesheet" type="text/css" :href="CSSRef" />-->
         <div :class="isFull ? 'full-player' : 'player'" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
             <div :class="isFull ? 'full-player-container' : 'player-container'" :style="containerMove">
-                <buttons :isFull="isFull" @nextclick="playNextTrack" @dropdownclick="switchPlayerView"></buttons>
+                <buttons :isFull="isFull" @nextclick="playNextTrack" @prev-click="prevClick" @dropdownclick="switchPlayerView"></buttons>
                 <logos ref="logos" v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
                 <menu-more :performerID="performerID" :isFull="isFull"></menu-more>
                 <track-performer v-bind="trackPerformer" :isFull="isFull"></track-performer>
@@ -48,7 +48,7 @@ export default {
             //CSSRef: CSSRefs.small,
             isFull: false,
             isHovered: false,
-            containerMove: '',
+            containerMove: {},
             performerID: 0,
             track: {
                 current: null,
@@ -94,16 +94,15 @@ export default {
             this.moveContainer('right');
             
         });
-        this.$bus.$on('page-changed', event => {
-            console.log('piska')
-            this.isFull = false;
-        });
     },
     computed: {
         queueTracks: {
             get() {
                 return this.$store.state.queueTracks
             }
+        },
+        historyTracks() {
+            return this.$store.state.historyTracks
         }
     },
     watch: {
@@ -111,29 +110,61 @@ export default {
             if(this.queueTracks[0])
             {
                 this.logos.nextLogoLink = this.queueTracks[0].image_alb;
-                this.$refs.logos.refresh(this.queueTracks[0].image_alb);
+                this.$refs.logos.refresh(this.logos.nextLogoLink);
             }
         }
     },
-    methods: {        
+    methods: {
+        prevClick() {
+            if(this.historyTracks.length > 0 && !this.isTimeout)
+            {
+                this.isTimeout = true;
+                var self = this
+                setTimeout(function() { self.isTimeout = false }, 1000);
+                this.$store.commit('unshiftQueueTracks', this.track.current)
+                var current = this.historyTracks[0]
+                this.setCurrentTrackAttrs(current);
+                this.track.current = current
+                this.$store.commit('removeFirstHistoryTracks')
+                this.logos.prevLogoLink = this.historyTracks[0] ? this.historyTracks[0].image_alb : ''
+                this.logos.logoLink = current.image_alb
+                this.logos.nextLogoLink = this.queueTracks[0].image_alb
+                //this.logos.nextLogoLink = this.queueTracks[0].image_alb
+                //this.$refs.logos.refresh()
+                this.$bus.$emit('prev-click', this.logos);
+            }
+        },  
         playingEnded() {
             this.playNextTrack()
         },
         moveContainer(prop) {
-            if (this.containerMove === '')
+            if (prop === 'left')
             {
-                this.setContainer(prop);
+                if(this.containerMove.left === undefined)
+                    this.setContainer(prop);
+                else
+                    this.containerMove.left = undefined;
             }
-            else
-                this.containerMove = '';
+            else if (prop === 'right')
+                if(this.containerMove.right === undefined)
+                    this.setContainer(prop);
+                else
+                    this.containerMove.right = undefined;
         },
         updateContainer() {
-            if (this.containerMove != '')
+            if (this.containerMove.left !== undefined)
+            {
                 this.setContainer('left');
+            }
+            if (this.containerMove.right !== undefined)
+            {
+                this.setContainer('right');
+            }
         },
         setContainer(prop) {
             var dist = document.body.offsetWidth / 2 - 675;
-            this.containerMove = (dist < 0) ? (prop + ': ' + ((dist-30) * 2) + 'px') : 'left: 0';
+            var offset = (dist < 0) ? (((dist-30) * 2) + 'px') : '0'
+            this.$set(this.containerMove, prop, offset)
         },
         pushQueue(id) {
             this.$http.get('track_attr', {
@@ -151,16 +182,21 @@ export default {
         },
         playNextTrack() {
             //this.queue.tracks[0]
-            this.$store.commit('pushHistoryTracks', this.track.current)
-            var first =  this.queueTracks[0]
-            this.loadNextTrack(first);
-            this.$refs.logos.prepareForImmediateAnimating();
-            this.$store.commit('removeFirstQueueTracks')
-            
-            this.$http.put('history', {}, {
-                responseType: 'json',
-                params: { track_id: first.id }
-            }).then(response => {  });
+            if(!this.isTimeout)
+            {
+                this.isTimeout = true;
+                setTimeout(this.nextTrackTimeout, 1000);
+                this.$store.commit('pushHistoryTracks', this.track.current)
+                var first =  this.queueTracks[0]
+                this.loadNextTrack(first);
+                this.$refs.logos.prepareForImmediateAnimating();
+                this.$store.commit('removeFirstQueueTracks')
+                
+                this.$http.put('history', {}, {
+                    responseType: 'json',
+                    params: { track_id: first.id }
+                }).then(response => {  });
+            }
         },
         switchPlayerView() {
             this.isFull = !this.isFull;
@@ -200,10 +236,6 @@ export default {
             this.isTimeout = false;
         },
         loadNextTrack(first = this.queueTracks[0]) {
-            if(!this.isTimeout)
-            {
-                this.isTimeout = true;
-                setTimeout(this.nextTrackTimeout, 1000);
                 //this.likeTrack();
                 var varData = {
                     current_track: this.track.currentID,
@@ -213,7 +245,6 @@ export default {
                     responseType: 'json',
                     params: varData
                 }).then(this.nextTrackSuccessFunc);
-            }
         },
         nextTrackSuccessFunc(data) {         //функция успеха после получения следующего трека
             //console.log(data.body)
@@ -224,7 +255,7 @@ export default {
             this.track.current = current
 
             next.auto = true
-            if(this.queueTracks.length === 0) this.queueTracks.push(next)
+            if(this.queueTracks.length === 0) this.$store.commit('pushQueueTracks', next)
 
             var logo = this.logos.logoLink;
             this.setCurrentTrackAttrs(current);
@@ -233,7 +264,8 @@ export default {
                        
             this.logos.prevLogoLink = logo;
             this.logos.nextLogoLink = this.queueTracks[0].image_alb;
-            
+
+            this.$bus.$emit('next-track-load', this.logos);
         },
         setCurrentTrackAttrs(track) {
             this.trackPerformer.trackName = track.name_trc;
@@ -245,7 +277,7 @@ export default {
             this.logos.logoLink = track.image_alb;
             this.track.isLiked = !!(track.is_liked);
             this.logos.isLiked = this.track.isLiked;
-            this.$bus.$emit('next-track-load');
+            
         }
     }
 }

@@ -104,11 +104,14 @@ export default {
                 if (!(isNaN(this.genre))) {
                     this.getGengeAndStyles(this.genre);
                 }
-                this.style = '';
+                else {
+                    this.getGengeAndStyles()
+                }
+                this.style = null;
             }
             if(message2 != null) {
                 this.style = message2;
-                this.genre = '';
+                this.genre = null;
             }
             if(message3 != null) {
                 this.sort = message3;

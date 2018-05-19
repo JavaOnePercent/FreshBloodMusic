@@ -5,11 +5,11 @@
             <img :class="isFull ? 'full-logo' : 'logo'" :src="logoLink" draggable="false" :style="rotationCSS"/>
             <img :class="isFull ? 'full-like' : 'like'" v-show="showLike" src="/static/mainapp/images/like.svg" draggable="false"/>
         </div>
-        <img :class="isFull ? 'full-main-to-prev-logo' : 'main-to-prev-logo'" :src="logo" draggable="false" :style="mainToPrevLogoAnimation"/>
-        <img :class="isFull ? 'full-next-to-main-logo' : 'next-to-main-logo'" :src="logoLink" draggable="false" :style="nextToMainLogoAnimation"/>
-        <img :class="isFull ? 'full-prev-envelope' : 'prev-envelope'" :src="logo" draggable="false" :style="prevEnvelopeAnimation"/>
+        <img :class="isFull ? 'full-main-to-prev-logo' : 'main-to-prev-logo'" :src="mainToPrevLogo" draggable="false" :style="mainToPrevLogoAnimation"/>
+        <img :class="isFull ? 'full-next-to-main-logo' : 'next-to-main-logo'" :src="nextToMainLogo" draggable="false" :style="nextToMainLogoAnimation"/>
+        <img :class="isFull ? 'full-prev-envelope' : 'prev-envelope'" :src="prevEnvelopeLogo" draggable="false" :style="prevEnvelopeAnimation"/>
         <img :class="isFull ? 'full-prev-logo' : 'prev-logo'" @click="prevLogoClick" :src="prevLogo" v-show="showPrev" draggable="false" :style="prevLogoAnimation"/>
-        <img :class="isFull ? 'full-next-logo' : 'next-logo'" @click="nextLogoClick" :src="nextLogoLink" draggable="false" :style="nextLogoAnimation"/>
+        <img :class="isFull ? 'full-next-logo' : 'next-logo'" @click="nextLogoClick" :src="nextLogo" draggable="false" :style="nextLogoAnimation"/>
         <img :class="isFull ? 'full-next-envelope' : 'next-envelope'" :src="nextEnvelopeLogo" draggable="false" :style="nextEnvelopeAnimation"/>
     </div>
 </template>
@@ -37,11 +37,14 @@ export default {
             nextEnvelopeAnimation:'',
             nextLogoAnimation: '',
             audio: null,
-            logo: '',
+            prevEnvelopeLogo: '',
             prevLogo: '',
+            nextLogo: '',
             lastRotation: '',
             wasPlaying: false,
             nextEnvelopeLogo: '',
+            mainToPrevLogo: '',
+            nextToMainLogo: '',
             isAnimating: false
             //duration: 0,
             //currentTime: 0
@@ -66,6 +69,10 @@ export default {
             this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
             this.wasPlaying = this.playing;
         });
+        this.$bus.$on('prev-click', event => {
+            this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
+            this.wasPlaying = this.playing;
+        });
         this.$bus.$on('playingended', event => {
             this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
             this.wasPlaying = true;
@@ -80,12 +87,31 @@ export default {
             }
         });
         this.$bus.$on('next-track-load', event => {
+            this.isAnimating = true;
+            this.nextLogo = event.nextLogoLink
+            this.mainToPrevLogo = event.prevLogoLink
+            this.nextToMainLogo = event.logoLink
+            this.prevEnvelopeLogo = event.prevLogoLink
             this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
             this.nextLogoAnimation = 'visibility: hidden;';
             this.mainLogoAnimation = 'visibility: hidden;';
             this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg);';
-            this.isAnimating = true;
             setTimeout(this.startAnimation, 100);
+        });
+        this.$bus.$on('prev-click', event => {
+            this.isAnimating = true;
+            //this.prevEnvelopeLogo = event.logoLink
+            this.nextToMainLogo = event.logoLink
+            this.mainToPrevLogo = event.nextLogoLink
+            this.nextEnvelopeLogo = event.nextLogoLink
+            this.prevLogo = event.prevLogoLink
+            this.prevEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s', top: '100px'};
+            this.prevLogoAnimation = 'visibility: hidden;';
+            this.mainLogoAnimation = 'visibility: hidden;';
+            this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg); left: unset; right: 165px;';
+            this.nextToMainLogoAnimation = {right: 'unset', left: '-75px', transition: null, top: null, height: null, width: null }
+            this.nextEnvelopeAnimation = {top: "0"}
+            setTimeout(this.startBackwardsAnimation, 100);
         });
         
         /*bus.$on('slidermoved', event => {
@@ -117,8 +143,10 @@ export default {
             this.showLike = shL;
         },
         prevLogo(pr) {
-            if(pr != '')
+            if(pr !== '')
                 this.showPrev = true;
+            else
+                this.showPrev = false
         },
         isFull(iF) {
             if(!iF) this.rotationCSS = ''
@@ -149,9 +177,12 @@ export default {
             this.nextLogoAnimation = 'visibility: hidden;';
             this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
         },
-        refresh(link) {
+        refresh(logo) {
             if(!this.isAnimating)
-                this.nextEnvelopeLogo = link;
+            {
+                this.nextEnvelopeLogo = logo;
+                this.nextLogo = logo;
+            }
         },
         nextLogoClick() {
             this.$bus.$emit('queue-opened');
@@ -170,6 +201,32 @@ export default {
             this.nextLogoAnimation = 'right: -200px; opacity: 0.0; transition: all 0.0s';
             setTimeout(this.moveNextEnvelope, 500);
         },
+        startBackwardsAnimation() {
+            
+            setTimeout(this.endBackwardsAnimation, 800);
+            this.mainToPrevLogoAnimation += 'right: -75px; height: 150px; width: 150px; top: 100px; transition: right 0.8s, height 0.3s, width 0.3s, top 0.3s;';
+            this.nextToMainLogoAnimation.left= '165px';  this.nextToMainLogoAnimation.transition= 'left 0.8s' 
+            setTimeout(this.startExpandingNextToMain, 500);
+            
+            this.nextEnvelopeAnimation = {top: '100px', opacity: '1.0', transition: 'top 0.3s, opacity 0.3s'};
+            this.nextLogoAnimation = 'right: -200px; opacity: 0.0; transition: right 0.5s, opacity 0.5s;';
+            this.prevLogoAnimation = 'left: -200px; opacity: 0.0; transition: all 0.0s';
+            setTimeout(this.movePrevEnvelopeBackwards, 500);
+        },
+        endBackwardsAnimation() {
+            
+            this.prevEnvelopeLogo = this.prevLogoLink;
+            this.nextLogo = this.nextLogoLink;
+            this.mainToPrevLogoAnimation = 'visibility:hidden;';
+            this.nextToMainLogoAnimation = 'visibility:hidden;'
+            this.mainLogoAnimation = '';
+            this.nextEnvelopeAnimation.opacity = 0.0;
+            this.nextEnvelopeAnimation.transition = 'opacity 0.15s';
+            setTimeout(this.hideNextEnvelopeBackwards, 150);
+            this.prevLogoAnimation = '';
+            this.nextLogoAnimation = '';
+            this.prevEnvelopeAnimation = 'visibility:hidden;';
+        },
         endAnimation() {
             
             this.nextEnvelopeLogo = this.nextLogoLink;
@@ -185,8 +242,13 @@ export default {
             this.nextLogoAnimation = '';
             this.nextEnvelopeAnimation = 'visibility:hidden;';
         },
+        hideNextEnvelopeBackwards() {
+            this.prevEnvelopeLogo = this.prevLogoLink;
+            this.nextEnvelopeAnimation = 'visibility:hidden;';
+            this.isAnimating = false;
+        },
         hidePrevEnvelope() {
-            this.logo = this.logoLink;
+            this.prevEnvelopeLogo = this.prevLogoLink;
             this.prevEnvelopeAnimation = 'visibility:hidden;';
             this.isAnimating = false;
         },
@@ -195,6 +257,12 @@ export default {
             this.nextToMainLogoAnimation.top = '40px';
             this.nextToMainLogoAnimation.height = '270px';
             this.nextToMainLogoAnimation.width = '270px';
+        },
+        movePrevEnvelopeBackwards() {
+            this.prevEnvelopeAnimation.top = '0px';
+            this.prevEnvelopeAnimation.opacity = '0.0';
+            this.prevEnvelopeAnimation.transition = 'all 0.3s';
+            this.prevLogoAnimation = 'transition: left 0.5s, opacity 0.5s;';
         },
         moveNextEnvelope() {
             this.nextEnvelopeAnimation.top = '0px';
