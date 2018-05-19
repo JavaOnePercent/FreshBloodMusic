@@ -24,10 +24,11 @@ class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайз�
 class TopTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека без ссылки на аудио
     image_alb = serializers.FileField(source='alb_id.image_alb')  # картинка альбома
     name_per = serializers.ReadOnlyField(source='alb_id.per_id.name_per')  # имя исполнителя
-
+    name_gnr = serializers.ReadOnlyField(source='alb_id.stl_id.gnr_id.name_gnr') # название жанра
+    name_stl = serializers.ReadOnlyField(source='alb_id.stl_id.name_stl') # жанра стиля
     class Meta:
         model = Track
-        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'rating_trc')
+        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'rating_trc', 'name_gnr', 'name_stl')
 
 
 class SmallTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека только с именем

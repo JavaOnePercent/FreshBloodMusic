@@ -79,9 +79,8 @@ def likes(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class PostLimitOffsetPagination(CursorPagination):
+class PostLimitOffsetPagination(PageNumberPagination):
     page_size = 12
-    ordering = ''
 
 class TrackOverview(generics.ListAPIView):
     serializer_class = NoLinkTrackSerializer
@@ -89,51 +88,59 @@ class TrackOverview(generics.ListAPIView):
 
     def get_queryset(self):
         gen = self.request.query_params['gen']
+        sty = self.request.query_params['sty']
         bool = self.request.query_params['bool']
         request = self.request
-        if gen == 'fav':
-            likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id')
-            tracks = Track.objects.filter(id__in=likedtracks)
-            '''tracks = []
-            for track in likedtracks:
-                trc = Track.objects.all().get(id=track[0])
-                tracks.append(trc)'''
-        elif gen == 'rec':
-            likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
-            historytracks = TrackHistory.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
-            idenusers = LikedTrack.objects.all().filter(~Q(user_id=auth.get_user(request).id)).values_list('user_id', flat=True).distinct()
-            chance = {}
-            for user in idenusers:
-                tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
-                likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                         (math.fabs(len(set(likedtracks) | set(tracks)))))
-                chance[user] = likes
-            chance = sorted(chance.items(), key=lambda item: -item[1])
-            tracks = []
-            for key in chance:
-                tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
-            identracks = []
-            for track in tracks:
-                if track not in identracks and track not in historytracks and track not in likedtracks:
-                    identracks.append(track[0])
-            # tracks = Track.objects.all().filter(id__in=[l for l in identracks])
-            # tracks = []
-            # for track in identracks:
-            #     trc = Track.objects.all().filter(id=track)
-            #     tracks.append(trc)
-            ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
-            tracks = Track.objects.filter(pk__in=identracks).extra(
-                select={'ordering': ordering}, order_by=('ordering',))
-            PostLimitOffsetPagination.ordering = 'id' #минус жизнь
-        elif gen != 'all':
-            tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
-        else:
-            tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
-        if bool == 'popular' and gen != 'rec':
-            PostLimitOffsetPagination.ordering = '-rating_trc'
-        elif bool == 'time' and gen != 'rec':
-            PostLimitOffsetPagination.ordering = '-date_trc'
-        return tracks
+        if gen != '' and sty == '':
+            if gen == 'fav':
+                likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id')
+                tracks = Track.objects.filter(id__in=likedtracks)
+                '''tracks = []
+                for track in likedtracks:
+                    trc = Track.objects.all().get(id=track[0])
+                    tracks.append(trc)'''
+            elif gen == 'rec':
+                likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
+                historytracks = TrackHistory.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
+                idenusers = LikedTrack.objects.all().filter(~Q(user_id=auth.get_user(request).id)).values_list('user_id', flat=True).distinct()
+                chance = {}
+                for user in idenusers:
+                    tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
+                    likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
+                             (math.fabs(len(set(likedtracks) | set(tracks)))))
+                    chance[user] = likes
+                chance = sorted(chance.items(), key=lambda item: -item[1])
+                tracks = []
+                for key in chance:
+                    tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+                identracks = []
+                for track in tracks:
+                    if track not in identracks and track not in historytracks and track not in likedtracks:
+                        identracks.append(track[0])
+                # tracks = Track.objects.all().filter(id__in=[l for l in identracks])
+                # tracks = []
+                # for track in identracks:
+                #     trc = Track.objects.all().filter(id=track)
+                #     tracks.append(trc)
+                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
+                tracks = Track.objects.filter(pk__in=identracks).extra(
+                    select={'ordering': ordering}, order_by=('ordering',))
+            elif gen != 'all':
+                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
+            else:
+                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
+            if bool == 'popular' and gen != 'rec':
+                tracks = tracks.order_by('-rating_trc')
+            elif bool == 'time' and gen != 'rec':
+                tracks = tracks.order_by('-date_trc')
+            return tracks
+        elif sty != '' and gen == '':
+            tracks = Track.objects.select_related('alb_id__stl_id').filter(alb_id__stl_id=sty)
+            if bool == 'popular':
+                tracks = tracks.order_by('-rating_trc')
+            elif bool == 'time':
+                tracks = tracks.order_by('-date_trc')
+            return tracks
 
 def gettrack(authuser): #для Димы
     likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
@@ -289,7 +296,7 @@ def genre(request):
             gen_id = request.query_params['id']
         except MultiValueDictKeyError:
             gen_id = None
-        if gen_id is None:
+        if gen_id is None or gen_id == '':
             genres = GenreMethods.get()
             serializer = GenreSerializer(genres, many=True)
         else:

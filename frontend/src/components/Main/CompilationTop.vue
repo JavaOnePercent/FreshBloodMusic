@@ -4,10 +4,10 @@
             <div class="sortirovka-conteiner">
                 <div class="sortirovka">
                     <label class="sortirovka-name">Рекомендации</label>
-                    <div class="sort">
+                    <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <a class="time" id="button" @click="showGenre(genre, 'time')" @mousedown="checkSort">времени</a>
-                        <a class="topic" id="button" @click="showGenre(genre, 'popular')" @mousedown="checkSort">популярности</a>
+                        <a class="time" id="button" @click="showGenre(genre, style, 'time')" @mousedown="checkSort">времени</a>
+                        <a class="topic" id="button" @click="showGenre(genre, style, 'popular')" @mousedown="checkSort">популярности</a>
                     </div>
                 </div>
             </div>
@@ -16,7 +16,7 @@
                     <a class="janr" name="" @click="showGenre('all')">Все</a>
                     <a class="janr" name="" @click="showGenre('rec')">Рекомендации</a>
                     <a class="janr" name="" @click="showGenre('fav')">Избранное</a>
-                    <div class="gen janr" :key="index" v-for="(gen, index) in genreandstyles">
+                    <div class="gen janr" :key="index" v-for="(gen, index) in genres">
                         <a  :name="gen.id" @click="showGenre(gen.id)">{{gen.name_gnr}}</a>
                     </div>
                 </div>
@@ -24,6 +24,9 @@
             <div class="janrStyles-conteiner">
                 <div class="janrStyles">
                     <a class="janr" name="" @click="showGenre('all')">Все</a>
+                    <div class="gen janr" :key="index" v-for="(sty, index) in styles">
+                        <a  :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -45,11 +48,14 @@ export default {
         return{
             compilation:[],
             compilations:[],
-            genreandstyles:[],
+            genres:[],
+            styles:[],
             url: 'track?genre=all&bool=0',
             loading: false,
             sort: '',
             genre: '',
+            style: '',
+            showsortbutton: true
           //hoverClass: 'disk'
         }
     },
@@ -85,19 +91,35 @@ export default {
             }
 
         },
-        showGenre: function(message1 = null, message2 = null) {
+        showGenre: function(message1 = null, message2 = null, message3 = null) {
           this.loading = true;
           var obj = {};
           this.sort = 'popular';
-          if(message1 != null)
+          if(message1 != null || message2 != null)
           {
             this.url = 'track';
             this.compilations = [];
-            this.genre = message1;
-            if(message2 != null)
-                this.sort = message2;
-
-            obj = {params: {gen: this.genre, bool: this.sort}}
+            if(message1 != null) {
+                this.genre = message1;
+                if (!(isNaN(this.genre))) {
+                    this.getGengeAndStyles(this.genre);
+                }
+                this.style = '';
+            }
+            if(message2 != null) {
+                this.style = message2;
+                this.genre = '';
+            }
+            if(message3 != null) {
+                this.sort = message3;
+            }
+            if(this.genre === 'rec') {
+                this.showsortbutton = false;
+            }
+            else {
+                this.showsortbutton = true;
+            }
+            obj = {params: {gen: this.genre, sty: this.style, bool: this.sort}}
           }
           this.$http.get(this.url, obj/*{params: {genre: message}}*/).then(function(response){
                 this.compilation = response.body.results;
@@ -134,9 +156,14 @@ export default {
         },
         //для Илюши
         getGengeAndStyles: function (message = null) {
-            this.$http.get('genre').then(function(response){
-                console.log(response.data)
-                this.genreandstyles = response.data;
+            this.$http.get('genre', {params: {id: message}}).then(function(response){
+                // console.log(response.data)
+                if(message == null) {
+                    this.genres = response.data;
+                    this.styles = null;
+                }
+                else
+                    this.styles = response.data;
             }, function(error){
             })
         }

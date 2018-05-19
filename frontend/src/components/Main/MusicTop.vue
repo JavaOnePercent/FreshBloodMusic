@@ -13,7 +13,7 @@
                     <img title="Воспроизвести" class="play" src="/static/mainapp/images/Wplay.svg" alt="play">
                     <img title="В очередь" class="turn" src="/static/mainapp/images/Wplaylist.svg" alt="turn">
                     <p>Понравилась: {{ infotracks.month.rating_trc}} пользователям</p>
-                    <P>Жанр:</p>
+                    <P>Жанр: {{ infotracks.month.name_gnr}} / {{ infotracks.month.name_stl}}</p>
                 </div>
             </div>
         </transition>
@@ -26,7 +26,7 @@
                     <img title="Воспроизвести" class="play" src="/static/mainapp/images/Wplay.svg" alt="play">
                     <img title="В очередь" class="turn" src="/static/mainapp/images/Wplaylist.svg" alt="turn">
                     <p>Понравилась: {{ infotracks.week.rating_trc}} пользователям</p>
-                    <P>Жанр:</p>
+                    <P>Жанр: {{ infotracks.week.name_gnr}} / {{ infotracks.week.name_stl}}</p>
                 </div>
             </div>
         </transition>
