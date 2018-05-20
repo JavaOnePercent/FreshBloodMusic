@@ -11,29 +11,32 @@
                     </div>
                 </div>
             </div>
-            <div class="music-style-conteiner">
+         <div class="music-style-conteiner">
                 <div class="music-style">
-                    <a class="janr" name="" @click="showGenre('all', null, sort)">Все</a>
-                    <a class="janr" name="" @click="showGenre('rec', null, sort)">Рекомендации</a>
-                    <a class="janr" name="" @click="showGenre('fav', null, sort)">Избранное</a>
-                    <div class="gen janr" :key="index" v-for="(gen, index) in genres">
-                        <a  :name="gen.id" @click="showGenre(gen.id, null, sort)">{{gen.name_gnr}}</a>
+                    <a class="janr gen" name="" @click="showGenre('all')">Все</a>
+                    <a class="janr gen" name="" @click="showGenre('rec')">Рекомендации</a>
+                    <a class="janr gen" name="" @click="showGenre('fav')">Избранное</a>
+                    <div class=" janr" :key="index" v-for="(gen, index) in genres" >
+                        <a  :name="gen.id" @click="showGenre(gen.id)">{{gen.name_gnr}}</a>
                     </div>
                 </div>
             </div>
-            <div class="janrStyles-conteiner">
-                <div class="janrStyles gen">
-                    <div class="janr" :key="index" v-for="(sty, index) in styles">
-                        <a  :name="sty.id" @click="showGenre(null, sty.id, sort)">{{sty.name_stl}}</a>
+          <transition name="style" mode="out">
+                <div v-if="showStyles" class="janrStyles-conteiner">
+                <!-- <div  class="janrStyles-conteiner"> -->
+                    <div class="janrStyles">
+                        <div class=" janr" :key="index" v-for="(sty, index) in styles">
+                            <a  :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </transition>
         </div>
         <div class="compilation convert" ref="list">
             <div class="music" :key="index" v-for="(compilation, index) in compilations">
              <div class="cover-cont">
-                <div class="play btn"><img src="/static/mainapp/images/Wplay.svg" alt="play" title="воспроизвести"></div>
-                <div class="turn btn"><img src="/static/mainapp/images/Wplaylist.svg" alt="tunr" title="в очередь"></div>                   
+                <div class="play btn"><img src="/static/mainapp/images/playButton.svg" alt="play" title="воспроизвести"></div>
+                <div class="turn btn"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>                   
                 <img class="cover" :src="compilation.image_alb" alt="обложка" @click="trackClick(index)">
                 <img class="disk" :src="compilation.image_alb" alt="disk">
             </div>
@@ -71,18 +74,9 @@ export default {
      checkSort(e)
         {
             e.preventDefault();
-            if(e.target.style.backgroundColor=="rgba(192, 192, 192, 0.8)")
-            {
-                document.getElementById('time').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
-                document.getElementById('topic').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
-                e.target.style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1"
-            }
-            else
-            {
-                document.getElementById('time').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
-                document.getElementById('topic').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
-                e.target.style="background-color: rgba(192,192,192,0.8);border-bottom: 2px solid currentColor;line-height: 0.85;color: rgb(0,0,0)";
-            }
+            document.getElementById('time').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
+            document.getElementById('topic').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
+            e.target.style="background-color: rgba(192,192,192,0.8);border-bottom: 2px solid currentColor;line-height: 0.85;color: rgb(0,0,0)";
         },
         onScroll: function(event) {
             var wrapper = event.target;
@@ -175,6 +169,14 @@ export default {
                 }
                 else
                     this.styles = response.data;
+                    if(this.styles!=null && this.styles.length!=0 )
+                    {
+                        this.showStyles=true;
+                    }
+                    else
+                    {
+                        this.showStyles=false;
+                    }
             }, function(error){
             })
         }
@@ -238,6 +240,10 @@ export default {
 }
 .sort
 {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select:none;
     color: rgba(0,0,0,0.55);
     font-size: 20px;
     line-height: 40px;
@@ -273,6 +279,12 @@ export default {
     content: "\f06d";
     /* content: '⚡'; */
     margin-right:5px; 
+}
+.topic
+{
+    background-color: rgba(192,192,192,0.8);
+    border-bottom: 2px solid currentColor;
+    line-height: 0.85;color: rgb(0,0,0)
 }
 /*рекомендации*/
 .music-style-conteiner
@@ -328,17 +340,36 @@ export default {
     min-width: 915px; 
     color: white;
 }
+
 .janr
 {
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select:none;
+    /* padding: 0 15px; */
+}
+.janr a
+{
     padding: 0 15px;
+    position: relative;
+    width: 110%;
+    height: 100%;
+    display: block;
 }
 .janr:hover
 {
+    height: 100%;
     cursor: pointer;
     background-color: rgba(192,192,192,0.8);
     border-bottom: 2px solid currentColor;
-    line-height: 1.6;
+    line-height: 1.8;
     box-shadow: 0 6px 12px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
+}
+.gen
+{
+    padding: 0 15px;
 }
 .janr:focus
 {
@@ -424,6 +455,7 @@ export default {
 {
     image-rendering:  auto;
     border: none;
+    object-fit: cover;
     image-rendering: optimizeQuality;
     image-rendering: -webkit-crisp-edges;
     /* backface-visibility: hidden; */
@@ -502,9 +534,8 @@ export default {
 }
 .cover-cont:hover .cover
 {
-
     z-index: 60;
-    filter:sepia(50%);
+    filter:grayscale(.75);
     height: auto;
     -o-transform: translateX(8.3%);
     -ms-transform: translateX(8.3%);
@@ -514,12 +545,10 @@ export default {
     transition-duration: .7s;
     cursor: pointer;
     /*-webkit-filter: invert(100%)*/
-
     /*box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);*/ 
 }
 .cover-cont:hover .btn
 {
-
     -o-transform: translateX(25%);
     -ms-transform: translateX(25%);
     -moz-transform: translateX(25%);
@@ -531,11 +560,11 @@ export default {
 }
 .btn
 {
-    opacity: 0.6;
+    opacity: 0.8;
     transition: 1.4s transform;
     display: none;
     cursor: pointer; 
-    background-color: rgba(85, 85, 85,0.6);
+    background-color: rgba(255, 255, 255,0.7);
     padding: 5%;
     border-radius: 50px;
     width: 22%;
@@ -555,8 +584,11 @@ export default {
 }
 .btn img
 {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0;left: 0;right: 0;bottom: 0;
+    margin: auto;
+    width: 70%;
+    height: 70%;
 } 
 .play
 {
@@ -566,4 +598,20 @@ export default {
 {
     left:35%;
 }
+.turn img
+{
+    top: 15%;
+}
+.style-enter-active, .style-leave-active {
+    transition: all 0.3s;
+}
+.style-enter, .style-leave-active {
+    height: 0px;
+}
+/* .style-enter {
+  transform: translatey(40px);
+}
+.style-leave-active {
+  transform: translatey(40px);
+} */
 </style>

@@ -4,14 +4,14 @@
         <div id="next-page" class="next-page"  @click="show" ></div>
         <div id="previous-page" class="previous-page" @click="show"></div>
 
-        <transition :name="animation" mode="out-in">
+        <transition :name="animation" mode="in-out">
             <div class="infotrack" v-show="infotracks.month && showDiv">
                 <img class="img" :src="infotracks.month.image_alb" alt="обложка">
                 <div class="text">
                     <span>Лучший трек этого месяца</span>
                     <p>{{ infotracks.month.name_per}} <br> {{ infotracks.month.name_trc}}</p>
-                    <img title="Воспроизвести" class="play" src="/static/mainapp/images/Wplay.svg" alt="play">
-                    <img title="В очередь" class="turn" src="/static/mainapp/images/Wplaylist.svg" alt="turn">
+                    <div class="play btn"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
+                    <div class="turn btn"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
                     <p>Понравилась: {{ infotracks.month.rating_trc}} пользователям</p>
                     <P>Жанр: {{ infotracks.month.name_gnr}} / {{ infotracks.month.name_stl}}</p>
                 </div>
@@ -23,14 +23,13 @@
                 <div class="text">
                     <span>Лучший трек этой недели</span>
                     <p>{{ infotracks.week.name_per}} <br> {{ infotracks.week.name_trc}}</p>
-                    <img title="Воспроизвести" class="play" src="/static/mainapp/images/Wplay.svg" alt="play">
-                    <img title="В очередь" class="turn" src="/static/mainapp/images/Wplaylist.svg" alt="turn">
+                    <div class="play btn"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
+                    <div class="turn btn"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
                     <p>Понравилась: {{ infotracks.week.rating_trc}} пользователям</p>
                     <P>Жанр: {{ infotracks.week.name_gnr}} / {{ infotracks.week.name_stl}}</p>
                 </div>
             </div>
         </transition>
-
     </div>
 </transition>
 </template>
@@ -71,7 +70,7 @@ export default {
         },
     },
     created: function() {
-        this.updatePosts();
+        // this.updatePosts();
         this.$http.get('top', /*{params: {per: this.period}}*/).then(function(response){
                 //console.log(response.data);
                 this.infotracks = response.data;
@@ -133,7 +132,7 @@ export default {
     {
         margin: 0;
     }
-    .play, .turn
+    .btn
     {
         margin-top:29.3px;
     }
@@ -183,7 +182,7 @@ export default {
     {
         margin-top:37.3px;
     }
-    .play, .turn
+    .btn
     {
         margin-top:37.3px;
     }
@@ -261,81 +260,39 @@ export default {
 {
     font-size: 15px;
 }
-.play
+.btn
 {
-    cursor: pointer;
-    margin-right: 20px;
     width: 60px;
     height: 60px;
+    display: inline-block;
+}
+.playIm
+{
+    width: 60px;
+    height: 60px;
+}
+.turnIm
+{
+    position: absolute;
+    top: 0;right: 0;left: 0;bottom: 0;
+    margin: 10px auto 0 auto;
+    width: 70px;
+    height: 70px;
+}
+.play
+{
+    position: relative;
+    cursor: pointer;
+    margin-right: 20px;
 }
 .turn
 {
+    margin-top: 10px;
+    position: relative;
     cursor: pointer;
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
 }
-/* .animation{
-    animation-fill-mode: forwards;
-    animation-name: slideRight;
-    -webkit-animation-name: slideRight; 
-    z-index: 1;
-    animation-duration: 0.6s; 
-    -webkit-animation-duration: 0.6s;
- 
-    animation-timing-function: ease-in-out; 
-    -webkit-animation-timing-function: ease-in-out;     
- 
-    visibility: visible !important; 
-}
-@keyframes slideRight {
-    0% {
-        transform: translateX(-150%);
-    }          
-    100% {
-        transform: translateX(0%);
-    }   
-}
- 
-@-webkit-keyframes slideRight {
-    0% {
-        -webkit-transform: translateX(-150%);
-    }
-       
-    100% {
-        -webkit-transform: translateX(0%);
-    }
-}
-.animation1{
-    animation-fill-mode: forwards;
-    animation-name: slideRight1;
-    -webkit-animation-name: slideRight1; 
-    z-index: 1;
-    animation-duration: 0.6s; 
-    -webkit-animation-duration: 0.6s;
- 
-    animation-timing-function: ease-in-out; 
-    -webkit-animation-timing-function: ease-in-out;     
- 
-    visibility: visible !important; 
-}
-@keyframes slideRight1 {
-    0% {
-        transform: translateX(150%);
-    }          
-    100% {
-        transform: translateX(0%);
-    }   
-}
- 
-@-webkit-keyframes slideRight1 {
-    0% {
-        -webkit-transform: translateX(150%);
-    }
-       
-    100% {
-        -webkit-transform: translateX(0%);
-    }
-} */
 
 
 .animation-enter-active, .animation-leave-active {

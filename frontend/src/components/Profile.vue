@@ -1,86 +1,96 @@
 <template>
     <div class="ProfileConteiner" id="body">
-        <div class="profile-row">
-            <div class="leftColumn">
-            <div class="ProfileLable Lblock" >
-                <img :src="logo" alt="аватарка" class="ProfileImg" />
-                <router-link to="/settings">
-                    <div class="ProfileNastr" @click="nastrClick">
-                        <label>Настройки</label>
-                        <img src="/static/mainapp/images/settings-cogwheel-button.svg" alt="настройки"/>
-                    </div>
-                </router-link>
-            </div>
-            <div class="VK Lblock">
-                <label>В контакте</label>
-                <img src="/static/mainapp/images/vk.svg" alt="настройки"/>
-            </div>
-            <div class="LikeMusic Lblock">
-                <label title="Понравившаяся музыка">Понравившаяся музыка({{ likes.length }})</label>
-                <hr>
-                <div class="likedMusic" :key="index" v-for="(like, index) in likes">
-                    <!--<div class="likedMusicHover"></div>-->
-                    <div class="musicLable" :style="backgroundImage(like.logo)"></div>
-                    <div class="musicLablecontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
-                    {{ like.performer }} - {{ like.name }}
+        <div class="profile">
+            <div v-if="error" class="error-cont profile-row">
+                <div class="error">
+                    <img class="errorImg" src="/static/mainapp/images/Yoda.png" alt="">
+                    <label> Это не тот пользователь которого вы ищите</label>
                 </div>
             </div>
-            <!--<div class="subscribers Lblock">
-                <label>Подписки (+число)</label>
-                <hr>
-                <div class="sub-cont">
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                <div class="sub"> чел </div>
-                </div>
-            </div>-->
-            </div>       
-            <div class="rightColumn">
-                <div class="ProfileName Rblock">
-                    <label>{{ name }}</label>
-                </div>
-                <div class="ProfileDescription Rblock">
-                    <label>Описание</label>
-                    <p>{{ description }}</p>
-                </div>
-                <!--<div class="favoriteAlbum Rblock">
-                    <label>Любимый Альбом</label>
-                    <p>Тут любимый альбом</p>
-                </div>-->
-                <div class="MyAlbums Rblock">
-                    <label>Мои издания</label>
-
-                    <div class="MyAlbums-conteiner" :key="index" v-for="(album, index) in albums">
-                        <div class="MyAlbum">
-                            <img class="MyAlbum-lable" :src="album.logo" alt="настройки"/>
-                            <div class="Albom-Description">
-                                <span> {{ album.name }}</span>
-                                <label> жанр: {{ album.genre }}</label>
-                                <label> дата выхода: {{ album.date }}</label>
-                                <span class="more"> подробнее... </span>
+            <div v-if="!error">
+                <div class="profile-row">
+                    <div class="leftColumn">
+                    <div class="ProfileLable Lblock" >
+                        <img :src="logo" alt="аватарка" class="ProfileImg" />
+                        <router-link to="/settings">
+                            <div class="ProfileNastr" @click="nastrClick">
+                                <label>Настройки</label>
+                                <img src="/static/mainapp/images/settings-cogwheel-button.svg" alt="настройки"/>
                             </div>
-                            <div class="MyAlbum-music">
-                               <div class="Mymusic-conteiner">
-                                    <div class="MyMusic" :key="index" v-for="(track, index) in album.tracks">
-                                        <!--<div class="likedMusicHover"></div>-->
-                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
-                                        {{ track.name }}
+                        </router-link>
+                    </div>
+                    <div class="VK Lblock">
+                        <label>В контакте</label>
+                        <img src="/static/mainapp/images/vk.svg" alt="настройки"/>
+                    </div>
+                    <div class="LikeMusic Lblock">
+                        <label title="Понравившаяся музыка">Понравившаяся музыка({{ likes.length }})</label>
+                        <hr>
+                        <div class="likedMusic" :key="index" v-for="(like, index) in likes">
+                            <!--<div class="likedMusicHover"></div>-->
+                            <div class="musicLable" :style="backgroundImage(like.logo)"></div>
+                            <div class="musicLablecontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
+                            {{ like.performer }} - {{ like.name }}
+                        </div>
+                    </div>
+                    <!--<div class="subscribers Lblock">
+                        <label>Подписки (+число)</label>
+                        <hr>
+                        <div class="sub-cont">
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        <div class="sub"> чел </div>
+                        </div>
+                    </div>-->
+                    </div>       
+                    <div class="rightColumn">
+                        <div class="ProfileName Rblock">
+                            <label>{{ name }}</label>
+                        </div>
+                        <div class="ProfileDescription Rblock">
+                            <label>Описание</label>
+                            <p>{{ description }}</p>
+                        </div>
+                        <!--<div class="favoriteAlbum Rblock">
+                            <label>Любимый Альбом</label>
+                            <p>Тут любимый альбом</p>
+                        </div>-->
+                        <div class="MyAlbums Rblock">
+                            <label>Мои издания</label>
+
+                            <div class="MyAlbums-conteiner" :key="index" v-for="(album, index) in albums">
+                                <div class="MyAlbum">
+                                    <img class="MyAlbum-lable" :src="album.logo" alt="настройки"/>
+                                    <div class="Albom-Description">
+                                        <span> {{ album.name }}</span>
+                                        <label> жанр: {{ album.genre }}</label>
+                                        <label> дата выхода: {{ album.date }}</label>
+                                        <span class="more"> подробнее... </span>
                                     </div>
-                               </div>
+                                    <div class="MyAlbum-music">
+                                    <div class="Mymusic-conteiner">
+                                            <div class="MyMusic" :key="index" v-for="(track, index) in album.tracks">
+                                                <!--<div class="likedMusicHover"></div>-->
+                                                <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
+                                                {{ track.name }}
+                                            </div>
+                                    </div>
+                                    </div>
+                                </div>    
                             </div>
-                        </div>    
-                    </div>
 
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div>  
 </template>
 
 <script>
@@ -89,7 +99,8 @@ export default {
   data() {
         return {
             albums: [],
-            likes: []
+            likes: [],
+            error:false,
         }
     },
     watch: {
@@ -136,6 +147,9 @@ export default {
                 this.$store.commit('performerName', response.body.name_per);
                 this.$store.commit('performerLogo', response.body.image_per);
                 this.$store.commit('performerDescription', response.body.about_per);
+                this.error=false;
+            }, function(error){
+                this.error=true;
             });
             this.$http.get('likes').then(function(response){
                 //console.log(response.body)
@@ -179,16 +193,22 @@ html, body
 }
 .ProfileConteiner
 {
-    padding-bottom: 69px; 
-    background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(0, 85, 255,0.2));
+    background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(36, 87, 189, 0.2));
     font-size: 110%;
     top: 55px;
     position: relative;
+    width: 100%;
+    height: 100%;
+    /*width: 60%;*/
+}
+.profile
+{
+    padding-bottom: 69px; 
     padding-left: 15px;
     padding-right: 15px;
     margin: 0 auto;
-    max-width: 1280px;
-    /*width: 60%;*/
+    max-width: 1143px; 
+    min-width: 915px; 
 }
 .Rblock
 {
@@ -509,7 +529,33 @@ a
     margin-right: 3%;
 }
 
+.error-cnt
+{
+    min-height: 100%;
+    position: relative;
+    width: 100%;
 
-
+}
+.error
+{
+    line-height: 250px;
+    max-width: 1143px; 
+    min-width: 915px; 
+    position: relative;
+    top:0;left: 0;right: 0; bottom: 0;
+    margin: 10% auto;
+}
+.errorImg
+{
+    width: 20%;
+    float: left;
+}
+.error label
+{
+    width: 80%;
+    font-size: 200%;
+    font-weight: 600; 
+    float: left;
+}
 
 </style>
