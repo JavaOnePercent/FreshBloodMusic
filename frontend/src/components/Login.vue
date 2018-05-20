@@ -54,7 +54,9 @@ export default {
                 var self = this;
                 this.$http.post('login', data).then(function(response){
                     self.$store.commit('username', response.data.username)
-                    self.$router.push('performers/me')
+                    self.$router.push('performers/' + response.data.per_id)
+                    self.$store.commit('performerID', response.data.per_id)
+                    
                 },function(error){
                     document.getElementById('username').style.backgroundColor="rgba(255, 179, 179,0.98)"
                     document.getElementById('password').style.backgroundColor="rgba(255, 179, 179,0.98)"

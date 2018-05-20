@@ -335,7 +335,7 @@ export default {
             if (track_name_loader && track) {
                 this.errorMessage = '';
                 this.loader=true;
-                this.$http.post('album', data).then(function(response){
+                this.$http.post('albums', data).then(function(response){
                     this.loader=false
                 console.log('Success! Response: ', response.body);})
             }

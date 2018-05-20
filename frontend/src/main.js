@@ -56,13 +56,17 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         isDragging: false,
         showLoader: false,
         showProfile: false,
-        performerName: '',
-        performerLogo: '',
-        performerDescription: '',
-        performerID: 0,
+        performer: {
+            performerName: '',
+            performerLogo: '',
+            performerDescription: '',
+            performerID: 0,
+        },
         queueTracks: [],
         historyTracks: [],
-        username: ''
+        username: '',
+        myPerformerID: 0,
+        currentTrack: null
     },
     mutations: {
         currentTime (state, val) {
@@ -92,22 +96,23 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
             state.isDragging = val;
         },
         performerName(state, val) {
-            state.performerName = val;
+            state.performer.performerName = val;
         },
         performerLogo(state, val) {
-            state.performerLogo = val;
+            state.performer.performerLogo = val;
         },
         performerDescription(state, val) {
-            state.performerDescription = val;
+            state.performer.performerDescription = val;
         },
         performerID(state, val) {
-            state.performerID = val;
+            state.performer.performerID = val;
         },
         updateQueueTracks(state, val) {
             state.queueTracks = val;
         },
         pushQueueTracks(state, val) {
-            if(state.queueTracks.length > 0)
+
+            if(state.queueTracks.length > 0 && val.auto !== true)
             { 
                 var last = state.queueTracks[state.queueTracks.length - 1]
 
@@ -131,11 +136,20 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
                 state.historyTracks.pop()
             }
         },
+        truePushHistoryTrack(state, val) {
+            state.historyTracks.push(val)
+        },
         removeFirstHistoryTracks(state) {
             state.historyTracks.shift()
         },
         username(state, val) {
             state.username = val;
+        },
+        myPerformerID(state, val) {
+            state.myPerformerID = val
+        },
+        currentTrack(state, val) {
+            state.currentTrack = val
         }
     }
 })

@@ -1,3 +1,4 @@
+import datetime
 import math
 import random
 
@@ -16,12 +17,18 @@ def get_random(all_tracks):  # возвращает рандомное знач�
 
 class PerformerMethods:
     @staticmethod
-    def create(id, user, name, description, date):
-        performer = Performer.objects.update_or_create(id=id, defaults={'user_id': User.objects.get(pk=user),
-                                                                        'name_per': name,
-                                                                        'about_per': description,
-                                                                        'date_per': date})
+    def update(id, name, description):
+        date = datetime.date.today()
+        performer = Performer.objects.filter(id=id)
+        performer.update(name_per=name, about_per=description, date_per=date)
         return performer[0]
+
+    @staticmethod
+    def create(user, name, description):
+        date = datetime.date.today()
+
+        performer = Performer.objects.create(user_id=User.objects.get(pk=user), name_per=name, about_per=description, date_per=date)
+        return performer
 
     @staticmethod
     def add_image(performer, image):
@@ -121,8 +128,8 @@ class GenreStyleMethods:
 
 class LikedTrackMethods:
     @staticmethod
-    def get(user_id):
-        user = User.objects.get(pk=user_id)
+    def get(per_id):
+        user = Performer.objects.get(pk=per_id).user_id
         likes = LikedTrack.objects.filter(user_id=user)
         return likes
 
@@ -184,15 +191,35 @@ class TrackHistoryMethods:
     @staticmethod
     def create(track_id, user_id):  # добавление записи истории в таблицу
         if track_id is not None and user_id is not None:
+
             track = Track.objects.get(pk=track_id)
             user = User.objects.get(pk=user_id)
-            count = TrackHistory.objects.filter(user_id=user).order_by('count').last()
-            if count is None:
-                count = 0
-            TrackHistory(user_id=user, trc_id=track, count=count.count+1).save()
+
+            history = TrackHistory.objects.filter(user_id=user).order_by('id')
+            last = history.last()
+            if last is not None:
+                last = last.id
+                count = history.count()
+                for hist in history:
+                    if count > 49:
+                        hist.delete()  # здесь бы надо закодить, чтобы переписывать старые записи из таблицы, а не все время плодить новые индексы
+                        count -= 1
+            '''for index, hist in enumerate(history):
+                if hist != history.last():
+                    TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)
+                else:
+                    TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)'''
+
+            TrackHistory(user_id=user, trc_id=track).save()
             return True
         else:
             return False
+
+    @staticmethod
+    def get(user_id):
+        user = User.objects.get(pk=user_id)
+        tracks = TrackHistory.objects.filter(user_id=user).order_by('id').reverse()[:11]
+        return tracks
 
 
 class TrackReportMethods:
@@ -209,6 +236,7 @@ class TrackReportMethods:
                 return False
         else:
             return False
+
 
 class TrackRecommendation:
     @staticmethod
@@ -228,8 +256,16 @@ class TrackRecommendation:
         for key in chance:
             tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
         identracks = []
+        recommended_in_history = []
         for track in tracks:
             if track not in identracks and track not in historytracks and track not in likedtracks and track not in reporttracks:
                 identracks.append(track[0])
+            elif track in historytracks:
+                recommended_in_history.append(track[0])
+        rec_in_hist = TrackHistory.objects.filter(trc_id__in=recommended_in_history, user_id=authuser).order_by('id')
+        for rec in rec_in_hist:
+            # print(rec.id)
+            if rec.trc_id.id in identracks:
+                identracks.remove(rec.trc_id.id)
+            identracks.append(rec.trc_id.id)
         return identracks
-

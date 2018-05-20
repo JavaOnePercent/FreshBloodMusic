@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from mainapp.models import Track, LikedTrack, Genre, GenreStyle, Performer, Album
+from mainapp.models import Track, LikedTrack, Genre, GenreStyle, Performer, Album, TrackHistory
 
 
 class TrackSerializer(serializers.ModelSerializer):  # сериалайзер трека для метода nextTrack
@@ -52,7 +52,7 @@ class GenreStyleSerializer(serializers.ModelSerializer):
 class PerformerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Performer
-        fields = ('name_per', 'image_per')
+        fields = ('name_per', 'image_per', 'id')
 
 
 class AlbumSerializer(serializers.ModelSerializer):
@@ -81,4 +81,16 @@ class LikedTrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = LikedTrack
         fields = ('name_trc', 'name_per', 'image_alb', 'trc_id')
+
+
+class TrackHistorySerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(source='trc_id', read_only='True')
+    image_alb = serializers.FileField(source='trc_id.alb_id.image_alb')  # картинка альбома
+    name_per = serializers.ReadOnlyField(source='trc_id.alb_id.per_id.name_per')  # имя исполнителя
+    name_trc = serializers.ReadOnlyField(source='trc_id.name_trc')  # имя трека
+    audio_trc = serializers.FileField(source='trc_id.audio_trc')  # имя трека
+
+    class Meta:
+        model = TrackHistory
+        fields = ('name_trc', 'name_per', 'image_alb', 'id', 'audio_trc')
 

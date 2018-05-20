@@ -65,14 +65,6 @@ export default {
         }
     },
     created() {
-        this.$bus.$on('nextclick', event => {
-            this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
-            this.wasPlaying = this.playing;
-        });
-        this.$bus.$on('prev-click', event => {
-            this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
-            this.wasPlaying = this.playing;
-        });
         this.$bus.$on('playingended', event => {
             this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
             this.wasPlaying = true;
@@ -87,6 +79,8 @@ export default {
             }
         });
         this.$bus.$on('next-track-load', event => {
+            this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
+            this.wasPlaying = this.playing;
             this.isAnimating = true;
             this.nextLogo = event.nextLogoLink
             this.mainToPrevLogo = event.prevLogoLink
@@ -99,6 +93,8 @@ export default {
             setTimeout(this.startAnimation, 100);
         });
         this.$bus.$on('prev-click', event => {
+            this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
+            this.wasPlaying = this.playing;
             this.isAnimating = true;
             //this.prevEnvelopeLogo = event.logoLink
             this.nextToMainLogo = event.logoLink

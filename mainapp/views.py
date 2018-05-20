@@ -8,14 +8,15 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from rest_framework.views import APIView
 
-from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory, TrackReport
+from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory
 from django.db.models import Q
 from django.http import HttpResponse, Http404
 from .uploader import Compressor, save_album, save_performer
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
-    PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer
+    PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer, \
+    TrackHistorySerializer
 from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods, PerformerMethods, \
-    AlbumMethods, TrackHistoryMethods, TrackReportMethods, TrackRecommendation
+    AlbumMethods, TrackHistoryMethods, TrackRecommendation, TrackReportMethods
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -47,14 +48,14 @@ def main_view(request):  # главная
     # return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
 
 
-@api_view(['GET'])  # запрос следующего трека
+'''@api_view(['GET'])  # запрос следующего трека
 def next_track(request):
     if request.method == 'GET':
         tracks = TrackMethods.get_two(request.query_params)
         is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, tracks[0].id)
         serializer = TrackSerializer(tracks, many=True)
         serializer.data[0]["is_liked"] = is_liked
-        return Response({'current': serializer.data[0], 'next': serializer.data[1]}, status=status.HTTP_200_OK)
+        return Response({'current': serializer.data[0], 'next': serializer.data[1]}, status=status.HTTP_200_OK)'''
 
 
 @api_view(['PUT', 'DELETE', 'GET'])  # обработчик лайков
@@ -75,8 +76,9 @@ def likes(request):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == "GET":  # получение лайков для пользователя
-        likes = LikedTrackMethods.get(auth.get_user(request).id)
+    elif request.method == "GET":  # получение лайков для исполнителя
+        performer = request.query_params['performer']
+        likes = LikedTrackMethods.get(performer)
         serializer = LikedTrackSerializer(likes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
@@ -130,64 +132,37 @@ class TrackOverview(generics.ListAPIView):
             return tracks
 
 
-def gettrack(authuser): #для Димы
-    tracks = Track.objects.all().filter(id=TrackRecommendation.get_recommendation(authuser)[0])
-    return tracks
-'''@api_view(['GET'])
-def track(request):
-    if request.method == "GET":
-        gen = request.query_params['genre']
-        if gen == 'fav':
-            likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
-            tracks = []
-            for track in likedtracks:
-                trc = Track.objects.all().get(id=track[0])
-                tracks.append(trc)
-        elif gen == 'rec':
-            likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
-            users = LikedTrack.objects.all().values_list('user_id')
-            idenusers = []
-            for user in users:
-                if user not in idenusers and user != auth.get_user(request).id:
-                    idenusers.append(user)
-            chance = {}
-            for user in idenusers:
-                tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
-                likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                         (math.fabs(len(set(likedtracks) | set(tracks))))) / (len(idenusers) - 1)
-                chance[user] = likes
-            chance = sorted(chance.items(), key=lambda item: -item[1])
-            tracks = []
-            for key in chance:
-                tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
-            identracks = []
-            for track in tracks:
-                if track not in identracks and track not in likedtracks:
-                    identracks.append(track)
-            tracks = []
-            for track in identracks:
-                trc = Track.objects.all().get(id=track[0])
-                tracks.append(trc)
+class TrackDetail(APIView):
+    def get_next(self, user):
+        try:
+            track = Track.objects.get(id=TrackRecommendation.get_recommendation(user)[0])
+            # TrackHistoryMethods.create(track.id, user)
+            return track
+        except Track.DoesNotExist:
+            raise Http404
+
+    def get_object(self, pk):
+        try:
+            return Track.objects.get(pk=pk)
+        except Track.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        if re.fullmatch(r'[0-9]+', pk):
+            track = self.get_object(pk)
+            serializer = TrackSerializer(track)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif pk == 'next':
+            track = self.get_next(auth.get_user(request).id)
+            serializer = TrackSerializer(track)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            # print(gen)
-            # tracks = Track.objects.all().select_related('alb_id__per_id').values('name_trc', 'alb_id__image_alb',
-            # 'alb_id__per_id__name_per', 'id')
-            tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all().order_by('-rating_trc')
-            if gen != 'all':
-                tracks = tracks.filter(alb_id__stl_id__gnr_id_id=gen)
-
-        serializer = NoLinkTrackSerializer(tracks, many=True)
-        # json_jn = json.dumps(list(tracks), cls=DjangoJSONEncoder)
-        # return HttpResponse(json_jn, content_type="application/json")
-        return Response(serializer.data, status=status.HTTP_200_OK)'''
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['GET'])
-def best_performer(request):
-    if request.method == "GET":
-        performer = Performer.objects.order_by('rating_per').reverse()[:3]
-        serializer = PerformerSerializer(performer, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+'''def gettrack(authuser):  # для Димы
+    tracks = Track.objects.all().filter(id=TrackRecommendation.get_recommendation(authuser)[0])
+    return tracks'''
 
 
 @api_view(['GET'])
@@ -212,16 +187,8 @@ class Names:
         self.image_track = image_track
 
 
-def load_music(request):
-    return render(request, 'mainapp/loader-music.html')
-
-
-def profile(request):
-    return render(request, 'mainapp/profile.html')
-
-
 @api_view(['POST', 'GET'])
-def album(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
+def albums(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
     if request.method == 'POST':
         album_name = request.POST["name"]
         gen_id = request.POST["gen_id"]
@@ -241,10 +208,6 @@ def album(request):  # нужно сделать отдельный запрос
         albums = AlbumMethods.get(auth.get_user(request).id)
         serializer = AlbumSerializer(albums, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-def music_group(request):
-    return render(request, 'mainapp/musicgroup.html', {'performer': Performer.objects.all()})
 
 
 @api_view(['GET'])
@@ -276,7 +239,7 @@ def genre(request):
 
 
 class PerformersList(APIView):
-    def post(self, request, format=None):  # создание или изменение исполнителя
+    def post(self, request, format=None):  # изменение исполнителя
         name = request.POST["name"]
         try:
             label = request.FILES["label"]
@@ -284,9 +247,14 @@ class PerformersList(APIView):
             label = None
         description = request.POST["description"]
         id = request.POST["id"]
-        save_performer(id, auth.get_user(request).id, name, label, description)
+        save_performer(id, name, label, description)
 
         return Response(status=status.HTTP_200_OK)
+
+    def get(self, request, format=None):
+        performer = Performer.objects.order_by('rating_per').reverse()[:3]
+        serializer = PerformerSerializer(performer, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class PerformerDetail(APIView):
@@ -297,17 +265,12 @@ class PerformerDetail(APIView):
             raise Http404
 
     def get(self, request, pk, format=None):
-        if pk == 'me':  # получение исполнителя по пользователю
-            user = auth.get_user(request).id
-            performer = PerformerMethods.get(user)
-            serializer = FullPerformerSerializer(performer)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        elif re.fullmatch(r'[0-9]+', pk):
+        if re.fullmatch(r'[0-9]+', pk):
             performer = self.get_object(pk)
             serializer = FullPerformerSerializer(performer)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     '''def put(self, request, pk, format=None):
         snippet = self.get_object(pk)
@@ -341,7 +304,7 @@ def performers(request):
         return Response(serializer.data, status=status.HTTP_200_OK)'''
 
 
-@api_view(['PUT'])
+@api_view(['PUT', 'GET'])
 def history(request):
     if request.method == 'PUT':
         result = TrackHistoryMethods.create(request.query_params['track_id'], auth.get_user(request).id)
@@ -349,6 +312,11 @@ def history(request):
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'GET':
+        tracks = TrackHistoryMethods.get(auth.get_user(request).id)
+        serializer = TrackHistorySerializer(tracks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def report(request):
@@ -364,14 +332,16 @@ def report(request):
 @api_view(['POST', 'GET'])
 def login(request):
     if request.method == 'GET':
-        return Response({'username': auth.get_user(request).username}, status=status.HTTP_200_OK)
+        performer = PerformerMethods.get(auth.get_user(request).id)
+        return Response({'username': auth.get_user(request).username, 'per_id': performer.id}, status=status.HTTP_200_OK)
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            return Response({'username': auth.get_user(request).username}, status=status.HTTP_200_OK)
+            performer = PerformerMethods.get(auth.get_user(request).id)
+            return Response({'username': auth.get_user(request).username, 'per_id': performer.id}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -390,4 +360,5 @@ def register(request):
         newuser = User.objects.create_user(username, '1@1.ru', password).save()
         user = auth.authenticate(username=username, password=password)
         auth.login(request, user)
-        return Response({'username': auth.get_user(request).username}, status=status.HTTP_200_OK)
+        performer = PerformerMethods.create(auth.get_user(request).id, username, '')
+        return Response({'username': auth.get_user(request).username, 'per_id': performer.id}, status=status.HTTP_200_OK)

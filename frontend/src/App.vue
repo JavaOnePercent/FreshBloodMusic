@@ -33,8 +33,23 @@ export default {
         var self = this
         this.$http.get('login').then(function(response){
             self.$store.commit("username", response.data.username)
+            self.$store.commit('myPerformerID', response.data.per_id)
         });
         this.$http.get('token').then(function(response){
+        });
+        this.$http.get('history').then(response => {
+            //console.log(response.data)
+            if(response.data[0])
+            {
+                //self.$store.commit('currentTrack', response.data[0].id)
+                for(var i = 1; i < response.data.length; i++)
+                {
+                    self.$store.commit('truePushHistoryTrack', response.data[i])
+                }
+                this.$bus.$emit('set-current-track', response.data[0].id)
+            }
+            else
+                this.$bus.$emit('set-current-track', null)
         });
     },
     computed: {

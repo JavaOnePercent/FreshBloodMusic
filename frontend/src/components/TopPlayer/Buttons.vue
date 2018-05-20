@@ -26,12 +26,10 @@ export default {
             this.$store.commit('switchPlaying');
         },
         prevClick() {
-            this.$emit('prev-click');
-            this.$bus.$emit('prev-click');
+            this.$emit('prevclick');
         },
         nextClick(){
             this.$emit('nextclick');
-            this.$bus.$emit('nextclick');
         },
         dropdownClick(){
             this.$emit('dropdownclick');

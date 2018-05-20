@@ -12,7 +12,7 @@
                     <div class="leftColumn">
                     <div class="ProfileLable Lblock" >
                         <img :src="logo" alt="аватарка" class="ProfileImg" />
-                        <router-link to="/settings">
+                        <router-link to="/settings" v-if="myPerformerID === performerID">
                             <div class="ProfileNastr" @click="nastrClick">
                                 <label>Настройки</label>
                                 <img src="/static/mainapp/images/settings-cogwheel-button.svg" alt="настройки"/>
@@ -26,7 +26,7 @@
                     <div class="LikeMusic Lblock">
                         <label title="Понравившаяся музыка">Понравившаяся музыка({{ likes.length }})</label>
                         <hr>
-                        <div class="likedMusic" :key="index" v-for="(like, index) in likes">
+                        <div @click="playClick(like.id)" class="likedMusic" :key="index" v-for="(like, index) in likes">
                             <!--<div class="likedMusicHover"></div>-->
                             <div class="musicLable" :style="backgroundImage(like.logo)"></div>
                             <div class="musicLablecontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
@@ -74,13 +74,13 @@
                                         <span class="more"> подробнее... </span>
                                     </div>
                                     <div class="MyAlbum-music">
-                                    <div class="Mymusic-conteiner">
-                                            <div class="MyMusic" :key="index" v-for="(track, index) in album.tracks">
+                                        <div class="Mymusic-conteiner">
+                                            <div @click="playClick(track.id)" class="MyMusic" :key="index" v-for="(track, index) in album.tracks">
                                                 <!--<div class="likedMusicHover"></div>-->
                                                 <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
                                                 {{ track.name }}
                                             </div>
-                                    </div>
+                                        </div>
                                     </div>
                                 </div>    
                             </div>
@@ -112,20 +112,26 @@ export default {
     },
     computed: {
         name() {
-            return this.$store.state.performerName;
+            return this.$store.state.performer.performerName;
         },
         logo() {
-            return this.$store.state.performerLogo;
+            return this.$store.state.performer.performerLogo;
         },
         description() {
-            return this.$store.state.performerDescription;
+            return this.$store.state.performer.performerDescription;
+        },
+        performerID() {
+            return this.$store.state.performer.performerID;
+        },
+        myPerformerID() {
+            return this.$store.state.myPerformerID;
         }
     },
     methods: {
         receiveData() {
             var id = this.$route.params.id;
             this.$http.get('performers/' + id).then(function(response){
-                console.log(response.body)
+                //console.log(response.body)
                 for(var i = 0; i < response.body.albums.length; i++)
                 {
                     var tracks = [];
@@ -151,11 +157,11 @@ export default {
             }, function(error){
                 this.error=true;
             });
-            this.$http.get('likes').then(function(response){
-                //console.log(response.body)
+            this.$http.get('likes', {params: {performer: id}}).then(function(response){
+                this.likes = []
                 for(var i = 0; i < response.body.length; i++)
                 {
-                    this.$set(this.likes, i, {name: response.body[i].name_trc, performer: response.body[i].name_per, logo:response.body[i].image_alb})
+                    this.likes.push({name: response.body[i].name_trc, performer: response.body[i].name_per, logo:response.body[i].image_alb, id:response.body[i].trc_id})
                 }
             });
         },
@@ -164,7 +170,19 @@ export default {
         },
         nastrClick() {
             this.$emit('nastr-clicked');
-        }
+        },
+        toQueueClick: function(index) {
+            //this.$emit('trackclicked');
+            this.$bus.$emit('track-to-queue', {
+				id: index
+			});
+        },
+        playClick: function(index) {
+            //this.$emit('trackclicked');
+            this.$bus.$emit('play-track', {
+				id: index
+			});
+        },
     },
 }
 </script>
@@ -426,6 +444,7 @@ a
     min-height: 37.38px;
     max-height: 316.38px;
     overflow: hidden;
+    overflow-y: scroll;
 }
 .likedMusic:hover
 {

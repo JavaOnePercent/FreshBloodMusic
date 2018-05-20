@@ -27,9 +27,8 @@ def save_album(user, name, genre, logo, tracks, track_name):  # сохранен
     Compressor.remove_temp()
 
 
-def save_performer(id, user, name, label, description):
-    date = datetime.date.today()
-    performer = PerformerMethods.create(id=id, user=user, name=name, description=description, date=date)
+def save_performer(id, name, label, description):
+    performer = PerformerMethods.update(id=id, name=name, description=description)
     directory = 'performers/' + str(performer.id) + '/'
     try_mkdir(Compressor.path + directory)
     if label is not None:

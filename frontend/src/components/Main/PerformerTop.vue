@@ -4,7 +4,7 @@
             Лучшие исполнители
         </label>
         <div class="compositors" id="compositors">
-            <div class="compositor" :key="index" v-for="(compositor, index) in compositors">
+            <div @click="goToPerformer(compositor.id)" class="compositor" :key="index" v-for="(compositor, index) in compositors">
                 <img class="compositor-avatar" :src="compositor.image_per" alt="обложка">
                 <label class="compositor-name">{{ compositor.name_per}}</label>
             </div>
@@ -22,7 +22,7 @@ export default {
     },
     methods: {
         showBest: function() {
-            this.$http.get('best_performer/').then(function(response){
+            this.$http.get('performers').then(function(response){
                 //console.log(response);
                 this.compositors = response.data;
                 /*this.compositors.forEach(function(item, i, arr) {
@@ -33,6 +33,9 @@ export default {
             })
         },
 
+        goToPerformer(id) {
+            this.$router.push({ path: '/performers/' + id})
+        }
     },
 
     created: function() {

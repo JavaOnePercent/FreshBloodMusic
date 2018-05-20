@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-          <transition name="style" mode="out">
+          <transition name="style">
                 <div v-if="showStyles" class="janrStyles-conteiner">
                 <!-- <div  class="janrStyles-conteiner"> -->
                     <div class="janrStyles">
@@ -35,9 +35,9 @@
         <div class="compilation convert" ref="list">
             <div class="music" :key="index" v-for="(compilation, index) in compilations">
              <div class="cover-cont">
-                <div class="play btn"><img src="/static/mainapp/images/playButton.svg" alt="play" title="воспроизвести"></div>
-                <div class="turn btn"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>                   
-                <img class="cover" :src="compilation.image_alb" alt="обложка" @click="trackClick(index)">
+                <div class="play btn" @click="playClick(index)"><img src="/static/mainapp/images/playButton.svg" alt="play" title="воспроизвести"></div>
+                <div class="turn btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>                   
+                <img class="cover" :src="compilation.image_alb" alt="обложка">
                 <img class="disk" :src="compilation.image_alb" alt="disk">
             </div>
             <div class="name-cont">
@@ -63,12 +63,16 @@ export default {
             sort: 'popular',
             genre: '',
             style: '',
-            showsortbutton: true
+            showsortbutton: true,
+            showStyles: false
           //hoverClass: 'disk'
         }
     },
     mounted(){
         document.body.addEventListener("scroll", this.onScroll, false);
+    },
+    beforeDestroy () { 
+        document.body.removeEventListener("scroll", this.onScroll, false);
     },
     methods: {
      checkSort(e)
@@ -99,7 +103,7 @@ export default {
           var obj = {};
           if(message1 != null || message2 != null)
           {
-            this.url = 'track';
+            this.url = 'tracks';
             this.compilations = [];
             if(message1 != null) {
                 this.genre = message1;
@@ -153,9 +157,15 @@ export default {
                 this.loading = false;
             })
         },
-        trackClick: function(index) {
+        toQueueClick: function(index) {
             //this.$emit('trackclicked');
-            this.$bus.$emit('trackclicked', {
+            this.$bus.$emit('track-to-queue', {
+				id: this.compilations[index].id
+			});
+        },
+        playClick: function(index) {
+            //this.$emit('trackclicked');
+            this.$bus.$emit('play-track', {
 				id: this.compilations[index].id
 			});
         },
@@ -244,7 +254,7 @@ export default {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select:none;
-    color: rgba(0,0,0,0.55);
+    /* color: rgba(0,0,0,0.55); */
     font-size: 20px;
     line-height: 40px;
     width: 70%;
@@ -270,14 +280,14 @@ export default {
 {
     font-family: "FontAwesome";
     content: "\f017"; 
-    /* content: '🕒'; */
+    content: '🕒';
     margin-right:5px; 
 }
 .topic:before
 {
     font-family: "FontAwesome";
     content: "\f06d";
-    /* content: '⚡'; */
+    content: '⚡';
     margin-right:5px; 
 }
 .topic
@@ -507,7 +517,6 @@ export default {
 .group-name
 {
     width:100%; 
-    cursor: pointer;
     position: relative;
     backface-visibility: hidden;
     display: block;
@@ -523,7 +532,6 @@ export default {
 .music-name
 {
     position: relative;
-    cursor: pointer;
     backface-visibility: hidden;
     overflow-x:hidden;
     white-space: nowrap;
@@ -543,7 +551,6 @@ export default {
     -webkit-transform: translateX(8.3%);
     transform: /*scale(1.05)*/ translateX(8.3%);
     transition-duration: .7s;
-    cursor: pointer;
     /*-webkit-filter: invert(100%)*/
     /*box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);*/ 
 }

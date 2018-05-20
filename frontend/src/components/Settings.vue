@@ -45,8 +45,8 @@
                 <div class="N-subbmit block nastr-row">
                     
                         <div class="str" > 
-                            <router-link to="/performers/me"><button @click='saveSettings' class="N-sub" name="sub"> Сохранить </button></router-link>
-                            <router-link to="/performers/me"><div type="reset" class="Cancel" @click="cencleClick">Отмена</div></router-link>
+                            <router-link :to="'/performers/' + myPerformerID"><button @click='saveSettings' class="N-sub" name="sub"> Сохранить </button></router-link>
+                            <router-link :to="'/performers/' + myPerformerID"><div type="reset" class="Cancel" @click="cencleClick">Отмена</div></router-link>
                         </div>
                     
                 </div>             
@@ -78,10 +78,12 @@ export default {
         }
     },*/
     created() {
-        this.name = this.$store.state.performerName;
-        this.label = this.$store.state.performerLogo;
-        this.description = this.$store.state.performerDescription;
-        this.id = this.$store.state.performerID;
+        this.$http.get('performers/' + this.myPerformerID).then(function(response){
+            this.id = this.myPerformerID
+            this.name = response.data.name_per
+            //this.label = response.data.image_per
+            this.description = response.data.about_per
+        })
     },
     methods: {
         setLabel(e) {
@@ -94,7 +96,7 @@ export default {
             data.append('description', this.description);
             data.append('id', this.id);
             this.$http.post('performers', data).then(function(response){
-                this.$store.commit('performerLogo', '');
+                //this.$store.commit('performerLogo', '');
                 this.$store.commit('performerLogo', this.label);
                 this.$emit('cencle-clicked');
             });
@@ -103,6 +105,11 @@ export default {
             this.$emit('cencle-clicked');
         } 
     },
+    computed: {
+        myPerformerID() {
+            return this.$store.state.myPerformerID
+        }
+    }
 }
 </script>
 

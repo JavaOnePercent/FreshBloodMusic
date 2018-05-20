@@ -1,30 +1,30 @@
 <template>
 <transition name="fade" mode="in-out">
-    <div id="music-top" class="music-top">
-        <div id="next-page" class="next-page"  @click="show" ></div>
+    <div id="music-top" class="music-top" @mouseenter="stopFlipping" @mouseleave="startFlipping">
+        <div id="next-page" class="next-page" @click="show"></div>
         <div id="previous-page" class="previous-page" @click="show"></div>
 
         <transition :name="animation" mode="in-out">
-            <div class="infotrack" v-show="infotracks.month && showDiv">
+            <div class="infotrack" v-show="showDiv" v-if="infotracks.month">
                 <img class="img" :src="infotracks.month.image_alb" alt="обложка">
                 <div class="text">
                     <span>Лучший трек этого месяца</span>
                     <p>{{ infotracks.month.name_per}} <br> {{ infotracks.month.name_trc}}</p>
-                    <div class="play btn"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
-                    <div class="turn btn"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
+                    <div class="play btn" @click="playClick(infotracks.month.id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
+                    <div class="turn btn" @click="toQueueClick(infotracks.month.id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
                     <p>Понравилась: {{ infotracks.month.rating_trc}} пользователям</p>
                     <P>Жанр: {{ infotracks.month.name_gnr}} / {{ infotracks.month.name_stl}}</p>
                 </div>
             </div>
         </transition>
         <transition :name="animation" mode="out-in">
-            <div class="infotrack" v-show="infotracks.week && !showDiv">
+            <div class="infotrack" v-show="!showDiv" v-if="infotracks.week">
                 <img class="img" :src="infotracks.week.image_alb" alt="обложка">
                 <div class="text">
                     <span>Лучший трек этой недели</span>
                     <p>{{ infotracks.week.name_per}} <br> {{ infotracks.week.name_trc}}</p>
-                    <div class="play btn"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
-                    <div class="turn btn"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
+                    <div class="play btn" @click="playClick(infotracks.week.id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
+                    <div class="turn btn" @click="toQueueClick(infotracks.week.id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
                     <p>Понравилась: {{ infotracks.week.rating_trc}} пользователям</p>
                     <P>Жанр: {{ infotracks.week.name_gnr}} / {{ infotracks.week.name_stl}}</p>
                 </div>
@@ -42,14 +42,20 @@ export default {
             infotracks: {},
             animation: "",
             showDiv: true,
-            isTimeout: false
+            isTimeout: false,
+            autoFlip: null
         }
     },
     methods: {
         updatePosts: function () {
-            this.showDiv=!this.showDiv
-            this.animation = "animation";
-            setTimeout(this.updatePosts, 7000);
+            if(!this.isTimeout)
+            {
+                this.isTimeout = true
+                var self = this
+                setTimeout(function() { self.isTimeout=false }, 500);
+                this.showDiv=!this.showDiv
+                this.animation = "animation";
+            }
         },
         show(e){
             if(!this.isTimeout)
@@ -66,11 +72,32 @@ export default {
                 setTimeout(function() { self.isTimeout=false }, 500);
                 //this.animation = "";
                 this.showDiv=!this.showDiv
+                clearInterval(this.autoFlip)
+                this.autoFlip = setInterval(this.updatePosts, 7000);
             }
+        },
+        toQueueClick: function(index) {
+            //this.$emit('trackclicked');
+            this.$bus.$emit('track-to-queue', {
+				id: index
+			});
+        },
+        playClick: function(index) {
+            //this.$emit('trackclicked');
+            this.$bus.$emit('play-track', {
+				id: index
+			});
+        },
+        startFlipping() {
+            clearInterval(this.autoFlip)
+            this.autoFlip = setInterval(this.updatePosts, 7000);
+        },
+        stopFlipping() {
+            clearInterval(this.autoFlip)
         },
     },
     created: function() {
-        // this.updatePosts();
+        this.autoFlip = setInterval(this.updatePosts, 7000);
         this.$http.get('top', /*{params: {per: this.period}}*/).then(function(response){
                 //console.log(response.data);
                 this.infotracks = response.data;
@@ -239,6 +266,7 @@ export default {
 }
 .music-top
 {
+    overflow: hidden;
     /* background-color: rgb(60, 60, 60); */
     transition: 100ms all;
     height: 350px;

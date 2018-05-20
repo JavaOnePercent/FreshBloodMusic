@@ -99,6 +99,9 @@ export default {
         this.$bus.$on('queue-opened', event => {
             setTimeout(this.refreshSlider, 400)
         });
+        this.$bus.$on('history-opened', event => {
+            setTimeout(this.refreshSlider, 400)
+        });
     },
     /*mounted() {
         var el = this.$refs.slider.$refs.wrap;

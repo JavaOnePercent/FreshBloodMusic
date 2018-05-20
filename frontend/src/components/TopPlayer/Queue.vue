@@ -68,7 +68,17 @@ export default {
             return this.$store.state.historyTracks
         }
     },
+    watch: {
+        isFull(iF) {
+            if(!iF)
+                this.hideLists()
+        }
+    },
     methods: {
+        hideLists() {
+            this.showQueue = false
+            this.showHistory = false
+        },
         openQueue() {
             this.showQueue = !this.showQueue;
         },

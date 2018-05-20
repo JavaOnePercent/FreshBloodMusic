@@ -80,10 +80,10 @@ class TrackHistory(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userhistory')
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackhistory')
-    count = models.IntegerField(default=1)
 
     def __int__(self):
         return self.trc_id
+
 
 class TrackReport(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')

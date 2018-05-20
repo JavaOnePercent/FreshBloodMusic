@@ -13,7 +13,7 @@
                             <span>{{ username }}</span>
                             <img title="загрузить"  class="user" src="/static/mainapp/images/user.svg" alt="user">
                             <ul class="menu-drop" v-if="menuShow">
-                                <li @click="emitPageChanged"><router-link to="/performers/me">Профиль</router-link></li> <!-- <a @click="openProfile">Профиль</a> -->
+                                <li><router-link :to="'/performers/' + performerID">Профиль</router-link></li> <!-- <a @click="openProfile">Профиль</a> -->
                                 <li><a @click="logout">Выйти</a></li>
                             </ul>
 
@@ -21,8 +21,8 @@
                         <img class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader" @click='showMenu'>  
                     </div>
                     <div v-else>
-                    <router-link @click="emitPageChanged" to="/login">Войти</router-link>
-                    <router-link @click="emitPageChanged" to="/register">Регистрация</router-link>
+                        <router-link to="/login">Войти</router-link>
+                        <router-link to="/register">Регистрация</router-link>
                     </div>
                 </div>
             </div>
@@ -39,10 +39,6 @@ export default {
         }
     },
     methods: {
-        emitPageChanged() {
-            console.log('piska')
-            this.$bus.$emit('page-changed')
-        },
         showMenu() {
             this.$store.commit("showLoader", true)
         },
@@ -60,6 +56,9 @@ export default {
     computed: {
         username() {
             return this.$store.state.username
+        },
+        performerID() {
+            return this.$store.state.myPerformerID
         }
     }
 }
