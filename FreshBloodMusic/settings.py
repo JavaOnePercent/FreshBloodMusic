@@ -26,7 +26,7 @@ SECRET_KEY = 'ghp^77^#!$dr665bx505du*pgar$)@i(yz9&mfag6l+ld+9a45'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.0.104',
+    '192.168.0.7',
     '127.0.0.1'
 ]
 
@@ -34,10 +34,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'mainapp',
-    'loginsys',
-    'mymusic',
-    'musicgroup',
+    'mainapp.apps.MainappConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -86,8 +83,6 @@ DATABASES = {
         'NAME': 'music_db',
         'USER': 'djeban',
         'PASSWORD': 'iop139643234!QWE',
-        #'HOST': '127.0.0.1',
-        #'PORT': '3306',
     }
 }
 
@@ -109,6 +104,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -128,3 +127,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

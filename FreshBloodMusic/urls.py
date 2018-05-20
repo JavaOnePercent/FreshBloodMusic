@@ -15,13 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf.urls import url, include
-from mainapp.models import Performer
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^auth/', include('loginsys.urls')),
-    url(r'^performers/', include('mymusic.urls')),
-    url(r'^performer/', include('musicgroup.urls')),
     url(r'^', include('mainapp.urls')),
-
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

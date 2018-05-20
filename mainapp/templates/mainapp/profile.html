@@ -1,0 +1,23 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Имя Артиста</title>
+    <link rel="stylesheet" href="{% static 'mainapp/css/profile.css' %}" type="text/css"/>
+    <script src="{% static 'mainapp/js/vue/vue.js' %}"></script>
+</head>
+
+<body>
+    <div id="VueContainer">
+        <profile-nastr @cencle-clicked="show" v-show='nastrShow'></profile-nastr>
+        <profile @nastr-clicked="show" v-show='!nastrShow'></profile>
+    </div>
+
+    <div>
+        {% include "mainapp/ProfileNastr.html" %}
+    </div>
+
+</body>
+</html>

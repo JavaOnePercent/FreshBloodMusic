@@ -6,96 +6,37 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="{% static 'mainapp/css/font.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'mainapp/css/main.css' %}" type="text/css">
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">-->
-    <title>{{track_name}}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <title id="title">{{track_name}}</title>
     <script src="{% static 'mainapp/js/jquery-3.3.1.js' %}"></script>
-    <script src="{% static 'mainapp/js/genremenu.js' %}"></script>
-    <script src="{% static 'mainapp/js/bestperformer.js' %}"></script>
-    <script src="{% static 'mainapp/js/topmonth.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vue.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vue-resource.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vuex.js' %}"></script>
+    <script src="{% static 'mainapp/js/vue/vue-router.js' %}"></script>
+    <script src="{% static 'mainapp/js/init.js' %}"></script>
 </head>
 
-<body>
+<body   id="body">
     {% csrf_token %}
-    <div class="header" >
-        <header class="name">
-            BoysBand
-        </header>
-        <div class="radio">
-
-        </div>
-        <div class="management">
-                {% if username %}
-                <a href="performers/">Моя музыка</a>
-                <a href="auth/logout/">Выйти ({{ username }})</a>
-                {% else %}
-                <a href="auth/login/">Авторизация</a>
-                <a href="auth/register">Регистрация</a>
-                {% endif %}
-        </div>
-    </div>
-    <div class="main">
-        <div class="topics">
-            <div class="music-top">
-                <img class="img" src="" alt="обложка">
-                <label>Лучшая в этом месяце</label>
-                <p class="performer-top"></p>
-                <label class="track-top"></label>
-                <p class="rating-top"></p>
-                <div class="play">
-                    <i class="fa fa-play fa-4x" aria-hidden="true"></i>
-                </div>
-                <div class="turn">
-                    <i class="fa fa-align-justify fa-4x" aria-hidden="true"></i>
-                </div>
-            </div> 
-            <div class="compositor-top">
-                <label>
-                Лучшие исполнители
-                </label>
-                <div class="compositors">
-                    <div class="compositor">
-                        <img class="compositor-avatar" src="" alt="обложка">
-                        <label class="compositor-name"></label>
-                    </div>
-                </div>
+    <div id="VueContainer">
+        <header-container></header-container>
+        <div v-show="showLoader" class="modal" id="myModal" >
+            <div class="modal-content">
+                <loader></loader>
             </div>
         </div>
-        <div class="recommendations">
-            <div class="sortirovka">
-                <label class="sortirovka-name">Рекомендации</label>
-                <div class="sort">
-                    <label>Отсортировать по:</label>
-                    <a class="time" id="button">времени</a>
-                    <a class="topic" id="button">популярности</a>
-                </div>
-            </div>
-            <div class="music-style">
-                {% for gen in genre %}
-                    <a class="janr" name="{{gen.id}}" id="buttonjanr">{{gen.name_gnr}}</a>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="compilation">
-            <div class="music" >
-                <img class="cover" src="" alt="обложка"/>
-                <label class="music-name"></label>
-            </div>
-        </div>
-
-
-    <footer>
-        ©Отвратительные мужики
-    </footer>
-    </div>
-
-    
-    <script src="{% static 'mainapp/js/vue.js' %}"></script>
-    <div id="VueContainer"> <!-- сюда пихать все vue компоненты -->
+        <router-view></router-view>
+        <!--<profile-nastr @cencle-clicked="nastrShow = !nastrShow;" v-if='nastrShow'></profile-nastr>
+        <profile @nastr-clicked="nastrShow = !nastrShow;" v-if='!nastrShow && showProfile'></profile>
+        <main-compilation></main-compilation>-->
         <top-player></top-player>
     </div>
     <div>
+        {% include "mainapp/ProfileNastr.html" %}
+        {% include "mainapp/loader-music.html" %}
+        {% include "mainapp/music-top.html" %}
         {% include "mainapp/playerTemplates.html" %}
     </div>
-
+    <script src="{% static 'mainapp/js/root.js' %}"></script>
 </body>
 </html>

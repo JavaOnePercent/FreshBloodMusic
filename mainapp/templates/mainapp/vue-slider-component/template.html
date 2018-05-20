@@ -1,13 +1,12 @@
 {% block content %}
 {% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/vue-slider-component/style.css' %}" />
 <script type="text/x-template" id="vueSliderComponent">
     <div 
 ref="wrap" 
-:class="['vue-slider-component', flowDirection, disabledClass, stateClass, { 'vue-slider-has-label': piecewiseLabel }]" 
+:class="['vue-slider-component', myCSS, flowDirection, disabledClass, stateClass, { 'vue-slider-has-label': piecewiseLabel }]" 
 v-show="show" 
 :style="wrapStyles"
-@click="wrapClick"
+@mousedown="wrapClick"
 >
 <div ref="elem" aria-hidden="true" class="vue-slider" :style="[elemStyles, bgStyle]">
   <template v-if="isRange">
