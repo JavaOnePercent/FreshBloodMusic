@@ -47,6 +47,11 @@ export default {
         }
     },
     methods: {
+        updatePosts: function () {
+            this.showDiv=!this.showDiv
+            this.animation = "animation";
+            setTimeout(this.updatePosts, 7000);
+        },
         show(e){
             if(!this.isTimeout)
             {
@@ -66,7 +71,7 @@ export default {
         },
     },
     created: function() {
-        
+        this.updatePosts();
         this.$http.get('top', /*{params: {per: this.period}}*/).then(function(response){
                 //console.log(response.data);
                 this.infotracks = response.data;

@@ -6,8 +6,8 @@
                     <label class="sortirovka-name">Рекомендации</label>
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <a class="time" id="button" @click="showGenre(genre, style, 'time')" @mousedown="checkSort">времени</a>
-                        <a class="topic" id="button" @click="showGenre(genre, style, 'popular')" @mousedown="checkSort">популярности</a>
+                        <span class="time" id="time" @click="showGenre(genre, 'time')" @mousedown="checkSort">времени</span>
+                        <span class="topic" id="topic" @click="showGenre(genre, 'popular')" @mousedown="checkSort">популярности</span>
                     </div>
                 </div>
             </div>
@@ -22,9 +22,8 @@
                 </div>
             </div>
             <div class="janrStyles-conteiner">
-                <div class="janrStyles">
-                    <a class="janr" name="" @click="showGenre('all')">Все</a>
-                    <div class="gen janr" :key="index" v-for="(sty, index) in styles">
+                <div class="janrStyles gen">
+                    <div class="janr" :key="index" v-for="(sty, index) in styles">
                         <a  :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
                     </div>
                 </div>
@@ -32,12 +31,18 @@
         </div>
         <div class="compilation convert" ref="list">
             <div class="music" :key="index" v-for="(compilation, index) in compilations">
+             <div class="cover-cont">
+                <div class="play btn"><img src="/static/mainapp/images/Wplay.svg" alt="play" title="воспроизвести"></div>
+                <div class="turn btn"><img src="/static/mainapp/images/Wplaylist.svg" alt="tunr" title="в очередь"></div>                   
                 <img class="cover" :src="compilation.image_alb" alt="обложка" @click="trackClick(index)">
                 <img class="disk" :src="compilation.image_alb" alt="disk">
+            </div>
+            <div class="name-cont">
                 <span :title="compilation.name_trc" class="group-name">{{ compilation.name_trc}}</span>
                 <span class="music-name" >{{ compilation.name_per}}</span>
             </div>
         </div>
+    </div>
     </div>
 </template>
 
@@ -63,16 +68,20 @@ export default {
         document.body.addEventListener("scroll", this.onScroll, false);
     },
     methods: {
-        checkSort(e)
+     checkSort(e)
         {
             e.preventDefault();
             if(e.target.style.backgroundColor=="rgba(192, 192, 192, 0.8)")
             {
+                document.getElementById('time').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
+                document.getElementById('topic').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
                 e.target.style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1"
             }
             else
             {
-                e.target.style="background-color: rgba(192,192,192,0.8);border-bottom: 2px solid currentColor;line-height: 0.85";
+                document.getElementById('time').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
+                document.getElementById('topic').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
+                e.target.style="background-color: rgba(192,192,192,0.8);border-bottom: 2px solid currentColor;line-height: 0.85;color: rgb(0,0,0)";
             }
         },
         onScroll: function(event) {
@@ -211,6 +220,7 @@ export default {
 }
 .sortirovka
 {
+
     position: relative;
     height: 40px;
     padding-left: 15px;
@@ -219,10 +229,6 @@ export default {
     margin: 0 auto;
     max-width: 1143px; 
     min-width: 915px; 
-}
-.sortirovka-name, .sort
-{
-    flex-basis: 305px;
 }
 .sortirovka-name
 {
@@ -233,33 +239,40 @@ export default {
 }
 .sort
 {
+    color: rgba(0,0,0,0.55);
     font-size: 20px;
     line-height: 40px;
     width: 70%;
     float: left;
 }
-.sort a
+.sort label
+{
+    margin-right: 5px;
+}
+.sort span
 {
     margin-right:5px; 
-    padding: 6px;
+    padding: 4px;
 }
-.sort a:hover, .sort a:active
+.sort span:hover, .sort span:active
 {
     cursor: pointer;
     background-color: rgba(192,192,192,0.8);
     border-bottom: 2px solid currentColor;
     line-height: 0.85
 }
-.sort a:before
+.time:before
 {
     font-family: "FontAwesome";
-    content: "\f017";
+    content: "\f017"; 
+    /* content: '🕒'; */
     margin-right:5px; 
 }
-.sort a:nth-child(3)::before
+.topic:before
 {
     font-family: "FontAwesome";
     content: "\f06d";
+    /* content: '⚡'; */
     margin-right:5px; 
 }
 /*рекомендации*/
@@ -336,41 +349,89 @@ export default {
 
 .compilation
 {
+    padding-left: 15px;
+    padding-right: 15px; 
     min-width: 915px; 
-    max-width: 1143px;
+    max-width: 1113px;
     margin: 0 auto;
     position: relative;
     padding-top: 25px;
-    align-items: flex-end;
     display: flex;
     flex-wrap: wrap;
 }
 
 .compilation .music
 {
-    
     position: relative;
-    padding-right: 2.5%;
-    padding-left: 2.5%;
-    padding-bottom: 20px;
-    flex-basis: 20%;
-    overflow: hidden;
-    min-height: 195px;
-    max-height: 300px;
+    padding-bottom:68px;
+    flex-basis: 22%;
+    /* overflow: hidden; */
     text-align: center;
 }
-
+.compilation .music:nth-child(4n+2)
+{
+    margin-right: 4%;
+    margin-left: 4%;
+}
+.compilation .music:nth-child(4n+3)
+{
+    margin-right: 4%;
+}
+/* .compilation .music::before
+{
+    content:url(/static/mainapp/images/playButton.svg);
+    position: absolute;
+    top: 0;left: 0; right: 0; bottom: 0;
+    margin: auto;
+    width: 25%;
+    height: 20%;
+    z-index: 70;
+} */
+.cover-cont
+{
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select:none;
+    display: block;
+    min-height: 195px;
+    max-height: 300px; 
+    width: 100%;
+    height: auto;
+    position: relative;
+    /* overflow:visible; */
+}
+/* .cover-cont::before
+{
+    content:url(/static/mainapp/images/playButton.svg);
+    position: absolute;
+    top: 0;left: 0; right: 0; bottom: 0;
+    margin: auto;
+    width: 25%;
+    height: 20%;
+  
+}
+.cover-cont::after
+{
+    content:url(/static/mainapp/images/playButton.svg);
+    position: absolute;
+    top: 0;left: 0; right: 0; bottom: 0;
+    margin: auto;
+    width: 25%;
+    height: 20%;
+    z-index: 70;
+} */
 .cover
 {
-    
+    image-rendering:  auto;
     border: none;
+    image-rendering: optimizeQuality;
     image-rendering: -webkit-crisp-edges;
-    backface-visibility: hidden;
+    /* backface-visibility: hidden; */
     transition: 1.4s transform;
     position:relative;
     z-index: 50;
     top: 0; right: 0; bottom: 0; left: 0;
-    display: block;
     height: auto;
     width: 100%; 
     padding: 0;
@@ -378,19 +439,17 @@ export default {
 .disk
 {
     border-radius: 50%;
-    margin: 0 auto auto auto;
     transition: 1s transform;
-    backface-visibility: hidden;
+    /* backface-visibility: hidden; */
     position:absolute;
     z-index: 40;
-    top: 0.8%; right: 0; bottom: 0; left: 0;
-    display: block;
+    top: 0; right: 0; bottom: 0; left: 0;
+    margin: auto;
     height: auto;
-    width: 76%; 
+    width: 95%; 
     padding: 0;
-
 }
-.cover:hover + .disk
+.cover-cont:hover  .disk
 {
     z-index: 40;
     transition-duration: .7s;
@@ -401,16 +460,25 @@ export default {
     -webkit-transform: translateX(-13.5%) rotate(45deg);
     display: block;
 }
-.cover:hover~span
+.cover-cont:hover~.name-cont
 {
     transition-duration: .7s;
     transform: /*scale(1.05)*/ translateX(8.3%) /*translateY(5px)*/;
 }
+.name-cont
+{
+    height: 48px;
+    width: 100%;
+    transition: 1.4s transform;
+    position: absolute;
+    overflow: hidden;
+}
 .group-name
 {
+    width:100%; 
     cursor: pointer;
+    position: relative;
     backface-visibility: hidden;
-    transition: 1.4s transform;
     display: block;
     overflow-x:hidden;
     white-space: nowrap;
@@ -423,9 +491,9 @@ export default {
 }
 .music-name
 {
+    position: relative;
     cursor: pointer;
     backface-visibility: hidden;
-    transition: 1.4s transform;
     overflow-x:hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -433,14 +501,12 @@ export default {
     display: block;
     font-size:18px; 
 }
-.cover:hover 
+.cover-cont:hover .cover
 {
-    image-rendering:  auto;
+
     z-index: 60;
-    padding:0;
     filter:sepia(50%);
     height: auto;
-    top: 0; right: 0; bottom: 0; left: 0;
     -o-transform: translateX(8.3%);
     -ms-transform: translateX(8.3%);
     -moz-transform: translateX(8.3%);
@@ -451,5 +517,54 @@ export default {
     /*-webkit-filter: invert(100%)*/
 
     /*box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);*/ 
+}
+.cover-cont:hover .btn
+{
+
+    -o-transform: translateX(25%);
+    -ms-transform: translateX(25%);
+    -moz-transform: translateX(25%);
+    -webkit-transform: translateX(25%);
+    transform: translateX(25%);
+    display: block;
+    transition: 1.4s transform;
+    transition-duration: .7s;
+}
+.btn
+{
+    opacity: 0.6;
+    transition: 1.4s transform;
+    display: none;
+    cursor: pointer; 
+    background-color: rgba(85, 85, 85,0.6);
+    padding: 5%;
+    border-radius: 50px;
+    width: 22%;
+    height: 22%;
+    z-index: 70;
+    position: absolute;
+    top: 0;left: 0;right: 0;bottom: 0;
+    margin: auto
+}
+.btn:hover
+{
+    opacity: 1;
+}
+.btn:active
+{
+    box-shadow: 200px 0 0 0 rgba(0,0,0,.3) inset;
+}
+.btn img
+{
+    width: 100%;
+    height: 100%;
+} 
+.play
+{
+    right: 35%;
+}
+.turn
+{
+    left:35%;
 }
 </style>

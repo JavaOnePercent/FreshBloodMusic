@@ -21,7 +21,7 @@
                 <div class="likedMusic" :key="index" v-for="(like, index) in likes">
                     <!--<div class="likedMusicHover"></div>-->
                     <div class="musicLable" :style="backgroundImage(like.logo)"></div>
-                    <div class="musicLablecontrol" style="background-image: url(/play-arrow.svg)"></div>
+                    <div class="musicLablecontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
                     {{ like.performer }} - {{ like.name }}
                 </div>
             </div>
@@ -69,7 +69,7 @@
                                <div class="Mymusic-conteiner">
                                     <div class="MyMusic" :key="index" v-for="(track, index) in album.tracks">
                                         <!--<div class="likedMusicHover"></div>-->
-                                        <div class="MyMusiccontrol" style="background-image: url(/play-arrow.svg)"></div>
+                                        <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
                                         {{ track.name }}
                                     </div>
                                </div>

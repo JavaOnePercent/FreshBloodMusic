@@ -89,6 +89,7 @@ export default {
 }
 .compositor label
 {
+    
     cursor: pointer;
 }
 .compositor:hover
@@ -99,6 +100,10 @@ export default {
 }
 .compositor-avatar
 {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select:none;
     padding: 0;
     height: 80.6666667px;
     width: 80.6666667px;

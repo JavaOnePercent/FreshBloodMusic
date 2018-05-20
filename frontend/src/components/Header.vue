@@ -80,6 +80,10 @@ export default {
 /*шапка*/
 .header-conteiner
 {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select:none;
     width: 100%;
     background-color: rgba(255, 254, 255, 0.98);
     z-index: 120;
