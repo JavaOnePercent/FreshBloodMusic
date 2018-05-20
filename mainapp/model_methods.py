@@ -1,11 +1,12 @@
+import math
 import random
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.files import FieldFile, ImageFieldFile
-from django.db.models import F
+from django.db.models import F, Q
 
-from mainapp.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle, TrackHistory
+from mainapp.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle, TrackHistory, TrackReport
 
 
 def get_random(all_tracks):  # возвращает рандомное значение из списка
@@ -192,4 +193,43 @@ class TrackHistoryMethods:
             return True
         else:
             return False
+
+
+class TrackReportMethods:
+    @staticmethod
+    def create(track_id, user_id):  # добавление записи жалоб в таблицу
+        if track_id is not None and user_id is not None:
+            track = Track.objects.get(pk=track_id)
+            user = User.objects.get(pk=user_id)
+            report = TrackReport.objects.all().filter(user_id=user, trc_id=track)
+            if not report:
+                TrackReport(user_id=user, trc_id=track).save()
+                return True
+            else:
+                return False
+        else:
+            return False
+
+class TrackRecommendation:
+    @staticmethod
+    def get_recommendation(authuser):  # добавление записи жалоб в таблицу
+        likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
+        historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
+        reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
+        idenusers = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('user_id', flat=True).distinct()
+        chance = {}
+        tracks = LikedTrack.objects.all().filter(user_id__in=idenusers).values_list('trc_id')
+        for user in idenusers:
+            likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
+                     (math.fabs(len(set(likedtracks) | set(tracks)))))
+            chance[user] = likes
+        chance = sorted(chance.items(), key=lambda item: -item[1])
+        tracks = []
+        for key in chance:
+            tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+        identracks = []
+        for track in tracks:
+            if track not in identracks and track not in historytracks and track not in likedtracks and track not in reporttracks:
+                identracks.append(track[0])
+        return identracks
 

@@ -8,14 +8,14 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from rest_framework.views import APIView
 
-from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory
+from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory, TrackReport
 from django.db.models import Q
 from django.http import HttpResponse, Http404
 from .uploader import Compressor, save_album, save_performer
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
     PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer
 from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods, PerformerMethods, \
-    AlbumMethods, TrackHistoryMethods
+    AlbumMethods, TrackHistoryMethods, TrackReportMethods, TrackRecommendation
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -98,35 +98,16 @@ class TrackOverview(generics.ListAPIView):
         request = self.request
         if gen != '' and sty == '':
             if gen == 'fav':
-                likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id')
-                tracks = Track.objects.filter(id__in=likedtracks)
+                likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id').order_by('id')
+                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in likedtracks[0])
+                tracks = Track.objects.filter(id__in=likedtracks).extra(
+                    select={'ordering': ordering}, order_by=('ordering',))
                 '''tracks = []
                 for track in likedtracks:
                     trc = Track.objects.all().get(id=track[0])
                     tracks.append(trc)'''
             elif gen == 'rec':
-                likedtracks = LikedTrack.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
-                historytracks = TrackHistory.objects.all().filter(user_id=auth.get_user(request).id).values_list('trc_id')
-                idenusers = LikedTrack.objects.all().filter(~Q(user_id=auth.get_user(request).id)).values_list('user_id', flat=True).distinct()
-                chance = {}
-                for user in idenusers:
-                    tracks = LikedTrack.objects.all().filter(user_id=user).values_list('trc_id')
-                    likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                             (math.fabs(len(set(likedtracks) | set(tracks)))))
-                    chance[user] = likes
-                chance = sorted(chance.items(), key=lambda item: -item[1])
-                tracks = []
-                for key in chance:
-                    tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
-                identracks = []
-                for track in tracks:
-                    if track not in identracks and track not in historytracks and track not in likedtracks:
-                        identracks.append(track[0])
-                # tracks = Track.objects.all().filter(id__in=[l for l in identracks])
-                # tracks = []
-                # for track in identracks:
-                #     trc = Track.objects.all().filter(id=track)
-                #     tracks.append(trc)
+                identracks = TrackRecommendation.get_recommendation(auth.get_user(request).id)
                 ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
                 tracks = Track.objects.filter(pk__in=identracks).extra(
                     select={'ordering': ordering}, order_by=('ordering',))
@@ -137,8 +118,8 @@ class TrackOverview(generics.ListAPIView):
             if gen != 'rec' and gen != 'fav':
                 if bool == 'popular':
                     tracks = tracks.order_by('-rating_trc')
-            elif bool == 'time':
-                tracks = tracks.order_by('-date_trc')
+                elif bool == 'time':
+                    tracks = tracks.order_by('-date_trc')
             return tracks
         elif sty != '' and gen == '':
             tracks = Track.objects.select_related('alb_id__stl_id').filter(alb_id__stl_id=sty)
@@ -150,24 +131,7 @@ class TrackOverview(generics.ListAPIView):
 
 
 def gettrack(authuser): #для Димы
-    likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
-    historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
-    idenusers = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('user_id', flat=True).distinct()
-    chance = {}
-    tracks = LikedTrack.objects.all().filter(user_id__in=idenusers).values_list('trc_id')
-    for user in idenusers:
-        likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                 (math.fabs(len(set(likedtracks) | set(tracks)))))
-        chance[user] = likes
-    chance = sorted(chance.items(), key=lambda item: -item[1])
-    tracks = []
-    for key in chance:
-        tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
-    identracks = []
-    for track in tracks:
-        if track not in identracks and track not in historytracks and track not in likedtracks:
-            identracks.append(track[0])
-    tracks = Track.objects.all().filter(id=identracks[0])
+    tracks = Track.objects.all().filter(id=TrackRecommendation.get_recommendation(authuser)[0])
     return tracks
 '''@api_view(['GET'])
 def track(request):
@@ -381,6 +345,16 @@ def performers(request):
 def history(request):
     if request.method == 'PUT':
         result = TrackHistoryMethods.create(request.query_params['track_id'], auth.get_user(request).id)
+        if result:
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def report(request):
+    if request.method == 'GET':
+        track = request.query_params['track']
+        result = TrackReportMethods.create(track, auth.get_user(request).id)
         if result:
             return Response(status=status.HTTP_201_CREATED)
         else:

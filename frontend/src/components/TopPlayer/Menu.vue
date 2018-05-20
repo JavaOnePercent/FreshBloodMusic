@@ -5,7 +5,7 @@
             <ul class="menu-dropdown" v-show="showMenu" @mouseleave="closeDrop">
                 <li><router-link :to="{ name: 'performer', params: { id: this.performerID }}"><p class="menuElements">На страницу исполнителя</p></router-link></li>
                 <li><p class="menuElements">Добавить в избранное</p></li>
-                <li><p class="menuElements">Пожаловаться</p></li>
+                <li><p class="menuElements" @click="report()">Пожаловаться</p></li>
             </ul>
         </transition>
     </div>
@@ -26,7 +26,15 @@ export default {
         },
         closeDrop() {
             this.showMenu = false;
-        }
+        },
+        report() {
+            this.$http.get('report', {params: {track: 1}}).then(function(response){
+                this.showMenu = false;
+                alert('Вы отправили жалобу!\nСпасибо, что помогаете сделать наш сервис лучше:)');
+            }, function(error){
+                alert('Вы уже отправляли жалобу:(');
+            })
+        },
     }
 }
 </script>

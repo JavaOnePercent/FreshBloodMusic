@@ -6,25 +6,25 @@
                     <label class="sortirovka-name">Рекомендации</label>
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <span class="time" id="time" @click="showGenre(genre, 'time')" @mousedown="checkSort">времени</span>
-                        <span class="topic" id="topic" @click="showGenre(genre, 'popular')" @mousedown="checkSort">популярности</span>
+                        <span class="time" id="time" @click="showGenre(genre, style, 'time')" @mousedown="checkSort">времени</span>
+                        <span class="topic" id="topic" @click="showGenre(genre, style, 'popular')" @mousedown="checkSort">популярности</span>
                     </div>
                 </div>
             </div>
             <div class="music-style-conteiner">
                 <div class="music-style">
-                    <a class="janr" name="" @click="showGenre('all')">Все</a>
-                    <a class="janr" name="" @click="showGenre('rec')">Рекомендации</a>
-                    <a class="janr" name="" @click="showGenre('fav')">Избранное</a>
+                    <a class="janr" name="" @click="showGenre('all', null, sort)">Все</a>
+                    <a class="janr" name="" @click="showGenre('rec', null, sort)">Рекомендации</a>
+                    <a class="janr" name="" @click="showGenre('fav', null, sort)">Избранное</a>
                     <div class="gen janr" :key="index" v-for="(gen, index) in genres">
-                        <a  :name="gen.id" @click="showGenre(gen.id)">{{gen.name_gnr}}</a>
+                        <a  :name="gen.id" @click="showGenre(gen.id, null, sort)">{{gen.name_gnr}}</a>
                     </div>
                 </div>
             </div>
             <div class="janrStyles-conteiner">
                 <div class="janrStyles gen">
                     <div class="janr" :key="index" v-for="(sty, index) in styles">
-                        <a  :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
+                        <a  :name="sty.id" @click="showGenre(null, sty.id, sort)">{{sty.name_stl}}</a>
                     </div>
                 </div>
             </div>
@@ -57,7 +57,7 @@ export default {
             styles:[],
             url: 'track?genre=all&bool=0',
             loading: false,
-            sort: '',
+            sort: 'popular',
             genre: '',
             style: '',
             showsortbutton: true
@@ -103,7 +103,6 @@ export default {
         showGenre: function(message1 = null, message2 = null, message3 = null) {
           this.loading = true;
           var obj = {};
-          this.sort = 'popular';
           if(message1 != null || message2 != null)
           {
             this.url = 'track';
@@ -125,7 +124,7 @@ export default {
             if(message3 != null) {
                 this.sort = message3;
             }
-            if(this.genre === 'rec') {
+            if(this.genre === 'rec' || this.genre === 'fav') {
                 this.showsortbutton = false;
             }
             else {

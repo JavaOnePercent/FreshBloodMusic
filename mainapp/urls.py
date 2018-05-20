@@ -21,6 +21,7 @@ urlpatterns = [
     # url(r'^performers$', views.performers, name='performers'),
     url(r'^genre$', views.genre, name='genre'),
     url(r'^history$', views.history, name='history'),
+    url(r'^report$', views.report, name='report'),
 
     url(r'^login', views.login, name='login'),
     url(r'^logout', views.logout, name='logout'),
