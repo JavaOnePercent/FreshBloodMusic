@@ -98,11 +98,11 @@ export default {
     },
     created: function() {
         this.autoFlip = setInterval(this.updatePosts, 7000);
-        this.$http.get('top', /*{params: {per: this.period}}*/).then(function(response){
+        this.$http.get('api/top', /*{params: {per: this.period}}*/).then(function(response){
                 //console.log(response.data);
                 this.infotracks = response.data;
-                this.$set(this.infotracks.month, 'label', 'Лучший трек этого месяца')
-                this.$set(this.infotracks.week, 'label', 'Лучший трек этой недели')
+                if(this.infotracks.month) this.$set(this.infotracks.month, 'label', 'Лучший трек этого месяца')
+                if(this.infotracks.week) this.$set(this.infotracks.week, 'label', 'Лучший трек этой недели')
                 /*this.infotracks.forEach(function(item, i, arr) {
                     item[2] = "/media/albums/" + item[2];
                 });*/

@@ -101,6 +101,9 @@ export default {
             albums: [],
             likes: [],
             error:false,
+            name: '',
+            logo: null,
+            description: '',
         }
     },
     watch: {
@@ -111,15 +114,6 @@ export default {
         this.receiveData();
     },
     computed: {
-        name() {
-            return this.$store.state.performer.performerName;
-        },
-        logo() {
-            return this.$store.state.performer.performerLogo;
-        },
-        description() {
-            return this.$store.state.performer.performerDescription;
-        },
         performerID() {
             return this.$store.state.performer.performerID;
         },
@@ -130,7 +124,7 @@ export default {
     methods: {
         receiveData() {
             var id = this.$route.params.id;
-            this.$http.get('performers/' + id).then(function(response){
+            this.$http.get('../api/performers/' + id).then(function(response){
                 //console.log(response.body)
                 for(var i = 0; i < response.body.albums.length; i++)
                 {
@@ -150,14 +144,17 @@ export default {
                 //         response.body.image_per = "/static/mainapp/images/cat.jpg"
                 //     }
                 this.$store.commit('performerID', response.body.id);
-                this.$store.commit('performerName', response.body.name_per);
+                /*this.$store.commit('performerName', response.body.name_per);
                 this.$store.commit('performerLogo', response.body.image_per);
-                this.$store.commit('performerDescription', response.body.about_per);
+                this.$store.commit('performerDescription', response.body.about_per);*/
+                this.name = response.body.name_per
+                this.logo = response.body.image_per + '?' + Math.random()
+                this.description = response.body.about_per
                 this.error=false;
             }, function(error){
                 this.error=true;
             });
-            this.$http.get('likes', {params: {performer: id}}).then(function(response){
+            this.$http.get('../api/likes', {params: {performer: id}}).then(function(response){
                 this.likes = []
                 for(var i = 0; i < response.body.length; i++)
                 {
@@ -169,7 +166,7 @@ export default {
             return 'background-image: url('+ url +')';
         },
         nastrClick() {
-            this.$emit('nastr-clicked');
+            this.logo = ''
         },
         toQueueClick: function(index) {
             //this.$emit('trackclicked');

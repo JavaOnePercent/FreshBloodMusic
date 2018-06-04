@@ -132,7 +132,7 @@ export default {
             this.show=!this.show;
             if(this.menuItems.length === 0)
             {
-                this.$http.get('genre').then(response => {response.body.forEach(this.genresIterator)})
+                this.$http.get('api/genre').then(response => {response.body.forEach(this.genresIterator)})
             }
         },
         
@@ -143,7 +143,7 @@ export default {
         genreClick(index) {
             this.menuIndexfunc(index);
             if(this.menuItems[index].children.length === 0)
-                this.$http.get('genre', {params: {id: this.menuItems[index].id}}).then(response => {response.body.forEach(this.stylesIterator)});
+                this.$http.get('api/genre', {params: {id: this.menuItems[index].id}}).then(response => {response.body.forEach(this.stylesIterator)});
         },
       
         stylesIterator(item, i, arr) { 
@@ -335,7 +335,7 @@ export default {
             if (track_name_loader && track) {
                 this.errorMessage = '';
                 this.loader=true;
-                this.$http.post('albums', data).then(function(response){
+                this.$http.post('api/albums', data).then(function(response){
                     this.loader=false
                 console.log('Success! Response: ', response.body);})
             }

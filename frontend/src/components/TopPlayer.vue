@@ -109,14 +109,14 @@ export default {
             }
             if(!event) event = 'next'
             var self = this
-            this.$http.get('tracks/' + event, {
+            this.$http.get('../api/tracks/' + event, {
                     responseType: 'json'
                 }).then(response => {
                     self.$store.commit('pushQueueTracks', response.data)
-                    self.$http.put('history', {}, {
+                    self.$http.put('../api/history', {}, {
                         responseType: 'json',
                         params: { track_id: response.data.id }
-                        }).then(response => { self.loadNextTrack() });
+                        }).then(response => { self.loadNextTrack() }, error => { self.loadNextTrack(); });
                 });
             
         });
@@ -225,9 +225,8 @@ export default {
             }
             if(isNotInQueue)
             {
-                this.$http.get('track_attr', {
-                    responseType: 'json',
-                    params: { id: id }
+                this.$http.get('../api/tracks/' + id, {
+                    responseType: 'json'
                 }).then(response => {
                     this.$store.commit('pushQueueTracks', response.data)
                     
@@ -241,9 +240,8 @@ export default {
         },
         playNow(id) {
             if(this.current.id !== id)
-                this.$http.get('track_attr', {
-                    responseType: 'json',
-                    params: { id: id }
+                this.$http.get('../api/tracks/' + id, {
+                    responseType: 'json'
                 }).then(response => {
                     //this.$store.commit('pushHistoryTracks', this.track.current)
                     this.$store.commit('unshiftQueueTracks', response.data)
@@ -267,10 +265,10 @@ export default {
                 //this.$store.commit('removeFirstQueueTracks')
                 
                 var self = this
-                this.$http.put('history', {}, {
+                this.$http.put('../api/history', {}, {
                     responseType: 'json',
                     params: { track_id: first.id }
-                }).then(response => { self.loadNextTrack(); });
+                }).then(response => { self.loadNextTrack(); }, error => { self.loadNextTrack(); });
             }
         },
         switchPlayerView() {
@@ -287,12 +285,12 @@ export default {
                     track_id: this.track.currentID
                 };
                 if(this.logos.isLiked)
-                    this.$http.put('likes', {}, {
+                    this.$http.put('../api/likes', {}, {
                         //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //добавление
                 else
-                    this.$http.delete('likes', {
+                    this.$http.delete('api/likes', {
                         //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //удаление
@@ -317,7 +315,7 @@ export default {
                 this.nextTrackSuccessFunc()
             }
             else
-                this.$http.get('tracks/next', {responseType: 'json'}).then(response => {
+                this.$http.get('../api/tracks/next', {responseType: 'json'}).then(response => {
                     var track = response.data
                     track.auto = true
                     self.$store.commit('pushQueueTracks', track)

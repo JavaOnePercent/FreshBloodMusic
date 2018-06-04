@@ -47,8 +47,8 @@
                 <div class="N-subbmit block nastr-row">
                     
                         <div class="str" > 
-                            <router-link :to="'/performers/' + myPerformerID"><button @click='saveSettings' class="N-sub" name="sub"> Сохранить </button></router-link>
-                            <router-link :to="'/performers/' + myPerformerID"><div type="reset" class="Cancel" @click="cencleClick">Отмена</div></router-link>
+                            <div @click='saveSettings' class="N-sub" name="sub"> Сохранить </div>
+                            <router-link :to="'/performers/' + myPerformerID"><div type="reset" class="Cancel">Отмена</div></router-link>
                         </div>
                     
                 </div>             
@@ -91,11 +91,13 @@ export default {
     },
     methods: {
         getData() {
-            this.$http.get('performers/' + this.myPerformerID).then(function(response){
+            this.$http.get('../api/performers/' + this.myPerformerID).then(function(response){
                     this.id = this.myPerformerID
                     this.name = response.data.name_per
                     //this.label = response.data.image_per
+                    this.src = response.data.image_per + '?' + Math.random()
                     this.description = response.data.about_per
+                    document.getElementById('lable').style = ""
                 })
         },
          setLabel(e) {
@@ -140,9 +142,10 @@ export default {
             data.append('name', this.name);
             data.append('label', this.label);
             data.append('description', this.description);
-            data.append('id', this.id);
-            this.$http.put('performers/' + this.id, data).then(function(response){
+            var self = this
+            this.$http.put('../api/performers/' + this.id, data).then(function(response){
                 this.$store.commit('performerLogo', '');
+                self.$router.push('performers/' + self.myPerformerID)
             });
         }
     },
@@ -272,7 +275,7 @@ textarea
 	height: 40px;
 	padding-right: 5px;
 	position: relative;
-	line-height: 35px;
+	line-height: 40px;
 	text-align: center;
 }
 .N-sub:hover

@@ -48,7 +48,7 @@ export default {
         logout() {
             var self = this
             this.menuShow=false
-            this.$http.get('logout').then(function(response){
+            this.$http.get('api/logout').then(function(response){
                 self.$store.commit("username", '')
             });
         }

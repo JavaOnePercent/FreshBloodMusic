@@ -103,7 +103,7 @@ export default {
           var obj = {};
           if(message1 != null || message2 != null)
           {
-            this.url = 'tracks';
+            this.url = 'api/tracks';
             this.compilations = [];
             if(message1 != null) {
                 this.genre = message1;
@@ -171,7 +171,7 @@ export default {
         },
         //для Илюши
         getGengeAndStyles: function (message = null) {
-            this.$http.get('genre', {params: {id: message}}).then(function(response){
+            this.$http.get('api/genre', {params: {id: message}}).then(function(response){
                 // console.log(response.data)
                 if(message == null) {
                     this.genres = response.data;

@@ -22,7 +22,7 @@ export default {
     },
     methods: {
         showBest: function() {
-            this.$http.get('performers').then(function(response){
+            this.$http.get('api/performers').then(function(response){
                 //console.log(response);
                 this.compositors = response.data;
                 /*this.compositors.forEach(function(item, i, arr) {

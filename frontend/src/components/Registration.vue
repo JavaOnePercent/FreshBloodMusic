@@ -89,7 +89,7 @@ export default {
                 data.append('email', this.email);
                 data.append('password', this.password1);
                 var self = this;
-                this.$http.post('register', data).then(function(response){
+                this.$http.post('api/register', data).then(function(response){
                     self.$store.commit('username', response.data.username)
                     self.$router.push('performers/' + response.data.per_id)
                     self.$store.commit('performerID', response.data.per_id)

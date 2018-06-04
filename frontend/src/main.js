@@ -155,15 +155,15 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
 })
 
 const router = new VueRouter({
-  routes: [
+    routes: [
         { path: '/register', component: registration },
         { path: '/login', component: login },
         { path: '/performers/:id', name: 'performer', component: profile },
         { path: '/settings', component: settings },
         { path: '/', component: main },
-  ],
-  linkActiveClass: 'router-link-noob',
-  linkExactActiveClass: 'router-link-noob'
+    ],
+    linkActiveClass: 'router-link-noob',
+    linkExactActiveClass: 'router-link-noob'
 });
 
 new Vue({
