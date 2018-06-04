@@ -516,6 +516,7 @@ export default {
 }
 .group-name
 {
+    cursor: default;
     width:100%; 
     position: relative;
     backface-visibility: hidden;
@@ -531,6 +532,7 @@ export default {
 }
 .music-name
 {
+    cursor: pointer;
     position: relative;
     backface-visibility: hidden;
     overflow-x:hidden;
