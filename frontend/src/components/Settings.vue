@@ -3,29 +3,31 @@
         <form method="POST">
             <div class="nastr-row">
                 <div class="mainNastr block">
-                    <label>Настройки</label>
+                    <label style="fontSize:135%">Настройки</label>
                     <hr>
                     <div class="N-name str">
                         <label class="line">Ваше имя:</label>
                         <input v-model="name" class="" type="text" name="N-name" maxlength="40"/>
                     </div>
-                    <div class="N-Lable str">
+                    <div class="N-Lable str nastr-row" style="padding:15px 0">
                         <label class="line">Аватар:</label>
-                        <input @change="setLabel" type="file" name="lable" multiple accept="image/*" />
+                        <img style="display:none" id="lable" class="lable" :src="src" alt="обложка">
+                        <label class="imit" @click="imit">Выберите фото</label>
+                        <input style="display:none" ref="fileInput" @change="setLabel" type="file" name="lable" multiple accept="image/*" />
                     </div> 
-                    <div class="N-Description nastr-row">
+                    <div class="N-Description str">
                         <label class="line">О себе:</label>
                         <textarea v-model="description" class="" type="text" name="N-Description" maxlength="800">
                         </textarea>
                     </div>              
                 </div>
         
-                <div class="N-vk block nastr-row">
+                <div style="display:none" class="N-vk block nastr-row">
                     <label class="line">Привязка акканута к ВК:</label>
                     ну а тут можно просто ссылку требовать в инпут 
                 </div>
         
-                <div class="N-style block nastr-row">
+                <div style="display:none" class="N-style block nastr-row">
                     <label>Вид страницы</label>
                     <hr>
                     <div class="str">
@@ -46,7 +48,7 @@
                     
                         <div class="str" > 
                             <router-link :to="'/performers/' + myPerformerID"><button @click='saveSettings' class="N-sub" name="sub"> Сохранить </button></router-link>
-                            <router-link :to="'/performers/' + myPerformerID"><div type="reset" class="Cancel">Отмена</div></router-link>
+                            <router-link :to="'/performers/' + myPerformerID"><div type="reset" class="Cancel" @click="cencleClick">Отмена</div></router-link>
                         </div>
                     
                 </div>             
@@ -63,7 +65,8 @@ export default {
             name: '',
             label: null,
             description: '',
-            id: 0
+            id: 0, 
+            src: ''
         }
     },
     /*computed: {
@@ -95,14 +98,49 @@ export default {
                     this.description = response.data.about_per
                 })
         },
-        setLabel(e) {
+         setLabel(e) {
+            e.preventDefault();
+            var preview = document.querySelector('img[alt="обложка"]');  
+            var file    = document.querySelector('input[name="lable"]').files[0];
+            var reader  = new FileReader();
+
             this.label = e.target.files[0];
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+                document.getElementById('lable').style.display="block"
+            }
+            
+            if (file) {
+            if(e.target.files[0].type =="image/jpeg" || e.target.files[0].type =="image/png" ) //проверяем формат файла (переписать)
+            {   
+                reader.readAsDataURL(file);
+                this.imgStyle='Loaderimg';
+            } 
+            else 
+            {
+                document.getElementById('lable').style.display="none"
+                preview.src = "";
+                this.$refs.fileInput.value  =  ""; 
+            }
+            }
+            else 
+            {
+                document.getElementById('lable').style.display="none"
+                preview.src = "";
+                this.$refs.fileInput.value  =  ""; 
+            }
+
+        },
+        imit:function(){
+            this.$refs.fileInput.click()
         },
         saveSettings() {
             var data = new FormData();
             data.append('name', this.name);
             data.append('label', this.label);
             data.append('description', this.description);
+            data.append('id', this.id);
             this.$http.put('performers/' + this.id, data).then(function(response){
                 this.$store.commit('performerLogo', '');
             });
@@ -119,16 +157,22 @@ export default {
 <style scoped>
 .nastr-conteiner
 {
+    background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(36, 87, 189, 0.2));
+    font-size: 110%;
     top: 55px;
     position: relative;
-    padding-left: 15px;
-    padding-right: 15px;
-    max-width: 1024px;
+    width: 100%;
     margin: 0 auto;
     padding-bottom:69px; 
 }
 .nastr-row
 {
+    padding-bottom: 69px; 
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: 0 auto;
+    max-width: 1143px; 
+    min-width: 915px; 
     padding-top: 15px; 
     margin: 0 auto;
 }
@@ -142,6 +186,7 @@ export default {
 
 .block
 {
+    box-shadow: 0 5px 12px rgba(0,0,0,0.15), 0 3px 3px rgba(0,0,0,0.12);
     padding: 1%;
     background-color: #fff;
     display: block;
@@ -150,19 +195,56 @@ export default {
 }
 .str
 {
+    height: auto;
     width: 100%;
     padding-bottom: 13px;
+}
+.lable
+{
+    margin-right:10px; 
+    float: left;
+    position: relative;
+    object-fit: cover;
+    border-style: solid;
+    border-color:black;
+    width: 250px;
+    height: auto;
 }
 input
 {
     padding: 5px;
-    width: 50%;
+    width: 500px;
     height: 15px;
+}
+input[type=file]
+{
+    /* float: left;
+    clear: both; */
+    position: relative;
+    width: 200px;
+}
+.imit
+{
+    cursor: pointer;
+    background-color: rgba(0, 153, 153,0.5);
+    line-height: 28px;
+    display: inline-block;
+    height: 28px;
+    /* border: solid;
+    border-color:black;
+    border-width: 0.1px; */
+    position: relative;
+    padding: 0 5px
+}
+.imit:hover
+{
+    background-color: rgba(27, 223, 223, 0.5);
 }
 textarea
 {
+    font-family: Arial,Helvetica,sans-serif;
     padding: 5px;
-    width: 50%;
+    width: 500px;
     height: 60px;
     resize: vertical;
     max-height: 250px;
@@ -172,7 +254,8 @@ textarea
 {
     padding-right: 9px;
     line-height: 28px;
-    width: 25%;
+    position: relative;
+    width: 300px;
     float: left;
     text-align: right;
 }
@@ -183,7 +266,7 @@ textarea
     color: #fff;
 	font-size: 100%; 
 	cursor: pointer;
-	background-color: rgb(102, 204, 0);
+	background-color: rgba(0, 153, 38,0.7);
 	border: none;
 	width: 30%;
 	height: 40px;
@@ -191,6 +274,10 @@ textarea
 	position: relative;
 	line-height: 35px;
 	text-align: center;
+}
+.N-sub:hover
+{
+    background-color:  rgba(16, 180, 57, 0.7)
 }
 .Cancel
 {
@@ -201,6 +288,11 @@ textarea
     width: 20%;
     height: 40px;
     line-height: 40px;
+    color: black;
     background-color: rgb(153, 153, 153);
+}
+.Cancel:hover
+{
+    background-color: rgb(177, 177, 177);
 }
 </style>
