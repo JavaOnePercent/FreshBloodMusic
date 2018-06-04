@@ -46,7 +46,7 @@
                     
                         <div class="str" > 
                             <router-link :to="'/performers/' + myPerformerID"><button @click='saveSettings' class="N-sub" name="sub"> Сохранить </button></router-link>
-                            <router-link :to="'/performers/' + myPerformerID"><div type="reset" class="Cancel" @click="cencleClick">Отмена</div></router-link>
+                            <router-link :to="'/performers/' + myPerformerID"><div type="reset" class="Cancel">Отмена</div></router-link>
                         </div>
                     
                 </div>             
@@ -77,15 +77,24 @@ export default {
             return this.$store.state.performerDescription
         }
     },*/
+    watch: {
+        myPerformerID(id) {
+            if(id !== 0)
+                this.getData()
+        }
+    },
     created() {
-        this.$http.get('performers/' + this.myPerformerID).then(function(response){
-            this.id = this.myPerformerID
-            this.name = response.data.name_per
-            //this.label = response.data.image_per
-            this.description = response.data.about_per
-        })
+        this.getData()
     },
     methods: {
+        getData() {
+            this.$http.get('performers/' + this.myPerformerID).then(function(response){
+                    this.id = this.myPerformerID
+                    this.name = response.data.name_per
+                    //this.label = response.data.image_per
+                    this.description = response.data.about_per
+                })
+        },
         setLabel(e) {
             this.label = e.target.files[0];
         },
@@ -94,16 +103,10 @@ export default {
             data.append('name', this.name);
             data.append('label', this.label);
             data.append('description', this.description);
-            data.append('id', this.id);
-            this.$http.post('performers', data).then(function(response){
-                //this.$store.commit('performerLogo', '');
-                this.$store.commit('performerLogo', this.label);
-                this.$emit('cencle-clicked');
+            this.$http.put('performers/' + this.id, data).then(function(response){
+                this.$store.commit('performerLogo', '');
             });
-        },
-        cencleClick(){
-            this.$emit('cencle-clicked');
-        } 
+        }
     },
     computed: {
         myPerformerID() {
