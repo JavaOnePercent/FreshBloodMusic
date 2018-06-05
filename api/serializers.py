@@ -32,6 +32,8 @@ class TopTrackSerializer(serializers.ModelSerializer):  # сериалайзер
 
 
 class SmallTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека только с именем
+    #likes = serializers.IntegerField()
+
     class Meta:
         model = Track
         fields = ('id', 'name_trc')
@@ -62,7 +64,7 @@ class AlbumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Album
-        fields = ('name_alb', 'genre', 'style', 'image_alb', 'date_alb', 'tracks')
+        fields = ('name_alb', 'genre', 'style', 'image_alb', 'date_alb', 'tracks', 'id')
 
 
 class FullPerformerSerializer(serializers.ModelSerializer):

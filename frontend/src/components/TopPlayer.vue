@@ -1,13 +1,12 @@
 <template>
-    <div>
         <!--<link rel="stylesheet" type="text/css" href="{% static 'mainapp/css/audio.css' %}" />
         <link id="playerCSS" rel="stylesheet" type="text/css" :href="CSSRef" />-->
         <div :class="isFull ? 'full-player' : 'player'" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
             <div :class="isFull ? 'full-player-container' : 'player-container'" :style="containerMove">
                 <buttons :isFull="isFull" @nextclick="playNextTrack" @prevclick="prevClick" @dropdownclick="switchPlayerView"></buttons>
                 <logos ref="logos" v-bind="logos" @likepressed="onLikePressed" :isFull="isFull"></logos>
-                <menu-more :performerID="performerID" :isFull="isFull"></menu-more>
-                <track-performer v-bind="trackPerformer" :isFull="isFull"></track-performer>
+                <menu-more :performerID="performerID" :isLiked="logos.isLiked" @likepressed="onLikePressed" @show-performer="isFull = false" :isFull="isFull"></menu-more>
+                <track-performer :performerID="performerID" v-bind="trackPerformer" :isFull="isFull"></track-performer>
                 <volume-controller ref="volumeController" :isFull="isFull"></volume-controller>
                 <audio-player ref="audioPlayer" v-bind="audio" @playingended="playingEnded" :isFull="isFull"></audio-player>
                 <queue :isFull="isFull"></queue>
@@ -16,7 +15,6 @@
                 
             <progress-bar :isPlayerHovered="isHovered" :isFull="isFull" :style="containerMove"></progress-bar>
         </div>
-    </div>
 </template>
 
 <script>
@@ -48,7 +46,7 @@ export default {
             //CSSRef: CSSRefs.small,
             isFull: false,
             isHovered: false,
-            containerMove: {},
+            containerMove: {left: 0, right: 0},
             performerID: 0,
             track: {
                 currentID: null,
@@ -158,7 +156,11 @@ export default {
                 window.removeEventListener('resize', this.updateContainer);
                 this.containerMove = {}
             }
+        },
+        '$route': function() {
+            this.isFull = false
         }
+    
     },
     methods: {
 
@@ -187,23 +189,29 @@ export default {
         moveContainer(prop) {
             if (prop === 'left')
             {
-                if(this.containerMove.left === undefined)
+                if(this.containerMove.left === 0)
+                {
                     this.setContainer(prop);
+                    this.containerMove.right = 0;
+                }
                 else
-                    this.containerMove.left = undefined;
+                    this.containerMove.left = 0;
             }
             else if (prop === 'right')
-                if(this.containerMove.right === undefined)
+                if(this.containerMove.right === 0)
+                {
                     this.setContainer(prop);
+                    this.containerMove.left = 0;
+                }
                 else
-                    this.containerMove.right = undefined;
+                    this.containerMove.right = 0;
         },
         updateContainer() {
-            if (this.containerMove.left !== undefined)
+            if (this.containerMove.left !== 0)
             {
                 this.setContainer('left');
             }
-            if (this.containerMove.right !== undefined)
+            if (this.containerMove.right !== 0)
             {
                 this.setContainer('right');
             }
@@ -211,7 +219,12 @@ export default {
         setContainer(prop) {
             var dist = document.body.offsetWidth / 2 - 675;
             var offset = (dist < 0) ? (((dist-30) * 2) + 'px') : '0'
-            this.$set(this.containerMove, prop, offset)
+            //this.$set(this.containerMove, prop, offset)
+            //this.containerMove[prop] = offset
+            if (prop == 'left')
+                this.containerMove.left = offset
+            else
+                this.containerMove.right = offset
         },
         pushQueue(id) {
             var isNotInQueue = true
@@ -252,6 +265,8 @@ export default {
                     //this.track.nextID = id;
                     this.playNextTrack();
                 });
+            else
+                this.$refs.audioPlayer.startPlaying()
         },
         playNextTrack() {
             //this.queue.tracks[0]
@@ -290,7 +305,7 @@ export default {
                         params: varData
                     }).then(this.successfulLikeFunc); //добавление
                 else
-                    this.$http.delete('api/likes', {
+                    this.$http.delete('../api/likes', {
                         //headers: {"X-CSRFToken": csrftoken},
                         params: varData
                     }).then(this.successfulLikeFunc); //удаление

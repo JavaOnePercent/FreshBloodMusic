@@ -62,23 +62,26 @@
                             <p>Тут любимый альбом</p>
                         </div>-->
                         <div class="MyAlbums Rblock">
-                            <label>Мои издания</label>
+                            <label>Издания</label>
 
-                            <div class="MyAlbums-conteiner" :key="index" v-for="(album, index) in albums">
+                            <div class="MyAlbums-conteiner" :key="i" v-for="(album, i) in albums">
                                 <div class="MyAlbum">
-                                    <img class="MyAlbum-lable" :src="album.logo" alt="настройки"/>
+                                    <img class="MyAlbum-lable" :src="album.image_alb" alt="настройки"/>
                                     <div class="Albom-Description">
-                                        <span> {{ album.name }}</span>
-                                        <label> жанр: {{ album.genre }}</label>
-                                        <label> дата выхода: {{ album.date }}</label>
+                                        <span> {{ album.name_alb }}</span>
+                                        Удалить альбом: <div @click="deleteAlbum(i)" class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/xiomi.png);"></div>
+                                        Проиграть весь альбом: <div @click="playAlbum(album.tracks)" class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg);"></div>
+                                        <label> жанр: {{ album.genre + " / " + album.style }}</label>
+                                        <label> дата выхода: {{ album.date_alb }}</label>
                                         <span class="more"> подробнее... </span>
                                     </div>
                                     <div class="MyAlbum-music">
                                         <div class="Mymusic-conteiner">
-                                            <div @click="playClick(track.id)" class="MyMusic" :key="index" v-for="(track, index) in album.tracks">
+                                            <div @click="playClick(track.id)" class="MyMusic" :key="j" v-for="(track, j) in album.tracks">
                                                 <!--<div class="likedMusicHover"></div>-->
                                                 <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
-                                                {{ track.name }}
+                                                {{ track.name_trc }} Лайки: {{ track.likes }}
+                                                <div @click="deleteTrack(i, j)" class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/xiomi.png);"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -122,27 +125,50 @@ export default {
         }
     },
     methods: {
+        playAlbum(tracks) {
+            for(var i = 1; i < tracks.length; i++)
+            {
+                this.$bus.$emit('track-to-queue', tracks[i])
+            }
+            this.$bus.$emit('play-track', tracks[0])
+            
+        },
+        deleteTrack(i, j) {
+            this.$http.delete('../api/tracks/' + this.albums[i].tracks[j].id).then(
+                response => {
+                    this.albums[i].tracks.splice(j, 1)
+                }
+            )
+        },
+        deleteAlbum(i) {
+            this.$http.delete('../api/albums/' + this.albums[i].id).then(
+                response => {
+                    this.albums.splice(i, 1)
+                }
+            )
+        },
         receiveData() {
             var id = this.$route.params.id;
             this.$http.get('../api/performers/' + id).then(function(response){
                 //console.log(response.body)
-                for(var i = 0; i < response.body.albums.length; i++)
+                /*for(var i = 0; i < response.body.albums.length; i++)
                 {
                     var tracks = [];
                     for(var j = 0; j < response.body.albums[i].tracks.length; j++)
                     {
-                        tracks.push({name: response.body.albums[i].tracks[j].name_trc, id: response.body.albums[i].tracks[j].id});
+                        tracks.push(response.body.albums[i].tracks[j]);
                     }
                     this.$set(this.albums, i, { name: response.body.albums[i].name_alb,
                                                 logo: response.body.albums[i].image_alb,
                                                 genre: response.body.albums[i].genre + ' / ' + response.body.albums[i].style,
                                                 date: response.body.albums[i].date_alb,
                                                 tracks: tracks});
-                }
+                }*/
                 //  if(response.body.image_per === null )
                 //     {
                 //         response.body.image_per = "/static/mainapp/images/cat.jpg"
                 //     }
+                this.albums = response.body.albums
                 this.$store.commit('performerID', response.body.id);
                 /*this.$store.commit('performerName', response.body.name_per);
                 this.$store.commit('performerLogo', response.body.image_per);

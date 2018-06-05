@@ -65,6 +65,19 @@ class AlbumMethods:
         albums = Album.objects.filter(per_id=Performer.objects.get(pk=performer))
         return albums
 
+    @staticmethod
+    def delete(id, user_id):
+        try:
+            album = Album.objects.get(pk=id)
+            if user_id == album.per_id.user_id.id:
+                album.delete()
+                return True
+            else:
+                return False
+        except ObjectDoesNotExist:
+            return False
+
+
 
 class TrackMethods:
     @staticmethod
@@ -85,11 +98,23 @@ class TrackMethods:
     @staticmethod
     def get(id):
         try:
-            return Track.objects.all().get(pk=id)
+            return Track.objects.get(pk=id)
         except ObjectDoesNotExist:
             return None
 
     @staticmethod
+    def delete(id, user_id):
+        try:
+            track = Track.objects.get(pk=id)
+            if user_id == track.alb_id.per_id.user_id.id:
+                track.delete()
+                return True
+            else:
+                return False
+        except ObjectDoesNotExist:
+            return False
+
+    '''@staticmethod
     def get_two(parsed_json=None):
         # возвращает два трека рандомно (принимает json, в котором id текущего и следующего трека)
 
@@ -111,7 +136,7 @@ class TrackMethods:
                     tracks.append(track)
                     break
 
-        return tracks
+        return tracks'''
 
 
 class GenreMethods:
@@ -132,6 +157,12 @@ class LikedTrackMethods:
         user = Performer.objects.get(pk=per_id).user_id
         likes = LikedTrack.objects.filter(user_id=user)
         return likes
+
+    @staticmethod
+    def likesAmount(track):
+        trc = Track.objects.get(pk=track)
+        likes = LikedTrack.objects.filter(trc_id=trc)
+        return likes.count()
 
     @staticmethod
     def add_like(track_id, user_id):  # добавление нового лайка в таблицу
@@ -209,7 +240,7 @@ class TrackHistoryMethods:
                     TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)
                 else:
                     TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)'''
-
+            TrackHistory.objects.filter(user_id=user, trc_id=track).delete()
             TrackHistory(user_id=user, trc_id=track).save()
             return True
         else:

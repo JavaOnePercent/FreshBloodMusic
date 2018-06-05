@@ -9,9 +9,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from rest_framework.views import APIView
 
 from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory
-from django.db.models import Q
 from django.http import HttpResponse, Http404
-from .uploader import Compressor, save_album, save_performer
+from .uploader import save_album, save_performer
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
     PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer, \
     TrackHistorySerializer
@@ -20,19 +19,11 @@ from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreS
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, generics
-import math
-from rest_framework.pagination import (
-    LimitOffsetPagination,
-    PageNumberPagination,
-    CursorPagination,
-    )
+
+from rest_framework.pagination import PageNumberPagination
+
 
 from pprint import pprint
-
-
-
-from django.contrib.auth.forms import UserCreationForm
-from django.template.context_processors import csrf
 
 
 @ensure_csrf_cookie
@@ -153,19 +144,24 @@ class TrackDetail(APIView):
     def get(self, request, pk, format=None):
         if re.fullmatch(r'[0-9]+', pk):
             track = self.get_object(pk)
-            serializer = TrackSerializer(track)
-            return Response(serializer.data, status=status.HTTP_200_OK)
         elif pk == 'next':
             track = self.get_next(auth.get_user(request).id)
-            serializer = TrackSerializer(track)
-            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        serializer = TrackSerializer(track)
+        is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, track.id)
+        data = dict(serializer.data)
+        data["is_liked"] = is_liked
+        #serializer.data["is_liked"] = is_liked
+        return Response(data, status=status.HTTP_200_OK)
 
-'''def gettrack(authuser):  # для Димы
-    tracks = Track.objects.all().filter(id=TrackRecommendation.get_recommendation(authuser)[0])
-    return tracks'''
+    def delete(self, request, pk, format=None):
+        delete = TrackMethods.delete(pk, auth.get_user(request).id)
+        if delete:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -199,7 +195,35 @@ class Names:
         self.image_track = image_track
 
 
-@api_view(['POST', 'GET'])
+class AlbumsList(APIView):
+
+    def post(self, request, format=None):
+        album_name = request.POST["name"]
+        gen_id = request.POST["gen_id"]
+        try:
+            photo = request.FILES["photo"]
+        except MultiValueDictKeyError:
+            photo = None
+        tracks = request.FILES.getlist('track')
+        track_name = request.POST.getlist("track_name")
+        pprint(track_name)
+        print(request.POST)
+        save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks,
+                   track_name=list(track_name))
+        return Response(status=status.HTTP_200_OK)
+
+
+class AlbumDetail(APIView):
+
+    def delete(self, request, pk, format=None):
+        delete = AlbumMethods.delete(pk, auth.get_user(request).id)
+        if delete:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+'''@api_view(['POST', 'GET'])
 def albums(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
     if request.method == 'POST':
         album_name = request.POST["name"]
@@ -219,7 +243,7 @@ def albums(request):  # нужно сделать отдельный запро�
     if request.method == "GET":
         albums = AlbumMethods.get(auth.get_user(request).id)
         serializer = AlbumSerializer(albums, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)'''
 
 
 @api_view(['GET'])
@@ -257,6 +281,9 @@ class PerformerDetail(APIView):
         if re.fullmatch(r'[0-9]+', pk):
             performer = self.get_object(pk)
             serializer = FullPerformerSerializer(performer)
+            for album in serializer.data["albums"]:
+                for track in album["tracks"]:
+                    track["likes"] = LikedTrackMethods.likesAmount(track["id"])
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -317,9 +344,9 @@ def history(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(['PUT'])
 def report(request):
-    if request.method == 'GET':
+    if request.method == 'PUT':
         track = request.query_params['track']
         result = TrackReportMethods.create(track, auth.get_user(request).id)
         if result:

@@ -1,21 +1,21 @@
 <template>
     <div id="loader-conteiner" class="loader-conteiner">
         <header class="Loaderheader">
-            <span>Загрузка музыки</span>
+            <span>Загрузка музыкального издания</span>
             <img class="esc" src="/static/mainapp/images/whiteClose.png" @click="close">
         </header>
         <form method="POST">
             <div class="track-img-loader-conteiner" >
-                <label>Обложка издания:</label>
+                <label>Обложка:</label>
                 <img :class="imgStyle"  @click="imit" src="/static/mainapp/images/camera.svg" alt="обложка">
             </div>
             <div class="track-name-loader-conteiner">
-                <label for="track-name-loader">Название издания*:</label>
+                <label for="track-name-loader">Название*:</label>
                 <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="40">
             </div>
     
             <div class="track-janr-loader-conteiner">
-                <label for="track-janr-loader">Жанр издания*:</label>
+                <label for="track-janr-loader">Жанр*:</label>
                 <div class="Loaderjanr" @click="genresButtonClick">{{ janr }}</div>
                 <ul class="janr-drop" v-if="show">
                     <li v-for="(item,index) in menuItems" :key="index" @click='genreClick(index)'>{{ item.name }}
@@ -28,7 +28,7 @@
             </div>
     
             <div class="description-conteiner">
-                <label for="track-name-loader">Описание издания:</label>
+                <label for="track-name-loader">Описание:</label>
                 <textarea type="text" name="description" maxlength="800"> </textarea>
             </div>
     
@@ -47,7 +47,7 @@
             <div style="pointer-events: all" id = "dropbox" class="add" :class="loaderStyle">
                 <label>
                     <input style="display:none" id='add' ref="add" @change="sync_track" type="file" name="track" multiple accept="audio/mpeg" >
-                    Добавить композицию
+                    Добавить композиции
                 </label>
             </div>
             <div id="error" class="error"><label  >{{errorMessage}} </label></div>

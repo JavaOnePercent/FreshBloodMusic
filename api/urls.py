@@ -9,7 +9,8 @@ urlpatterns = [
     # url(r'^next$', views.next_track, name='next_track'),  # запрос следующего трека
     url(r'^likes$', views.likes, name='likes'),  # обработка лайкусиков
     # url(r'^add_album/$', views.add_album, name='add_album'),
-    url(r'^albums$', views.albums, name='albums'),
+    url(r'^albums$', views.AlbumsList.as_view()),
+    url(r'^albums/(?P<pk>\w+)$', views.AlbumDetail.as_view()),
     url(r'^performers$', views.PerformersList.as_view()),
     url(r'^performers/(?P<pk>\w+)$', views.PerformerDetail.as_view()),
     url(r'^genre$', views.genre, name='genre'),
