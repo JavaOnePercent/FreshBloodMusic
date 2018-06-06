@@ -179,7 +179,7 @@ export default {
         float: left;
         text-align: center;
         color: white;
-        width: 65%;
+        width: calc(100% - 280px);
     }
     .img /*обложка лучшей композиции*/
     {

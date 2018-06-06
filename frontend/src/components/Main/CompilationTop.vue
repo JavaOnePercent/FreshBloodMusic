@@ -211,6 +211,7 @@ export default {
     position: relative;
     display: flex;
     flex-direction: column;
+    z-index: 10;
 }
 .recommendations .music-style, .recommendations .janrStyles
 {

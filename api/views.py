@@ -220,7 +220,7 @@ def genre(request):
 class PerformersList(APIView):
 
     def get(self, request, format=None):
-        performer = Performer.objects.order_by('rating_per').reverse()[:3]
+        performer = Performer.objects.order_by('rating_per').reverse()[:5]
         serializer = PerformerSerializer(performer, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

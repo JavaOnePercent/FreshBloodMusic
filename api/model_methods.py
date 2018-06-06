@@ -113,30 +113,6 @@ class TrackMethods:
         except ObjectDoesNotExist:
             return False
 
-    '''@staticmethod
-    def get_two(parsed_json=None):
-        # возвращает два трека рандомно (принимает json, в котором id текущего и следующего трека)
-
-        all_tracks = Track.objects.all()
-        tracks = []
-
-        if parsed_json["next_track"] != '':
-            tracks.append(all_tracks.get(pk=parsed_json["next_track"]))
-            while tracks.__len__() == 1:
-                track = get_random(all_tracks)
-                if track != tracks[0] and str(track.id) != parsed_json["current_track"]:
-                    tracks.append(track)
-                    break
-        else:
-            tracks.append(get_random(all_tracks))
-            while tracks.__len__() == 1:
-                track = get_random(all_tracks)
-                if track != tracks[0]:
-                    tracks.append(track)
-                    break
-
-        return tracks'''
-
 
 class GenreMethods:
     @staticmethod
@@ -270,32 +246,51 @@ class TrackReportMethods:
 
 class TrackRecommendation:
     @staticmethod
-    def get_recommendation(authuser):  # добавление записи жалоб в таблицу
+    def get_recommendation(authuser):
+        userstracks = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('trc_id', 'user_id')
         likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
         historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
         reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
-        idenusers = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('user_id', flat=True).distinct()
-        chance = {}
-        tracks = LikedTrack.objects.all().filter(user_id__in=idenusers).values_list('trc_id')
-        for user in idenusers:
-            likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                     (math.fabs(len(set(likedtracks) | set(tracks)))))
-            chance[user] = likes
-        chance = sorted(chance.items(), key=lambda item: -item[1])
-        tracks = []
-        for key in chance:
-            tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
         identracks = []
-        recommended_in_history = []
-        for track in tracks:
-            if track not in identracks and track not in historytracks and track not in likedtracks and track not in reporttracks:
-                identracks.append(track[0])
-            elif track in historytracks:
-                recommended_in_history.append(track[0])
-        rec_in_hist = TrackHistory.objects.filter(trc_id__in=recommended_in_history, user_id=authuser).order_by('id')
-        for rec in rec_in_hist:
-            # print(rec.id)
-            if rec.trc_id.id in identracks:
-                identracks.remove(rec.trc_id.id)
-            identracks.append(rec.trc_id.id)
+        liked = []
+        for auth in likedtracks:
+            liked.append(auth[0])
+        for track in userstracks:
+            if (track[0],) not in identracks and (track[0],) not in historytracks and (track[0],) not in likedtracks and (track[0],) not in reporttracks:
+                identracks.append(track)
+        dict = TrackRecommendation.dict_trans(userstracks)
+        dictiden = TrackRecommendation.dictiden_trans(identracks)
+        dicttrack = {}
+        likes = 0
+        for d in dictiden.keys():
+            for u in dictiden[d]:
+                likes = likes + ((math.fabs(len(set(liked) & set(dict[str(u)])))) /
+                         (math.fabs(len(set(liked) | set(dict[str(u)])))))
+            likes = likes / len(dictiden[d])
+            dicttrack.update({str(d): likes})
+            likes = 0
+        dicttrack = sorted(dicttrack.items(), key=lambda item: -item[1])
+        identracks = []
+        for iden in dicttrack:
+            identracks.append(int(iden[0]))
         return identracks
+
+    @staticmethod
+    def dict_trans(tuple):
+        dict = {}
+        for iden in tuple:
+            if str(iden[1]) not in dict.keys():
+                dict.update({str(iden[1]): [iden[0]]})
+            else:
+                dict[str(iden[1])].append(iden[0])
+        return dict
+
+    @staticmethod
+    def dictiden_trans(tuple):
+        dict = {}
+        for iden in tuple:
+            if str(iden[0]) not in dict.keys():
+                dict.update({str(iden[0]): [iden[1]]})
+            else:
+                dict[str(iden[0])].append(iden[1])
+        return dict
