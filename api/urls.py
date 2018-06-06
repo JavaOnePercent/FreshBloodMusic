@@ -5,10 +5,7 @@ urlpatterns = [
     url(r'^token$', views.get_token, name='get_token'),  # token
     url(r'^tracks$', views.TrackOverview.as_view(), name='tracks'),
     url(r'^tracks/(?P<pk>\w+)$', views.TrackDetail.as_view()),
-    url(r'^top$', views.top, name='top'),
-    # url(r'^next$', views.next_track, name='next_track'),  # запрос следующего трека
     url(r'^likes$', views.likes, name='likes'),  # обработка лайкусиков
-    # url(r'^add_album/$', views.add_album, name='add_album'),
     url(r'^albums$', views.AlbumsList.as_view()),
     url(r'^albums/(?P<pk>\w+)$', views.AlbumDetail.as_view()),
     url(r'^performers$', views.PerformersList.as_view()),

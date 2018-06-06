@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory
 from django.http import HttpResponse, Http404
-from .uploader import save_album, save_performer
+from .uploader import save_album, save_performer, save_track
 from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
     PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer, \
     TrackHistorySerializer
@@ -37,16 +37,6 @@ def main_view(request):  # главная
     file.close()
     return HttpResponse(index, content_type="text/html")
     # return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
-
-
-'''@api_view(['GET'])  # запрос следующего трека
-def next_track(request):
-    if request.method == 'GET':
-        tracks = TrackMethods.get_two(request.query_params)
-        is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, tracks[0].id)
-        serializer = TrackSerializer(tracks, many=True)
-        serializer.data[0]["is_liked"] = is_liked
-        return Response({'current': serializer.data[0], 'next': serializer.data[1]}, status=status.HTTP_200_OK)'''
 
 
 @api_view(['PUT', 'DELETE', 'GET'])  # обработчик лайков
@@ -80,47 +70,67 @@ class PostLimitOffsetPagination(PageNumberPagination):
     page_size = 12
 
 
-class TrackOverview(generics.ListAPIView):
+class TrackOverview(generics.ListCreateAPIView):
     serializer_class = NoLinkTrackSerializer
     pagination_class = PostLimitOffsetPagination
 
+    def create(self, request, *args, **kwargs):
+        album = request.POST["album"]
+        audio = request.FILES["track"]
+        name = request.POST["track_name"]
+        track = save_track(album, name, audio)
+        return Response({"index": request.POST["index"], 'id': track.id}, status=status.HTTP_201_CREATED)
+
     def get_queryset(self):
         gen = self.request.query_params['gen']
-        sty = self.request.query_params['sty']
-        bool = self.request.query_params['bool']
-        request = self.request
-        if gen != '' and sty == '':
-            if gen == 'fav':
-                likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id').order_by('id')
-                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in likedtracks[0])
-                tracks = Track.objects.filter(id__in=likedtracks).extra(
-                    select={'ordering': ordering}, order_by=('ordering',))
-                '''tracks = []
-                for track in likedtracks:
-                    trc = Track.objects.all().get(id=track[0])
-                    tracks.append(trc)'''
-            elif gen == 'rec':
-                identracks = TrackRecommendation.get_recommendation(auth.get_user(request).id)
-                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
-                tracks = Track.objects.filter(pk__in=identracks).extra(
-                    select={'ordering': ordering}, order_by=('ordering',))
-            elif gen != 'all':
-                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
-            else:
-                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
-            if gen != 'rec' and gen != 'fav':
-                if bool == 'popular':
+        if gen != 'top':
+            TrackOverview.serializer_class = NoLinkTrackSerializer
+            TrackOverview.pagination_class = PostLimitOffsetPagination
+            sty = self.request.query_params['sty']
+            sort = self.request.query_params['sort']
+            request = self.request
+            if gen != '' and sty == '':
+                if gen == 'fav':
+                    likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id').order_by('id')
+                    ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in likedtracks[0])
+                    tracks = Track.objects.filter(id__in=likedtracks).extra(
+                        select={'ordering': ordering}, order_by=('ordering',))
+                    '''tracks = []
+                    for track in likedtracks:
+                        trc = Track.objects.all().get(id=track[0])
+                        tracks.append(trc)'''
+                elif gen == 'rec':
+                    identracks = TrackRecommendation.get_recommendation(auth.get_user(request).id)
+                    ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
+                    tracks = Track.objects.filter(pk__in=identracks).extra(
+                        select={'ordering': ordering}, order_by=('ordering',))
+                elif gen != 'all':
+                    tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
+                else:
+                    tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
+                if gen != 'rec' and gen != 'fav':
+                    if sort == 'popular':
+                        tracks = tracks.order_by('-rating_trc')
+                    elif sort == 'time':
+                        tracks = tracks.order_by('-date_trc')
+                return tracks
+            elif sty != '' and gen == '':
+                tracks = Track.objects.select_related('alb_id__stl_id').filter(alb_id__stl_id=sty)
+                if sort == 'popular':
                     tracks = tracks.order_by('-rating_trc')
-                elif bool == 'time':
+                elif sort == 'time':
                     tracks = tracks.order_by('-date_trc')
-            return tracks
-        elif sty != '' and gen == '':
-            tracks = Track.objects.select_related('alb_id__stl_id').filter(alb_id__stl_id=sty)
-            if bool == 'popular':
-                tracks = tracks.order_by('-rating_trc')
-            elif bool == 'time':
-                tracks = tracks.order_by('-date_trc')
-            return tracks
+                return tracks
+        else:
+            TrackOverview.serializer_class = TopTrackSerializer
+            TrackOverview.pagination_class = None
+            month = Track.objects.order_by('rating_trc').reverse().filter(
+                date_trc__gte=date.today() - timedelta(days=31))[:1]
+            # elif per == 'week':
+            week = Track.objects.order_by('rating_trc').reverse().filter(
+                date_trc__gte=date.today() - timedelta(days=7))[:1]
+            month = month.union(week)
+            return month
 
 
 class TrackDetail(APIView):
@@ -164,37 +174,6 @@ class TrackDetail(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
-def top(request):
-    if request.method == "GET":
-        #per = request.query_params['per']
-        #if per == 'month':
-        month = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=31))[:1]
-        #elif per == 'week':
-        week = Track.objects.order_by('rating_trc').reverse().filter(date_trc__gte=date.today() - timedelta(days=7))[:1]
-        month = month.union(week)
-        monthS = TopTrackSerializer(month, many=True)
-        data = {}
-        try:
-            data['month'] = monthS.data[0]
-        except IndexError:
-            data['month'] = None
-        try:
-            data['week'] = monthS.data[1]
-        except IndexError:
-            data['week'] = None
-        return Response(data, status=status.HTTP_200_OK)
-
-
-class Names:
-    name_track = ""
-    image_track = ""
-
-    def __init__(self, name_track, image_track):
-        self.name_track = name_track
-        self.image_track = image_track
-
-
 class AlbumsList(APIView):
 
     def post(self, request, format=None):
@@ -204,13 +183,12 @@ class AlbumsList(APIView):
             photo = request.FILES["photo"]
         except MultiValueDictKeyError:
             photo = None
-        tracks = request.FILES.getlist('track')
-        track_name = request.POST.getlist("track_name")
-        pprint(track_name)
-        print(request.POST)
-        save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks,
-                   track_name=list(track_name))
-        return Response(status=status.HTTP_200_OK)
+        # tracks = request.FILES.getlist('track')
+        # track_name = request.POST.getlist("track_name")
+        # save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks,
+        # track_name=list(track_name))
+        album = save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo)
+        return Response({"alb_id": album.id}, status=status.HTTP_201_CREATED)
 
 
 class AlbumDetail(APIView):
@@ -221,29 +199,6 @@ class AlbumDetail(APIView):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-'''@api_view(['POST', 'GET'])
-def albums(request):  # нужно сделать отдельный запрос для каждого трека, и тогда можно будет отслеживать процесс их загрузки
-    if request.method == 'POST':
-        album_name = request.POST["name"]
-        gen_id = request.POST["gen_id"]
-        try:
-            photo = request.FILES["photo"]
-        except MultiValueDictKeyError:
-            photo = None
-        tracks = request.FILES.getlist('track')
-        track_name = request.POST.getlist("track_name")
-        pprint(track_name)
-        print(request.POST)
-        save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks, track_name=list(track_name))
-
-        return HttpResponse(status=200)
-
-    if request.method == "GET":
-        albums = AlbumMethods.get(auth.get_user(request).id)
-        serializer = AlbumSerializer(albums, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)'''
 
 
 @api_view(['GET'])
@@ -298,36 +253,6 @@ class PerformerDetail(APIView):
         save_performer(pk, name, label, description)
 
         return Response(status=status.HTTP_200_OK)
-    '''def put(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        serializer = SnippetSerializer(snippet, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    def delete(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        snippet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)'''
-
-
-'''@api_view(['PUT', 'POST', 'GET'])
-def performers(request):
-    if request.method == 'POST' or request.method == 'PUT':  # создание или изменение исполнителя
-        name = request.POST["name"]
-        try:
-            label = request.FILES["label"]
-        except MultiValueDictKeyError:
-            label = None
-        description = request.POST["description"]
-        id = request.POST["id"]
-        save_performer(id, auth.get_user(request).id, name, label, description)
-        return Response(status=status.HTTP_200_OK)
-    if request.method == "GET":  # получение исполнителя по пользователю
-        user = auth.get_user(request).id
-        performer = PerformerMethods.get(user)
-        serializer = FullPerformerSerializer(performer)
-        return Response(serializer.data, status=status.HTTP_200_OK)'''
 
 
 @api_view(['PUT', 'GET'])

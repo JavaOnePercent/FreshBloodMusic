@@ -42,7 +42,7 @@
             </div>
             <div class="name-cont">
                 <span :title="compilation.name_trc" class="group-name">{{ compilation.name_trc}}</span>
-                <span class="music-name" >{{ compilation.name_per}}</span>
+                <span class="music-name" @click="toPerformerPage(compilation.id_per)">{{ compilation.name_per}}</span>
             </div>
         </div>
     </div>
@@ -58,7 +58,7 @@ export default {
             compilations:[],
             genres:[],
             styles:[],
-            url: 'track?genre=all&bool=0',
+            url: 'track?genre=all&sort=0',
             loading: false,
             sort: 'popular',
             genre: '',
@@ -75,7 +75,10 @@ export default {
         document.body.removeEventListener("scroll", this.onScroll, false);
     },
     methods: {
-     checkSort(e)
+        toPerformerPage(id) {
+            this.$router.push({ name: 'performer', params: { id: id }})
+        },
+        checkSort(e)
         {
             e.preventDefault();
             document.getElementById('time').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
@@ -128,7 +131,7 @@ export default {
             else {
                 this.showsortbutton = true;
             }
-            obj = {params: {gen: this.genre, sty: this.style, bool: this.sort}}
+            obj = {params: {gen: this.genre, sty: this.style, sort: this.sort}}
           }
           this.$http.get(this.url, obj/*{params: {genre: message}}*/).then(function(response){
                 this.compilation = response.body.results;

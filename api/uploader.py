@@ -8,9 +8,19 @@ from PIL import Image
 from pydub import AudioSegment
 
 from api.model_methods import AlbumMethods, TrackMethods, PerformerMethods
+from api.models import Album
 
 
-def save_album(user, name, genre, logo, tracks, track_name):  # сохранение альбома в БД и в файлы
+def save_track(alb_id, name, audio):
+    date = datetime.date.today()
+    album = Album.objects.get(pk=alb_id)
+    directory = 'albums/' + str(album.id) + '/'
+    track = TrackMethods.create(album=album, name=name, date=date)
+    audio = Compressor(audio.read(), audio.content_type, str(track.id) + '.mp3', directory).compress()
+    TrackMethods.add_audio(track, audio)
+    return track
+
+def save_album(user, name, genre, logo, tracks=None, track_name=None):  # сохранение альбома с треками в БД и в файлы
     date = datetime.date.today()
     album = AlbumMethods.create(user=user, name=name, genre=genre, date=date)
     directory = 'albums/' + str(album.id) + '/'
@@ -18,13 +28,14 @@ def save_album(user, name, genre, logo, tracks, track_name):  # сохранен
     if logo is not None:
         image_alb = Compressor(logo.read(), logo.content_type, 'logo.jpg', directory).compress()
         AlbumMethods.add_image(album, image_alb)
-    pprint(track_name)
+
+    '''pprint(track_name)
     for i in range(len(tracks)):
         tr_id = TrackMethods.create(album=album, name=track_name[i], date=date)
         #pprint(track)
         audio = Compressor(tracks[i].read(), tracks[i].content_type, str(tr_id.id) + '.mp3', directory).compress()
-        TrackMethods.add_audio(tr_id, audio)
-    #Compressor.remove_temp()
+        TrackMethods.add_audio(tr_id, audio)'''
+    return album
 
 
 def save_performer(id, name, label, description):

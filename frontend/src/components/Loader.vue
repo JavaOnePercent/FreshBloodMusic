@@ -6,16 +6,16 @@
         </header>
         <form method="POST">
             <div class="track-img-loader-conteiner" >
-                <label>Обложка:</label>
+                <label>Обложка</label>
                 <img :class="imgStyle"  @click="imit" src="/static/mainapp/images/camera.svg" alt="обложка">
             </div>
             <div class="track-name-loader-conteiner">
-                <label for="track-name-loader">Название*:</label>
+                <label for="track-name-loader">Название*</label>
                 <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="40">
             </div>
     
             <div class="track-janr-loader-conteiner">
-                <label for="track-janr-loader">Жанр*:</label>
+                <label for="track-janr-loader">Жанр*</label>
                 <div class="Loaderjanr" @click="genresButtonClick">{{ janr }}</div>
                 <ul class="janr-drop" v-if="show">
                     <li v-for="(item,index) in menuItems" :key="index" @click='genreClick(index)'>{{ item.name }}
@@ -28,16 +28,17 @@
             </div>
     
             <div class="description-conteiner">
-                <label for="track-name-loader">Описание:</label>
+                <label for="track-name-loader">Описание</label>
                 <textarea type="text" name="description" maxlength="800"> </textarea>
             </div>
     
     
             <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
-            <div  class="loader-tracks" :key="index" v-for="(tracks, index) in track" >
-                <img class="Loaderplay" src="/static/mainapp/images/playButton.svg" alt="play">
+            <div class="loader-tracks" :key="index" v-for="(tracks, index) in track" >
+                <img class="Loaderplay" src="/static/mainapp/images/playButton.svg" alt="play" @click="playNow(tracks)">
                 <input v-focus v-on:keyup.enter="currentEdit=null" v-if="currentEdit===index" id="input" class="track" type="text" v-model='tracks.name' @change="track_Name" @blur="currentEdit=null" maxlength="30" > <!-- а тут менять длину по базе-->
                 <div v-else class="track" style="cursor: pointer"  @click="upgradeName(index)" >{{tracks.name}}</div>
+                <div class="loading" v-show="tracks.loading"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>
                 <img v-if="currentEdit===index" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
                 <img v-else class="edit" src="/static/mainapp/images/edit.png" @mousedown="upgradeName(index)">
                 <img class="del" src="/static/mainapp/images/xiomi.png" @click="deleteTrack(index)">
@@ -51,7 +52,7 @@
                 </label>
             </div>
             <div id="error" class="error"><label  >{{errorMessage}} </label></div>
-            <div class="loading" v-if="loader"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>
+            <!--<div class="loading" v-if="loader"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>-->
             <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "жанр" & !loader'  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
             
 
@@ -86,7 +87,7 @@ export default {
             loaderStyle: 'track-upload',
             currentEdit: null,
             trackName: '',
-            janr:'жанр',
+            janr:'Выбрать жанр',
             genreID: '',
             show: false,
             menuIndex:null,
@@ -128,6 +129,12 @@ export default {
     },
     //сносить досюда
     methods: {
+        playNow(tr) {
+            if(tr.trc_id)
+                this.$bus.$emit('play-track', {
+                    id: tr.trc_id
+                });
+        },
         genresButtonClick() {
             this.show=!this.show;
             if(this.menuItems.length === 0)
@@ -309,11 +316,11 @@ export default {
             e.preventDefault();
             if(this.track[this.currentEdit].name.length<1)
             {
-            console.log(this.trackName);
+            //console.log(this.trackName);
             this.errorMessage = "название трека не может быть пустым";
             this.track[this.currentEdit].name = this.trackName;
             }
-            console.log(this.track[this.currentEdit].name.length)
+            //console.log(this.track[this.currentEdit].name.length)
         },
         
         send:function () 
@@ -323,21 +330,38 @@ export default {
             var photo=this.photo
             var data = new FormData()
             data.append('photo', this.photo)
-            for(var track of this.track)
+            /*for(var track of this.track)
             {
                 data.append('track', track.file)
                 data.append('track_name', track.name)
-            }
+            }*/
             data.append('name', this.track_name_loader)
             data.append('gen_id', this.genreID)
 
-            console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
+            //console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
             if (track_name_loader && track) {
                 this.errorMessage = '';
                 this.loader=true;
-                this.$http.post('api/albums', data).then(function(response){
-                    this.loader=false
-                console.log('Success! Response: ', response.body);})
+
+                var self = this
+                this.$http.post('api/albums', data).then(response => {
+                    this.loader = false
+                    //console.log('Альбом создан: ', response.body)
+                    for(var tr of track)
+                    {
+                        var data = new FormData()
+                        data.append('track', tr.file)
+                        data.append('track_name', tr.name)
+                        data.append('album', response.body.alb_id)
+                        data.append('index', track.indexOf(tr))
+                        self.$set(self.track[self.track.indexOf(tr)], 'loading', true)
+                        this.$http.post('api/tracks', data).then(response => { 
+                            //console.log(response.body.index) 
+                            self.track[response.body.index].loading = false 
+                            self.$set(self.track[response.body.index], 'trc_id', response.body.id)
+                        })
+                    }
+                })
             }
             else {
                 this.errorMessage = 'Ты в пиве';
@@ -743,7 +767,7 @@ background-color: rgb(129, 129, 129);
     margin: 0 22px;
     width: 6%;
     position: relative;
-    top: 170px;
+    left: 500px;
 }
 
 .cssload-loader {

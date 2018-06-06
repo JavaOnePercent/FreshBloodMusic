@@ -78,7 +78,6 @@ class AlbumMethods:
             return False
 
 
-
 class TrackMethods:
     @staticmethod
     def create(album, name, date):
