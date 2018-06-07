@@ -171,16 +171,22 @@ export default {
                 var self = this
                 setTimeout(function() { self.isTimeout = false }, 1000);
                 this.$store.commit('unshiftQueueTracks', this.current)
-                var current = this.historyTracks[0]
-                this.setCurrentTrackAttrs(current);
-                this.current = current
-                this.$store.commit('removeFirstHistoryTracks')
-                this.logos.prevLogoLink = this.historyTracks[0] ? this.historyTracks[0].image_alb : ''
-                this.logos.logoLink = current ? current.image_alb : ''
-                this.logos.nextLogoLink = this.queueTracks[0].image_alb
-                //this.logos.nextLogoLink = this.queueTracks[0].image_alb
-                //this.$refs.logos.refresh()
-                this.$bus.$emit('prev-click', this.logos);
+
+                this.$http.get('../api/tracks/' + this.historyTracks[0].id, {
+                    responseType: 'json'
+                }).then(response => {
+                    var current = response.body
+                    this.setCurrentTrackAttrs(current);
+                    this.current = current
+                    this.$store.commit('removeFirstHistoryTracks')
+                    this.logos.prevLogoLink = this.historyTracks[0] ? this.historyTracks[0].image_alb : ''
+                    this.logos.logoLink = current ? current.image_alb : ''
+                    this.logos.nextLogoLink = this.queueTracks[0].image_alb
+                    //this.logos.nextLogoLink = this.queueTracks[0].image_alb
+                    //this.$refs.logos.refresh()
+                    this.$bus.$emit('prev-click', this.logos);
+                });
+                
             }
         },  
         playingEnded() {

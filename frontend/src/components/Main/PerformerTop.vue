@@ -46,6 +46,16 @@ export default {
         }
     },
     methods: {
+        shuffle(arr){
+            var j, temp;
+            for(var i = arr.length - 1; i > 0; i--){
+                j = Math.floor(Math.random()*(i + 1));
+                temp = arr[j];
+                arr[j] = arr[i];
+                arr[i] = temp;
+            }
+            return arr;
+        },
         carousel(sD) {
             if(sD)
                 if(this.compositors[0] === this.performers[this.performers.length - 1])
@@ -97,8 +107,9 @@ export default {
         showBest() {
             this.$http.get('api/performers').then(response => {
                 //console.log(response.data)
-                this.compositors = [response.data[0], response.data[1]]
-                this.performers = response.data
+                
+                this.performers = this.shuffle(response.data)
+                this.compositors = [this.performers[0], this.performers[1]]
             })
         },
 

@@ -86,11 +86,12 @@ export default {
             this.mainToPrevLogo = event.prevLogoLink
             this.nextToMainLogo = event.logoLink
             this.prevEnvelopeLogo = event.prevLogoLink
-            this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
+            if(this.isFull)
+            {this.nextEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s'};
             this.nextLogoAnimation = 'visibility: hidden;';
             this.mainLogoAnimation = 'visibility: hidden;';
             this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg);';
-            setTimeout(this.startAnimation, 100);
+            setTimeout(this.startAnimation, 100);}
         });
         this.$bus.$on('prev-click', event => {
             this.lastRotation = this.audio.currentTime/this.audio.duration * 1080;
@@ -101,13 +102,14 @@ export default {
             this.mainToPrevLogo = event.nextLogoLink
             this.nextEnvelopeLogo = event.nextLogoLink
             this.prevLogo = event.prevLogoLink
-            this.prevEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s', top: '100px'};
+            if(this.isFull)
+            {this.prevEnvelopeAnimation = {opacity: 1.0, transition: 'opacity 0.1s', top: '100px'};
             this.prevLogoAnimation = 'visibility: hidden;';
             this.mainLogoAnimation = 'visibility: hidden;';
             this.mainToPrevLogoAnimation = 'transform: rotate(' + this.lastRotation + 'deg); left: unset; right: 165px;';
             this.nextToMainLogoAnimation = {right: 'unset', left: '-75px', transition: null, top: null, height: null, width: null }
             this.nextEnvelopeAnimation = {top: "0"}
-            setTimeout(this.startBackwardsAnimation, 100);
+            setTimeout(this.startBackwardsAnimation, 100);}
         });
         
         /*bus.$on('slidermoved', event => {
