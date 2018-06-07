@@ -2,6 +2,7 @@ import datetime
 import math
 import random
 import shutil
+import os
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -27,8 +28,11 @@ class PerformerMethods:
     @staticmethod
     def create(user, name, description):
         date = datetime.date.today()
-
+        
         performer = Performer.objects.create(user_id=User.objects.get(pk=user), name_per=name, about_per=description, date_per=date)
+        is_new = try_mkdir('./media/performers/' + str(performer.id))
+        shutil.copy(r'./mainapp/static/mainapp/images/cat.jpg', './media/performers/' + str(performer.id) + '/logo.jpg')
+        performer = PerformerMethods.add_image(performer, 'performers/' + str(performer.id) + '/logo.jpg')
         return performer
 
     @staticmethod
@@ -36,12 +40,19 @@ class PerformerMethods:
         field_file = FieldFile(performer, Performer.image_per.field, image)
         performer.image_per = field_file
         performer.save()
+        return performer
 
     @staticmethod
     def get(user):
         performer = Performer.objects.get(user_id=User.objects.get(pk=user))
         return performer
 
+def try_mkdir(directory):
+    try:
+        os.mkdir(directory)
+        return True
+    except FileExistsError:
+        return False
 
 class AlbumMethods:
     @staticmethod
@@ -249,32 +260,66 @@ class TrackReportMethods:
 
 class TrackRecommendation:
     @staticmethod
-    def get_recommendation(authuser):  # добавление записи жалоб в таблицу
+    def get_recommendation(authuser):
+        userstracks = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('trc_id', 'user_id')
         likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
         historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
         reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
-        idenusers = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('user_id', flat=True).distinct()
-        chance = {}
-        tracks = LikedTrack.objects.all().filter(user_id__in=idenusers).values_list('trc_id')
-        for user in idenusers:
-            likes = ((math.fabs(len(set(likedtracks) & set(tracks)))) /
-                     (math.fabs(len(set(likedtracks) | set(tracks)))))
-            chance[user] = likes
-        chance = sorted(chance.items(), key=lambda item: -item[1])
+        liked = []
+        noauthtracks = []
+        for track in userstracks:
+            if (track[0],) not in likedtracks:
+                noauthtracks.append(track)
+        for auth in likedtracks:
+            liked.append(auth[0])
+        dict = TrackRecommendation.dict_trans(userstracks)
+        dictiden = TrackRecommendation.dictiden_trans(noauthtracks)
+        dicttrack = {}
+        likes = 0
+        for d in dictiden.keys():
+            for u in dictiden[d]:
+                likes = likes + ((math.fabs(len(set(liked) & set(dict[str(u)])))) /
+                                 (math.fabs(len(set(liked) | set(dict[str(u)])))))
+            likes = likes / len(dictiden[d])
+            dicttrack.update({str(d): likes})
+            likes = 0
+        dicttrack = sorted(dicttrack.items(), key=lambda item: -item[1])
+        print(dicttrack)
         tracks = []
-        for key in chance:
-            tracks += LikedTrack.objects.all().filter(user_id=key[0]).values_list('trc_id')
+        for track in dicttrack:
+            tracks.append(int(track[0]))
         identracks = []
+        print(tracks)
         recommended_in_history = []
         for track in tracks:
-            if track not in identracks and track not in historytracks and track not in likedtracks and track not in reporttracks:
-                identracks.append(track[0])
-            elif track in historytracks:
-                recommended_in_history.append(track[0])
+            if (track,) not in identracks and (track,) not in historytracks and (track,) not in reporttracks:
+                identracks.append(track)
+            elif (track,) in historytracks:
+                recommended_in_history.append((track,))
         rec_in_hist = TrackHistory.objects.filter(trc_id__in=recommended_in_history, user_id=authuser).order_by('id')
         for rec in rec_in_hist:
-            # print(rec.id)
             if rec.trc_id.id in identracks:
                 identracks.remove(rec.trc_id.id)
             identracks.append(rec.trc_id.id)
+        print(identracks)
         return identracks
+
+    @staticmethod
+    def dict_trans(tuple):
+        dict = {}
+        for iden in tuple:
+            if str(iden[1]) not in dict.keys():
+                dict.update({str(iden[1]): [iden[0]]})
+            else:
+                dict[str(iden[1])].append(iden[0])
+        return dict
+
+    @staticmethod
+    def dictiden_trans(tuple):
+        dict = {}
+        for iden in tuple:
+            if str(iden[0]) not in dict.keys():
+                dict.update({str(iden[0]): [iden[1]]})
+            else:
+                dict[str(iden[0])].append(iden[1])
+        return dict

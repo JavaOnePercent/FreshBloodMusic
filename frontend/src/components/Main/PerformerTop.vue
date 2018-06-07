@@ -155,15 +155,17 @@ export default {
 }
 .performer-top
 {   
-    z-index: 100;
+    z-index: 70;
     color:black;
-    background-color: white;
+    /* background-color: white; */
+    background-color: rgb(203,199, 205);
     font-size: 20px;
     box-shadow: 0 0 40px rgba(0, 0, 0, .1) inset;
     /*box-shadow:  0 -2px 4px rgba(0, 0, 0, .3),
     -23px 0 20px -23px rgba(0, 0, 0, .8),
     23px 0 20px -23px rgba(0, 0, 0, .8),
     0 0 40px rgba(0, 0, 0, .1) inset;*/
+
     position: relative;
 }
 .performer
@@ -194,12 +196,14 @@ export default {
 
 .prev-button 
 {
+    display: block;
     position: absolute;
     top: 0;
     width: 100%;
     height: 35px;
     z-index: 50;
-    background: url(/static/mainapp/up.svg), linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
+    background-image: url(/static/mainapp/up.svg);
+    /* background-image: url(/static/mainapp/up.svg), linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0)); */
     background-size: 35px;
     background-position: top center;
     background-repeat: no-repeat;
@@ -209,12 +213,14 @@ export default {
 
 .next-button 
 {
+    display: block;
     position: absolute;
     bottom: 0;
     width: 100%;
     height: 35px;
     z-index: 50;
-    background:url(/static/mainapp/down.svg), linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
+    background-image:url(/static/mainapp/down.svg);
+    /* background-image:url(/static/mainapp/down.svg), linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0)); */
     background-size: 35px;
     background-position: bottom center;
     background-repeat: no-repeat;

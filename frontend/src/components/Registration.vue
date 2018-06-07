@@ -89,12 +89,13 @@ export default {
                 data.append('email', this.email);
                 data.append('password', this.password1);
                 var self = this;
-                this.$http.post('api/register', data).then(function(response){
+                this.$http.post('api/register', data, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(function(response){
                     self.$store.commit('username', response.data.username)
                     self.$router.push('performers/' + response.data.per_id)
                     self.$store.commit('performerID', response.data.per_id)
                     self.$store.commit('myPerformerID', response.data.per_id)
-                    self.$http.get('api/token').then(function(response){});
+                    self.$http.get('api/token').then(function(response){this.$root.setToken()});
+                    
                 },
                 function(error){
                     document.getElementById('username').style.backgroundColor="rgba(255, 179, 179,0.98)"

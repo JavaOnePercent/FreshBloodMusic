@@ -87,7 +87,7 @@ html {
  {
     pointer-events: all;
     position: fixed;
-    z-index: 90000;
+    z-index: 900;
     left: 0;
     top: 0;
     width: 100%;

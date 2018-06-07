@@ -169,7 +169,7 @@ export default {
     }
     .next-page
     {
-        left: -15px;
+        /* left: -15px; */
     }
 }
 

@@ -46,10 +46,11 @@ export default {
 /*панель топов*/
 .topics-conteiner
 {
-    box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
-    -webkit-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
-    -moz-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
-    background-color: rgb(55, 55, 55);
+    box-shadow:0px -2px 6px 2px rgba(0,0,0,0.34)inset;
+    -webkit-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.34)inset;
+    -moz-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.34)inset;
+    background-color: rgb(141, 111, 185);
+    /* background-color: rgb(55, 55, 55); */
     top: 0px;
     left: 0px;
     height: 350px;

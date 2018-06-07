@@ -113,7 +113,8 @@ export default {
                     self.$store.commit('pushQueueTracks', response.data)
                     self.$http.put('../api/history', {}, {
                         responseType: 'json',
-                        params: { track_id: response.data.id }
+                        params: { track_id: response.data.id },
+                        headers: {'X-CSRFToken': this.$root.csrftoken}
                         }).then(response => { self.loadNextTrack() }, error => { self.loadNextTrack(); });
                 });
             
@@ -282,13 +283,14 @@ export default {
                 setTimeout(this.nextTrackTimeout, 1000);
                 this.$store.commit('pushHistoryTracks', this.current)
                 var first =  this.queueTracks[0]
-                this.$refs.logos.prepareForImmediateAnimating();
+                if (this.isFull) this.$refs.logos.prepareForImmediateAnimating();
                 //this.$store.commit('removeFirstQueueTracks')
                 
                 var self = this
                 this.$http.put('../api/history', {}, {
                     responseType: 'json',
-                    params: { track_id: first.id }
+                    params: { track_id: first.id },
+                    headers: {'X-CSRFToken': this.$root.csrftoken}
                 }).then(response => { self.loadNextTrack(); }, error => { self.loadNextTrack(); });
             }
         },
@@ -308,12 +310,14 @@ export default {
                 if(this.logos.isLiked)
                     this.$http.put('../api/likes', {}, {
                         //headers: {"X-CSRFToken": csrftoken},
-                        params: varData
+                        params: varData,
+                        headers: {'X-CSRFToken': this.$root.csrftoken}
                     }).then(this.successfulLikeFunc); //добавление
                 else
                     this.$http.delete('../api/likes', {
                         //headers: {"X-CSRFToken": csrftoken},
-                        params: varData
+                        params: varData,
+                        headers: {'X-CSRFToken': this.$root.csrftoken}
                     }).then(this.successfulLikeFunc); //удаление
             //}
         },
@@ -418,7 +422,7 @@ export default {
 
 .player {
     /*position: relative;*/
-    z-index: 70;
+    z-index: 901;
     margin: auto;
     height: 65px;
     bottom: 0px;

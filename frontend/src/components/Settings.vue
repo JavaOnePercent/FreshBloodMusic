@@ -143,7 +143,7 @@ export default {
             data.append('label', this.label);
             data.append('description', this.description);
             var self = this
-            this.$http.put('../api/performers/' + this.id, data).then(function(response){
+            this.$http.put('../api/performers/' + this.id, data, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(function(response){
                 this.$store.commit('performerLogo', '');
                 self.$router.push('performers/' + self.myPerformerID)
             });
@@ -158,25 +158,29 @@ export default {
 </script>
 
 <style scoped>
+
+
 .nastr-conteiner
 {
-    background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(36, 87, 189, 0.2));
+    background-color: rgba(70, 57, 78, 0.281);
+    /* background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(36, 87, 189, 0.2)); */
     font-size: 110%;
-    top: 55px;
-    position: relative;
+    /* top: 55px; */
+    position: absolute;
+    min-height: 100%;
     width: 100%;
     margin: 0 auto;
-    padding-bottom:69px; 
+    /* padding-bottom:69px;  */
 }
 .nastr-row
 {
-    padding-bottom: 69px; 
+    padding-bottom:69px; 
     padding-left: 15px;
     padding-right: 15px;
     margin: 0 auto;
     max-width: 1143px; 
     min-width: 915px; 
-    padding-top: 15px; 
+    padding-top: 70px; 
     margin: 0 auto;
 }
 .nastr-row:after
@@ -269,7 +273,8 @@ textarea
     color: #fff;
 	font-size: 100%; 
 	cursor: pointer;
-	background-color: rgba(0, 153, 38,0.7);
+	/* background-color: rgba(0, 153, 38,0.7); */
+    background-color: rgb(255, 181, 43);
 	border: none;
 	width: 30%;
 	height: 40px;
@@ -280,10 +285,12 @@ textarea
 }
 .N-sub:hover
 {
-    background-color:  rgba(16, 180, 57, 0.7)
+    /* background-color:  rgba(16, 180, 57, 0.7); */
+    background-color: rgb(226, 160, 38);
 }
 .Cancel
 {
+    color: white;
     cursor: pointer;
     text-align: center;
     float: left;
@@ -291,11 +298,13 @@ textarea
     width: 20%;
     height: 40px;
     line-height: 40px;
-    color: black;
-    background-color: rgb(153, 153, 153);
+    /* color: black; */
+    /* background-color: rgb(153, 153, 153); */
+    background-color: rgb(169, 154, 190);
 }
 .Cancel:hover
 {
-    background-color: rgb(177, 177, 177);
+    /* background-color: rgb(177, 177, 177); */
+    background-color: rgb(141, 111, 185);
 }
 </style>

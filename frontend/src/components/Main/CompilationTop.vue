@@ -12,21 +12,26 @@
                 </div>
             </div>
          <div class="music-style-conteiner">
-                <div class="music-style">
-                    <a class="janr gen" name="" @click="showGenre('all')">Все</a>
-                    <a class="janr gen" name="" @click="showGenre('rec')">Рекомендации</a>
-                    <a class="janr gen" name="" @click="showGenre('fav')">Избранное</a>
-                    <div class=" janr" :key="index" v-for="(gen, index) in genres" >
-                        <a  :name="gen.id" @click="showGenre(gen.id)">{{gen.name_gnr}}</a>
+                <img id="next" class="next" @click="leftScrol" src="/static/mainapp/left.png"/>
+                <div class="leftBevfore"></div>
+                <div id="music-style" class="music-style">
+                    <a  class="janr gen" name="" @click="showGenre('all')" :class="{'choseJanr':choseGenr==='all'}">Все</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='rec'}" name="" @click="showGenre('rec')">Рекомендации</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='fav'}" name="" @click="showGenre('fav')">Избранное</a>
+                    <div class=" janr" :class="{'choseJanr':choseGenr===gen.id}" :key="index" v-for="(gen, index) in genres" >
+                        <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id)" >{{gen.name_gnr}}</a>
                     </div>
                 </div>
+                <img id="previous" class="previous" @click="rightScrol" src="/static/mainapp/right.png"/>
+                <div class="rightBevfore"></div>
             </div>
           <transition name="style">
                 <div v-if="showStyles" class="janrStyles-conteiner">
                 <!-- <div  class="janrStyles-conteiner"> -->
                     <div class="janrStyles">
+                        <a style=" white-space: nowrap" class="janr gen"  @click="showGenre(genres[cock].id)">Все из {{genres[cock].name_gnr}}</a>
                         <div class=" janr" :key="index" v-for="(sty, index) in styles">
-                            <a  :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
+                            <a style=" white-space: nowrap" :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
                         </div>
                     </div>
                 </div>
@@ -36,7 +41,8 @@
             <div class="music" :key="index" v-for="(compilation, index) in compilations">
              <div class="cover-cont">
                 <div class="play btn" @click="playClick(index)"><img src="/static/mainapp/images/playButton.svg" alt="play" title="воспроизвести"></div>
-                <div class="turn btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>                   
+                <div class="turn btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>
+                <div class="album btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/album.svg" alt="tunr" title="перейти ко всему альбому"></div>                    
                 <img class="cover" :src="compilation.image_alb" alt="обложка">
                 <img class="disk" :src="compilation.image_alb" alt="disk">
             </div>
@@ -64,7 +70,9 @@ export default {
             genre: '',
             style: '',
             showsortbutton: true,
-            showStyles: false
+            showStyles: false,
+            choseGenr: '',
+            cock: 0
           //hoverClass: 'disk'
         }
     },
@@ -75,6 +83,19 @@ export default {
         document.body.removeEventListener("scroll", this.onScroll, false);
     },
     methods: {
+        showHer(index, id) {
+            this.cock = index
+            this.showGenre(id)
+        },
+        leftScrol()
+        {
+            document.getElementById('music-style').scrollLeft -= 300;
+        },
+        rightScrol()
+        {
+            document.getElementById('music-style').scrollLeft += 300;
+        },
+      
         toPerformerPage(id) {
             this.$router.push({ name: 'performer', params: { id: id }})
         },
@@ -110,6 +131,7 @@ export default {
             this.compilations = [];
             if(message1 != null) {
                 this.genre = message1;
+                this.choseGenr=message1;
                 if (!(isNaN(this.genre))) {
                     this.getGengeAndStyles(this.genre);
                 }
@@ -202,7 +224,6 @@ export default {
 </script>
 
 <style scoped>
-/*Рекомендации и сортировка*/
 .recommendations
 {
     height: auto;
@@ -211,7 +232,6 @@ export default {
     position: relative;
     display: flex;
     flex-direction: column;
-    z-index: 10;
 }
 .recommendations .music-style, .recommendations .janrStyles
 {
@@ -303,18 +323,22 @@ export default {
 /*рекомендации*/
 .music-style-conteiner
 {
-    background-color: rgb(85, 85, 85);
+    background-color: rgb(255, 181, 43);
+    /* background-color: rgb(85, 85, 85); */
     top: 0px;
     left: 0px;
     height: 40px;
     width: 100%;
     margin: 0 auto;
     position: relative;
-    justify-content: center;
+    display: block;
+    justify-content: center; 
 }
 .music-style
-{
-    background-color: rgb(85, 85, 85);
+{ 
+    scroll-behavior: smooth;
+    display: block;
+    /* background-color: rgb(85, 85, 85); */
     position: relative;
     height: 40px;
     /* padding-left: 15px;
@@ -322,16 +346,21 @@ export default {
     box-sizing: border-box;
     margin: 0 auto;
     max-width: 1143px; 
-    min-width: 915px; 
+    min-width: 775px;
     color: white;
-
+    overflow-x: scroll;
+    white-space: nowrap;
+    -ms-overflow-style: none;
 }
+.music-style::-webkit-scrollbar { display: none; }
+
 .janrStyles-conteiner
 {
-    box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
+    /* box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
     -webkit-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
-    -moz-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset;
-    background-color: rgb(55, 55, 55);
+    -moz-box-shadow:0px -2px 6px 2px rgba(0,0,0,0.64)inset; */
+    background-color: rgb(211, 147, 29);
+    /* background-color: rgb(55, 55, 55); */
     top: 0px;
     left: 0px;
     height: 40px;
@@ -354,10 +383,12 @@ export default {
     min-width: 915px; 
     color: white;
 }
-
+.janrStyles .janr:hover
+{
+    background-color: rgb(151, 106, 23);
+}
 .janr
 {
-
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -376,10 +407,19 @@ export default {
 {
     height: 100%;
     cursor: pointer;
-    background-color: rgba(192,192,192,0.8);
-    border-bottom: 2px solid currentColor;
+    background-color: rgb(250, 174, 32);
+    /* background-color: rgba(192,192,192,0.8); */
+    border-bottom: 5px solid rgb(126, 50, 44);
+    box-sizing: border-box; 
     line-height: 1.8;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.25)
+    /* box-shadow: 0 6px 12px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22); */
+}
+.choseJanr
+{
+    border-bottom: 5px solid rgb(126, 50, 44);
+    box-sizing: border-box; 
+    line-height: 1.8;
 }
 .gen
 {
@@ -580,8 +620,8 @@ export default {
     background-color: rgba(255, 255, 255,0.7);
     padding: 5%;
     border-radius: 50px;
-    width: 22%;
-    height: 22%;
+    width: 19%;
+    height: 19%;
     z-index: 70;
     position: absolute;
     top: 0;left: 0;right: 0;bottom: 0;
@@ -600,15 +640,17 @@ export default {
     position: absolute;
     top: 0;left: 0;right: 0;bottom: 0;
     margin: auto;
-    width: 70%;
-    height: 70%;
+    width: 60%;
+    height: 60%;
 } 
 .play
 {
+    bottom: 17%;
     right: 35%;
 }
 .turn
 {
+    bottom: 17%;
     left:35%;
 }
 .turn img
@@ -620,6 +662,58 @@ export default {
 }
 .style-enter, .style-leave-active {
     height: 0px;
+}
+.album
+{
+    top: 39.5%;
+}
+.next
+{
+    z-index: 50;
+    top: 0;
+    box-sizing: border-box;
+    padding: 7px;
+    cursor: pointer;
+    position:absolute;
+    width: 40px;
+    height: 40px;
+    background-color: rgb(255, 181, 43);
+}
+.leftBevfore
+{
+    z-index: 80;
+    left: 30px;
+    box-sizing: border-box;
+    position:absolute;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(to left, rgba(66, 160, 189, 0), rgba(255, 181, 43,1));
+}
+.previous
+{
+    clear: both;
+    text-align: right;
+    margin: 0 auto;
+    top: 0;
+    right: 0;
+    box-sizing: border-box;
+    padding: 7px;
+    cursor: pointer;
+    position:absolute;
+    width: 40px;
+    height: 40px;
+    background-color: rgb(255, 181, 43); 
+}
+.rightBevfore
+{
+    top: 0;
+    right: 30px;
+    box-sizing: border-box;
+    display: block;
+    position:absolute;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(to right, rgba(66, 160, 189, 0), rgb(255, 181, 43));
 }
 /* .style-enter {
   transform: translatey(40px);

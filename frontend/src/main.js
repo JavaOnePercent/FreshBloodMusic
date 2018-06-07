@@ -20,32 +20,15 @@ Vue.use(Vuex)
 
 Vue.config.productionTip = false
 
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-const csrftoken = getCookie('csrftoken')
-
 Object.defineProperty(Vue.prototype,"$bus",{
 	get: function() {
 		return this.$root.bus;
 	}
 });
 
-Vue.http.interceptors.push(function(request) {
+/*Vue.http.interceptors.push(function(request) {
     request.headers.set('X-CSRFToken', csrftoken);
-}); //эта штука перехватывает все запросы на Vue и преобразует их в запрос с csrf token'ом
+});*/ //эта штука перехватывает все запросы на Vue и преобразует их в запрос с csrf token'ом
 
 const store = new Vuex.Store({ //глобальное хранилище vuex
     state: {
@@ -155,6 +138,7 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
 })
 
 const router = new VueRouter({
+    mode: 'history',
     routes: [
         { path: '/register', component: registration },
         { path: '/login', component: login },
@@ -168,9 +152,33 @@ const router = new VueRouter({
 
 new Vue({
     data: {
-        bus: new Vue({})
+        bus: new Vue({}),
+        csrftoken: null
     },
     store,
     router,
-    render: h => h(App)
+    render: h => h(App),
+    methods: {
+        setToken() {
+            this.csrftoken = this.getCookie('csrftoken')
+        },
+        getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    },
+    created() {
+        this.setToken()
+    }
+
 }).$mount('#app')

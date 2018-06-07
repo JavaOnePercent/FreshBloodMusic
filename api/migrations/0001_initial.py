@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='Album',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name_alb', models.CharField(max_length=30)),
+                ('name_alb', models.CharField(max_length=60)),
                 ('numplays_alb', models.IntegerField(default=0)),
                 ('rating_alb', models.IntegerField(default=0)),
                 ('image_alb', models.FileField(default=None, upload_to='albums')),

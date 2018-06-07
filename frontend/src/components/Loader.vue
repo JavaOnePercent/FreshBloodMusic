@@ -35,10 +35,10 @@
     
             <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
             <div class="loader-tracks" :key="index" v-for="(tracks, index) in track" >
-                <img class="Loaderplay" src="/static/mainapp/images/playButton.svg" alt="play" @click="playNow(tracks)">
+                <img v-if="tracks.loading===false" class="Loaderplay" src="/static/mainapp/images/playButton.svg" alt="play" @click="playNow(tracks)">
                 <input v-focus v-on:keyup.enter="currentEdit=null" v-if="currentEdit===index" id="input" class="track" type="text" v-model='tracks.name' @change="track_Name" @blur="currentEdit=null" maxlength="30" > <!-- а тут менять длину по базе-->
                 <div v-else class="track" style="cursor: pointer"  @click="upgradeName(index)" >{{tracks.name}}</div>
-                <div class="loading" v-show="tracks.loading"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>
+                <div class="Loaderplay" v-show="tracks.loading"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>
                 <img v-if="currentEdit===index" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
                 <img v-else class="edit" src="/static/mainapp/images/edit.png" @mousedown="upgradeName(index)">
                 <img class="del" src="/static/mainapp/images/xiomi.png" @click="deleteTrack(index)">
@@ -344,7 +344,7 @@ export default {
                 this.loader=true;
 
                 var self = this
-                this.$http.post('api/albums', data).then(response => {
+                this.$http.post('api/albums', data, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(response => {
                     this.loader = false
                     //console.log('Альбом создан: ', response.body)
                     for(var tr of track)
@@ -355,7 +355,7 @@ export default {
                         data.append('album', response.body.alb_id)
                         data.append('index', track.indexOf(tr))
                         self.$set(self.track[self.track.indexOf(tr)], 'loading', true)
-                        this.$http.post('api/tracks', data).then(response => { 
+                        this.$http.post('api/tracks', data, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(response => { 
                             //console.log(response.body.index) 
                             self.track[response.body.index].loading = false 
                             self.$set(self.track[response.body.index], 'trc_id', response.body.id)
@@ -461,7 +461,8 @@ textarea
 	height: 40px;
 	font-size: 25px;
 	color: rgb(250, 250, 250);
-	background-color: rgb(70, 70, 70);
+	/* background-color: rgb(70, 70, 70); */
+    background-color: rgb(141, 111, 185);
 	margin-bottom: 17px;
 }
 .esc
@@ -514,7 +515,7 @@ textarea
 	cursor: pointer;
 	text-align:center;
 	height: 30px;
-	width: 170px;
+	width: 200px;
 	padding: 0 25px;
 	border-color:rgb(153, 153, 153);
 	background-color: rgba(179, 179, 179,0.3);
@@ -549,7 +550,7 @@ textarea
 	cursor: pointer;
 	border-top:none;
 	text-align: center;
-	width: 220px;
+	width: 250px;
 	height: 30px;
 }
 .janr-drop li:hover{
@@ -564,7 +565,7 @@ background-color: rgb(129, 129, 129);
 	max-height: 94px;
 	top: -1.3px;
 	position: absolute;
-	left: 224px;
+	left: 254px;
 	padding: 0;
 	margin: 0;
 	border-bottom: 2px solid rgb(153, 153, 153);
@@ -577,7 +578,7 @@ background-color: rgb(129, 129, 129);
 	border-top: none;
 	cursor: pointer;
 	text-align: center;
-	width: 226px;
+	width: 250px;
 	height: 30px;
 }
 .janr-drop-menu li:last-child
@@ -686,7 +687,8 @@ background-color: rgb(129, 129, 129);
 	font-size: 100%;
 	margin-top: 15px; 
 	cursor: pointer;
-	background-color: rgba(0, 153, 38,0.5);
+	/* background-color: rgba(0, 153, 38,0.5); */
+    background-color: rgb(255, 181, 43);
 	border: none;
 	width: 50%;
 	height: 40px;
@@ -696,7 +698,8 @@ background-color: rgb(129, 129, 129);
 	text-align: center;
 }
 .loader:hover{
-	background-color:  rgba(0, 230, 57,0.5)
+	/* background-color:  rgba(0, 230, 57,0.5) */
+    background-color: rgb(226, 160, 38);
 }
 /*кнопка загрузки*/
 .track-upload
@@ -706,7 +709,8 @@ background-color: rgb(129, 129, 129);
 	overflow: hidden; /* Все что выходит за пределы - скрываем */
 	width: 40%; /* Задаем ширину кнопки выбора файла */
 	height: 25px; /* Задаем высоту кнопки выбора файла */
-	background: rgb(89, 89, 89);
+	/* background: rgb(89, 89, 89); */
+    background-color: rgb(169, 154, 190);
 	padding: 8px 4px;
 	color: #fff;
 	line-height: 36px;
@@ -714,7 +718,8 @@ background-color: rgb(129, 129, 129);
 }
 .track-upload:hover 
 {
-	background: rgb(128, 128, 128);
+	/* background: rgb(128, 128, 128); */
+    background-color: rgb(141, 111, 185);
 }
 .track-upload label, .track-upload-drop label, .track-upload-drop2 label
 {
@@ -773,8 +778,8 @@ background-color: rgb(129, 129, 129);
 .cssload-loader {
 	display: block;
 	margin:0 auto;
-	width: 35px;
-	height: 35px;
+	width: 25px;
+	height: 25px;
 	position: relative;
 	border: 5px solid rgb(0,0,0);
 	animation: cssload-loader 2.3s infinite ease;

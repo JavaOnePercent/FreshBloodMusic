@@ -1,0 +1,384 @@
+#playerContainer {
+	width: 100%;
+    height: 65px;
+    right: 0;
+    position:absolute;
+    left: 0;
+    margin: auto;
+}
+
+#player {
+    /*position: relative;*/
+    z-index: 70;
+    margin: auto;
+    height: 65px;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    width: 90%;
+    position: fixed;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+#player:hover {
+    background-color: rgba(235, 235, 235, 0.95);
+}
+
+.play-button {
+	width: 30px;
+	height: 30px;
+    left: 30px;
+    margin: auto;
+	position: absolute;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+}
+.play-button:hover {
+    left: 29px;
+	width: 32px;
+	height: 32px;
+}
+
+.main-logo {
+    width: 56px;
+	height: 56px;
+	/*box-shadow: 0px 4px 28px black/*#64bdf5;;*/
+	/*right: 115px;*/
+	right: 210px;
+	position: absolute;
+    z-index: 15;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.main-logo:hover {
+    right: 209px;
+	width: 58px;
+	height: 58px;
+}
+
+#like {
+    z-index: 5;
+    opacity: 0.8;
+    width: 70%;
+    height: 70%;
+}
+
+#logo {
+    width: 100%;
+	height: 100%;
+	/*box-shadow: 0px 4px 28px black/*#64bdf5;;*/
+    opacity: 0.9;
+	z-index: 0;
+	visibility: visible;
+    padding: 0;
+}
+
+#vinyl {
+    display: none;
+}
+
+.next-logo {
+	display: none;
+}
+
+.main-to-prev-logo {
+	display: none;
+}
+
+.next-to-main-logo {
+    display: none;
+}
+
+.prev-logo {
+	top: -50%;
+    left: 0;
+	opacity: 0.3;
+	width: 25%;
+	height: 25%;
+    visibility: hidden;
+}
+
+.next-button {
+    width: 30px;
+    height: 30px;
+    left: 90px;
+    margin: auto;
+	position: absolute;
+    z-index: 10;
+    top: 0;
+    bottom: 0;
+}
+.next-button:hover {
+    left: 89px;
+	width: 32px;
+	height: 32px;
+}
+
+#previousButton {
+    display: none;
+}
+#trackname {
+	font: 20px Arial,Helvetica,sans-serif;
+	color: rgb(0, 0, 0);/* #e8e8e8;*/
+	text-align: right;
+	width: 60%;
+	height: 32px;
+    right: 296px;
+    margin: auto;
+	position: absolute;
+	line-height: 32px;
+}
+#performername {
+	font: 18px Arial,Helvetica,sans-serif;
+	color: rgb(89, 89, 89);
+	text-align: right;
+	width: 60%;
+	height: 32px;
+	top: 32px;
+    right: 296px;
+    margin: auto;
+	position: absolute;
+	line-height: 32px;
+}
+
+
+.menu {
+    z-index: 5;
+    width: 30px;
+    height: 30px;
+    /*right: 191px;*/
+    right: 150px;
+    top: 0;
+    bottom: 0;
+    line-height:0;
+    margin: auto;
+	position: absolute;
+}
+
+#menuPic:hover {
+    position: absolute;
+    left: -3%;
+    top: -3%;
+	width: 106%;
+	height: 106%;
+}
+
+#menuDropdown {
+    position: absolute;
+    margin: auto;
+    bottom: 58px;
+    width: 160px;
+    right: 0;
+    z-index: 100;
+    list-style: none;
+    padding: 0;
+    background: rgba(245, 245, 245, 0.95);/*#323232;*/
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .1), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .3),
+    23px 0 20px -23px rgba(0, 0, 0, .3),
+    0 0 40px rgba(0, 0, 0, .1) inset;
+}
+
+.volume-background {
+    margin: auto;
+	position: absolute;
+    height: 160px;
+    width: 50px;
+    left: -8px;
+    bottom: 1px;
+    background: rgba(245, 245, 245, 0.95);/*#323232;*/
+    box-shadow:  0 -2px 4px rgba(0, 0, 0, .1), /*тут бы поиграть с тенями*/
+    -23px 0 20px -23px rgba(0, 0, 0, .5),
+    23px 0 20px -23px rgba(0, 0, 0, .5),
+    0 0 40px rgba(0, 0, 0, .1) inset;
+}
+
+.speaker {
+    width: 30px;
+    height: 30px;
+    right: 90px;
+    padding: 0;
+    position: absolute;
+    bottom: 18px;
+    margin: auto;
+    line-height: 0;
+    z-index: 25
+}
+
+.speaker:hover {
+	width: 32px;
+	height: 32px;
+    bottom: 17px;
+    right: 89px;
+}
+
+
+.volume {
+    margin: auto;
+	position: absolute;
+    height: 155px;
+    width: 34px;
+    right: 0;
+    left: 0;
+    bottom:75px;
+}
+
+.volume-control-zone {
+    margin: auto;
+	position: absolute;
+    right: 75px;
+    bottom: 0;
+    width: 60px;
+    height: 236px;
+    z-index: 20;
+}
+
+#trackLength {
+    font: 12px Arial,Helvetica,sans-serif;
+	color: black;/*#e8e8e8;*/
+	text-align: right;
+	right: 0.5%;
+	margin: auto;
+	position: absolute;
+	height: 100%;
+	z-index: 20;
+	visibility: collapse;
+}
+
+#playedTime {
+    font: 12px Arial,Helvetica,sans-serif;
+	color: black;/*#e8e8e8;*/
+	text-align: left;
+	left: 0.5%;
+	margin: auto;
+	position: absolute;
+	height: 100%;
+	z-index: 20;
+	visibility: collapse;
+}
+
+#ball {
+    left: 0;
+    right: 0;
+    margin: auto;
+	position: absolute;
+	bottom: 110px;
+    width: 20px;
+    height: 20px;
+    z-index: 10;
+}
+#line {
+    background-color: #d5d5d5;
+    width: 10px;
+    height: 120px;
+    border-radius: 15px;
+    z-index: 0;
+}
+
+#fillingLine {
+    background-color: /*#282828;*/ /*black;*/ #959595;
+    height: 120px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 12px;
+    border-radius: 15px;
+    z-index: 5;
+    margin: auto;
+	position: absolute;
+}
+
+.dropdown-button {
+    margin: auto;
+	position: absolute;
+    width: 30px;
+    height: 30px;
+    right: 30px;
+    top: 0;
+    bottom: 0;
+}
+.dropdown-button:hover {
+    right: 29px;
+	width: 32px;
+	height: 32px;
+}
+
+/*#progress {
+    height: 4px;
+    width: 100%;
+    bottom: 65px;
+    margin: auto;
+    position: absolute;
+    transition: all 0.3s ease;
+}*/
+
+.vue-simple-progress {
+    position: absolute;
+    height: 75px;
+    top: -10px;
+    z-index: -2;
+    width: 100%;
+}
+
+.vue-slider-my {
+    bottom: 65px;
+}
+
+/*.foreground-progress-bar {
+    background: rgb(0, 0, 0);
+    bottom: 65px;
+    height: 4px;
+    transition: width 0.5s ease, height 0.2s ease;
+    position: absolute;
+    z-index: -1;
+}
+.foreground-progress-bar:hover {
+    cursor: pointer;
+}*/
+
+.background-progress-bar {
+    background: rgba(0, 0, 0, 0.08);
+    height: 100%;
+    position: absolute;
+    top: 10px;
+    z-index: -1;
+}
+
+.played-time {
+    color: #222;
+    font-size: 14px;
+    text-align: left;
+    position: absolute;
+    left: 5px;
+    bottom: 1px;
+}
+
+.track-length {
+    color: #222;
+    font-size: 14px;
+    text-align: right;
+    position: absolute;
+    right: 5px;
+    bottom: 1px;
+}
+
+
+.main-to-prev-logo {
+	display: none;
+}
+
+.next-to-main-logo {
+	display: none;
+}
+
+.prev-envelope {
+	display: none;
+}
+
+.next-envelope {
+	display: none;
+}
+

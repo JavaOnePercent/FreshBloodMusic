@@ -19,10 +19,10 @@
                             </div>
                         </router-link>
                     </div>
-                    <div class="VK Lblock">
+                    <!-- <div class="VK Lblock">
                         <label>В контакте</label>
                         <img src="/static/mainapp/images/vk.svg" alt="настройки"/>
-                    </div>
+                    </div> -->
                     <div class="LikeMusic Lblock">
                         <label title="Понравившаяся музыка">Понравившаяся музыка({{ likes.length }})</label>
                         <hr>
@@ -68,9 +68,12 @@
                                 <div class="MyAlbum">
                                     <img class="MyAlbum-lable" :src="album.image_alb" alt="настройки"/>
                                     <div class="Albom-Description">
-                                        <span> {{ album.name_alb }}</span>
-                                        Удалить альбом: <div @click="deleteAlbum(i)" class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/xiomi.png);"></div>
-                                        Проиграть весь альбом: <div @click="playAlbum(album.tracks)" class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg);"></div>
+                                        <span style="width:90%; overflow-x: hidden"> {{ album.name_alb }}</span>
+                                        <img title="Удалить альбом" @click="deleteAlbum(i)" class="albumDel" src="/static/mainapp/images/closeDropdown.svg"/>
+                                        <div @click="playAlbum(album.tracks)" class="playAll"> 
+                                            <img src="/static/mainapp/play-arrow.svg"/>
+                                            <span> Проигрывать весь альбом </span>
+                                        </div>
                                         <label> жанр: {{ album.genre + " / " + album.style }}</label>
                                         <label> дата выхода: {{ album.date_alb }}</label>
                                         <span class="more"> подробнее... </span>
@@ -80,14 +83,19 @@
                                             <div @click="playClick(track.id)" class="MyMusic" :key="j" v-for="(track, j) in album.tracks">
                                                 <!--<div class="likedMusicHover"></div>-->
                                                 <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
-                                                {{ track.name_trc }} Лайки: {{ track.likes }}
-                                                <div @click="deleteTrack(i, j)" class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/xiomi.png);"></div>
+                                                <div :title="track.name_trc" class="trackName">
+                                                    {{ track.name_trc }}
+                                                </div>
+                                                <div class="control" >
+                                                <img style="float:right" title="Удалить композицию" @click="deleteTrack(i, j)" class="MyMusiccontrol MyMusicDel" src="/static/mainapp/images/xiomi.png"/>
+                                                <span style="float:right;position:absolute;left:27px; font-size:80%;">{{ track.likes }}</span>
+                                                <img  class="liked" src="/static/mainapp/images/likeOren.svg"/>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>    
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -134,14 +142,14 @@ export default {
             
         },
         deleteTrack(i, j) {
-            this.$http.delete('../api/tracks/' + this.albums[i].tracks[j].id).then(
+            this.$http.delete('../api/tracks/' + this.albums[i].tracks[j].id, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(
                 response => {
                     this.albums[i].tracks.splice(j, 1)
                 }
             )
         },
         deleteAlbum(i) {
-            this.$http.delete('../api/albums/' + this.albums[i].id).then(
+            this.$http.delete('../api/albums/' + this.albums[i].id, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(
                 response => {
                     this.albums.splice(i, 1)
                 }
@@ -229,22 +237,23 @@ html, body
 }
 .profile-row
 {
-    padding-top: 15px; 
+    padding-bottom:69px; 
+    padding-top: 70px; 
     margin: 0 auto;
 }
 .ProfileConteiner
 {
-    background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(36, 87, 189, 0.2));
+    background-color: rgba(70, 57, 78, 0.281);
+    /* background: linear-gradient(0deg, rgba(255, 255, 153, .2), rgba(36, 87, 189, 0.2)); */
     font-size: 110%;
-    top: 55px;
-    position: relative;
+    /* padding-top: 55px; */
+    position: absolute;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     /*width: 60%;*/
 }
 .profile
-{
-    padding-bottom: 69px; 
+{ 
     padding-left: 15px;
     padding-right: 15px;
     margin: 0 auto;
@@ -309,7 +318,7 @@ html, body
     padding: 1%;
     background-color: rgba(217, 217, 217,0.3);
 }
-.Albom-Description, .MyAlbum-lable, .MyAlbum-music
+.Albom-Description, .MyAlbum-lable
 {
     float: left;
 }
@@ -322,12 +331,18 @@ html, body
 }
 .Albom-Description
 {
+    cursor: default;
+    position: relative;
     height: 20%;
     float: left;
     width: 66%;
     margin-right: 1.7%;
     display: flex;
     flex-direction: column;
+}
+span
+{
+    cursor: default;
 }
 .more
 {
@@ -341,12 +356,12 @@ html, body
 }
 .MyAlbum-music
 {
+    float: left;
     width: 66%;
-    display: block;
 }
 .Mymusic-conteiner
 {
-    max-height: 164.95px;
+    max-height: 163px;
     overflow-y: scroll;
     overflow-x: hidden;
     padding: 8px;
@@ -370,7 +385,7 @@ html, body
 }
 .MyMusic:hover
 {
-    background-color: rgba(230, 230, 230,0.5);
+    background-color: rgba(252, 177, 39, 0.2);
 }
 .MyMusiccontrol
 {
@@ -384,12 +399,14 @@ html, body
 
 .leftColumn
 {
+
     float: left;
     margin-right: 1.5%; 
     width: 25%;
 }
 .Lblock
 {
+
     padding: 2%;
     margin-bottom: 5%;
     display: block;
@@ -424,7 +441,9 @@ a
 .ProfileNastr:hover
 {
     cursor: pointer;
-    background-color: rgba(153, 153, 153,0.3)
+    /* background: linear-gradient(0deg, rgba(228, 170, 11, 0.4), rgba(84, 84, 85, 0.1));; */
+    background-color: rgba(252, 177, 39, 0.2)
+    /* background-color: rgba(153, 153, 153,0.3) */
 }
 .ProfileNastr img
 {
@@ -471,7 +490,8 @@ a
 }
 .likedMusic:hover
 {
-    background-color: rgb(235, 235, 235)
+    background-color: rgba(252, 177, 39, 0.2);
+    /* background-color: rgb(235, 235, 235) */
 }
 .likedMusic:hover  .musicLable
 {
@@ -599,5 +619,90 @@ a
     font-weight: 600; 
     float: left;
 }
-
+.albumDel
+{
+    position: absolute;
+    cursor: pointer;
+    width: 25px;
+    height: 25px;
+    top:1%;
+    left: 97%;
+}
+.albumDel:hover
+{
+    transform: scale(1)
+}
+.playAll
+{
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select:none;
+    margin-top:5px;
+    margin-bottom: 5px; 
+    padding: 5px;
+    height: 30px;
+    cursor: pointer;
+    line-height: 30px;
+    font-size: 75%;
+    font-weight: 600;
+    border: solid;
+    background-color: rgb(255, 181, 43);
+    border-color: rgba(255, 255, 255, 0);
+    /* transform: skew(-10deg); */
+    width: 233.656px;
+    display: flex;
+}
+.playAll img
+{
+    /* transform: skew(10deg); */
+    width: 30px;
+    height: 30px;
+    padding-right:5px; 
+}
+.playAll span
+{
+    cursor: pointer;
+    /* transform: skew(10deg); */
+}
+.playAll:active
+{
+    background-color: rgb(226, 160, 38);
+}
+.MyMusicDel
+{   
+    position: absolute;
+    margin-left: 15px; 
+    opacity: 60;
+    width: 30px;
+    height: 30px;
+    left: 54%; 
+}
+.liked
+{   
+    position: absolute;
+    opacity: 60%;
+    width: 25px;
+    height: 25px;
+    margin-top: 9px;
+}
+.control
+{
+    float: right;
+    height: 49px;
+    width: 20%;
+    position: relative;
+}
+.trackName
+{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    float: left;
+    margin: 0px;
+    width: 70%;
+}
+/* .MyMusic:hover .control
+{
+    display: block;
+} */
 </style>

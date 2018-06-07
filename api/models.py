@@ -35,7 +35,7 @@ class GenreStyle(models.Model):
 class Album(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     per_id = models.ForeignKey(Performer, on_delete=models.CASCADE, related_name='albums')
-    name_alb = models.CharField(max_length=30)
+    name_alb = models.CharField(max_length=60)
     stl_id = models.ForeignKey(GenreStyle, on_delete=models.CASCADE, related_name='style')
     numplays_alb = models.IntegerField(default=0)
     rating_alb = models.IntegerField(default=0)
