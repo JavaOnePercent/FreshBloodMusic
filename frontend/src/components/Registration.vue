@@ -89,10 +89,13 @@ export default {
                 data.append('email', this.email);
                 data.append('password', this.password1);
                 var self = this;
-                this.$http.post('register', data).then(function(response){
+                this.$http.post('api/register', data, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(function(response){
                     self.$store.commit('username', response.data.username)
                     self.$router.push('performers/' + response.data.per_id)
                     self.$store.commit('performerID', response.data.per_id)
+                    self.$store.commit('myPerformerID', response.data.per_id)
+                    self.$http.get('../api/token').then(function(response){this.$root.setToken()});
+                    
                 },
                 function(error){
                     document.getElementById('username').style.backgroundColor="rgba(255, 179, 179,0.98)"
@@ -140,7 +143,7 @@ export default {
 {
     position: absolute;
     /*background: linear-gradient(0deg, rgba(0, 255, 0, .2), rgba(0, 85, 255,0.2)), url(/RegistrationFon.jpg); */
-    background: linear-gradient(0deg, rgba(255, 255, 153, .3), rgba(0, 85, 255,0.3)), url(/static/mainapp/PwfWGDp7TcM.jpg); 
+    background: linear-gradient(0deg, rgba(255, 255, 153, .3), rgba(0, 85, 255,0.3)), url(/static/mainapp/images/PwfWGDp7TcM.jpg); 
     background-position:center;
     background-size: cover;
     height: 100%;

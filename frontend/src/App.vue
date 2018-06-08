@@ -6,7 +6,7 @@
                 <loader></loader>
             </div>
         </div>
-        <router-view></router-view>
+        <router-view @login="loadFromHistory" ></router-view>
         <top-player></top-player>
     </div>
 </template>
@@ -31,13 +31,23 @@ export default {
     },
     created() {
         var self = this
-        this.$http.get('login').then(function(response){
+        this.$http.get('../api/login').then(function(response){
             self.$store.commit("username", response.data.username)
             self.$store.commit('myPerformerID', response.data.per_id)
         });
-        this.$http.get('token').then(function(response){
+        this.$http.get('../api/token').then(function(response){
         });
-        this.$http.get('history').then(response => {
+        this.loadFromHistory()
+    },
+    computed: {
+        showLoader () {
+            return this.$store.state.showLoader
+        }
+    },
+    methods: {
+        loadFromHistory() {
+            var self = this
+            this.$http.get('../api/history').then(response => {
             //console.log(response.data)
             if(response.data[0])
             {
@@ -50,13 +60,9 @@ export default {
             }
             else
                 this.$bus.$emit('set-current-track', null)
-        });
-    },
-    computed: {
-        showLoader () {
-            return this.$store.state.showLoader
+        }, error => {this.$bus.$emit('set-current-track', null)});
         }
-    },
+    }
 }
 </script>
 
@@ -81,7 +87,7 @@ html {
  {
     pointer-events: all;
     position: fixed;
-    z-index: 90000;
+    z-index: 900;
     left: 0;
     top: 0;
     width: 100%;

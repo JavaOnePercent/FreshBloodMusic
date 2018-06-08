@@ -52,11 +52,14 @@ export default {
                 data.append('username', this.username);
                 data.append('password', this.password);
                 var self = this;
-                this.$http.post('login', data).then(function(response){
+                this.$http.post('api/login', data, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(function(response){
                     self.$store.commit('username', response.data.username)
                     self.$router.push('performers/' + response.data.per_id)
-                    self.$store.commit('performerID', response.data.per_id)
+                    self.$store.commit('myPerformerID', response.data.per_id)
+                    self.$emit('login')
                     
+                    this.$http.get('../api/token').then(function(response){this.$root.setToken()});
+
                 },function(error){
                     document.getElementById('username').style.backgroundColor="rgba(255, 179, 179,0.98)"
                     document.getElementById('password').style.backgroundColor="rgba(255, 179, 179,0.98)"
@@ -94,7 +97,7 @@ export default {
     position: absolute;
     /*background: linear-gradient(0deg, rgba(0, 255, 0, .2), rgba(0, 85, 255,0.2)), url(/RegistrationFon.jpg); */
     /*background: linear-gradient(0deg, rgba(204, 105, 39, 0.3), rgba(0, 85, 255,0.3)), url(/308943842556095.jpg);*/
-    background: linear-gradient(0deg, rgba(204, 105, 39, 0.3), rgba(0, 85, 255,0.3)), url(/static/mainapp/77491359960545_tumblr_ocp55as7o51qkprgpo1_1280.gif);
+    background: linear-gradient(0deg, rgba(204, 105, 39, 0.3), rgba(0, 85, 255,0.3)), url(/static/mainapp/images/77491359960545_tumblr_ocp55as7o51qkprgpo1_1280.gif);
     background-position:center; 
     background-size: cover;
     height: 100%;

@@ -5,28 +5,28 @@
         <div id="previous-page" class="previous-page" @click="show"></div>
 
         <transition :name="animation" mode="in-out">
-            <div class="infotrack" v-show="showDiv" v-if="infotracks.month">
-                <img class="img" :src="infotracks.month.image_alb" alt="обложка">
+            <div class="infotrack" v-show="showDiv" v-if="infotracks[0]">
+                <img class="img" :src="infotracks[0].image_alb" alt="обложка">
                 <div class="text">
                     <span>Лучший трек этого месяца</span>
-                    <p>{{ infotracks.month.name_per}} <br> {{ infotracks.month.name_trc}}</p>
-                    <div class="play btn" @click="playClick(infotracks.month.id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
-                    <div class="turn btn" @click="toQueueClick(infotracks.month.id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
-                    <p>Понравилась: {{ infotracks.month.rating_trc}} пользователям</p>
-                    <P>Жанр: {{ infotracks.month.name_gnr}} / {{ infotracks.month.name_stl}}</p>
+                    <p>{{ infotracks[0].name_per}} <br> {{ infotracks[0].name_trc}}</p>
+                    <div class="play btn" @click="playClick(infotracks[0].id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
+                    <div class="turn btn" @click="toQueueClick(infotracks[0].id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
+                    <p>Понравилась: {{ infotracks[0].rating_trc}} пользователям</p>
+                    <P>Жанр: {{ infotracks[0].name_gnr}} / {{ infotracks[0].name_stl}}</p>
                 </div>
             </div>
         </transition>
         <transition :name="animation" mode="out-in">
-            <div class="infotrack" v-show="!showDiv" v-if="infotracks.week">
-                <img class="img" :src="infotracks.week.image_alb" alt="обложка">
+            <div class="infotrack" v-show="!showDiv" v-if="infotracks[1]">
+                <img class="img" :src="infotracks[1].image_alb" alt="обложка">
                 <div class="text">
                     <span>Лучший трек этой недели</span>
-                    <p>{{ infotracks.week.name_per}} <br> {{ infotracks.week.name_trc}}</p>
-                    <div class="play btn" @click="playClick(infotracks.week.id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
-                    <div class="turn btn" @click="toQueueClick(infotracks.week.id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
-                    <p>Понравилась: {{ infotracks.week.rating_trc}} пользователям</p>
-                    <P>Жанр: {{ infotracks.week.name_gnr}} / {{ infotracks.week.name_stl}}</p>
+                    <p>{{ infotracks[1].name_per}} <br> {{ infotracks[1].name_trc}}</p>
+                    <div class="play btn" @click="playClick(infotracks[1].id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
+                    <div class="turn btn" @click="toQueueClick(infotracks[1].id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
+                    <p>Понравилась: {{ infotracks[1].rating_trc}} пользователям</p>
+                    <P>Жанр: {{ infotracks[1].name_gnr}} / {{ infotracks[1].name_stl}}</p>
                 </div>
             </div>
         </transition>
@@ -98,11 +98,11 @@ export default {
     },
     created: function() {
         this.autoFlip = setInterval(this.updatePosts, 7000);
-        this.$http.get('top', /*{params: {per: this.period}}*/).then(function(response){
+        this.$http.get('api/tracks', {params: {gen: 'top'}}).then(function(response){
                 //console.log(response.data);
                 this.infotracks = response.data;
-                this.$set(this.infotracks.month, 'label', 'Лучший трек этого месяца')
-                this.$set(this.infotracks.week, 'label', 'Лучший трек этой недели')
+                if(this.infotracks[0]) this.$set(this.infotracks[0], 'label', 'Лучший трек этого месяца')
+                if(this.infotracks[1]) this.$set(this.infotracks[1], 'label', 'Лучший трек этой недели')
                 /*this.infotracks.forEach(function(item, i, arr) {
                     item[2] = "/media/albums/" + item[2];
                 });*/
@@ -169,7 +169,7 @@ export default {
     }
     .next-page
     {
-        left: -15px;
+        /* left: -15px; */
     }
 }
 
@@ -179,7 +179,7 @@ export default {
         float: left;
         text-align: center;
         color: white;
-        width: 65%;
+        width: calc(100% - 280px);
     }
     .img /*обложка лучшей композиции*/
     {
@@ -246,7 +246,7 @@ export default {
 }
 .next-page
 {  
-    background:url(/static/mainapp/left.png), linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
+    background:url(/static/mainapp/images/left.png), linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
     display: none;
     /* opacity: 0.4; */
     background-size: 35px;
@@ -256,7 +256,7 @@ export default {
 }
 .previous-page
 {
-    background:url(/static/mainapp/right.png), linear-gradient(90deg,rgba(255, 255, 255, 0.0), rgba(0, 0, 0, 0.5) );
+    background:url(/static/mainapp/images/right.png), linear-gradient(90deg,rgba(255, 255, 255, 0.0), rgba(0, 0, 0, 0.5) );
     display: none;
     background-size: 35px;
     /* opacity: 0.4; */

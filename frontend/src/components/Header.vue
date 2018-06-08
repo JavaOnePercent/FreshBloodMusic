@@ -48,7 +48,7 @@ export default {
         logout() {
             var self = this
             this.menuShow=false
-            this.$http.get('logout').then(function(response){
+            this.$http.get('../api/logout').then(function(response){
                 self.$store.commit("username", '')
             });
         }
@@ -165,8 +165,9 @@ export default {
     margin: 0px;
     position: relative;
     display: block;
-    background-color: rgb(204, 204, 204);
+    background-color: rgb(236, 236, 236);
     padding: 7px;
+    box-shadow: 0 3.5px 7px rgba(0,0,0,0.25), 0 2.5px 2.5px rgba(0,0,0,0.22);
 }
 .drop-menu ul:hover ~ .drop-menu
 {

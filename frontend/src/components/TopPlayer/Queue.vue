@@ -81,9 +81,11 @@ export default {
         },
         openQueue() {
             this.showQueue = !this.showQueue;
+            this.showHistory = false
         },
         openHistory() {
             this.showHistory = !this.showHistory;
+            this.showQueue = false
         },
     },
 }

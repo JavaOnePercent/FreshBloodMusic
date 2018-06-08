@@ -3,9 +3,9 @@
         <img :class="isFull ? 'full-menu-pic' : 'menu-pic'" src="/static/mainapp/images/menu.svg" draggable="false"/>
         <transition name="menu-more">
             <ul class="menu-dropdown" v-show="showMenu" @mouseleave="closeDrop">
-                <li><router-link :to="{ name: 'performer', params: { id: this.performerID }}"><p class="menuElements">На страницу исполнителя</p></router-link></li>
-                <li><p class="menuElements">Добавить в избранное</p></li>
-                <li><p class="menuElements" @click="report()">Пожаловаться</p></li>
+                <li @click="toPerformerPage"><p class="menuElements">На страницу исполнителя</p></li>
+                <li @click="$emit('likepressed')"><p class="menuElements">{{ likeText }}</p></li>
+                <li @click="report"><p class="menuElements">Пожаловаться</p></li>
             </ul>
         </transition>
     </div>
@@ -14,13 +14,29 @@
 <script>
 export default {
     name: 'menu-more',
-    props: [ 'performerID', 'isFull' ],
+    props: [ 'performerID', 'isFull', 'isLiked' ],
     data() {
         return {
             showMenu: false,
+            likeText: "Добавить в избранное"
+        }
+    },
+    watch: {
+        isLiked(iL) {
+            if(iL) this.likeText = "Удалить из избранного"
+            else this.likeText = "Добавить в избранное"
+        }
+    },
+    computed: {
+        trackID() {
+            return this.$store.state.currentTrack.id;
         }
     },
     methods: {
+        toPerformerPage() {
+            this.$router.push({ name: 'performer', params: { id: this.performerID }})
+            this.$emit('show-performer')
+        },
         toggleDrop() {
             this.showMenu = !this.showMenu;
         },
@@ -28,7 +44,7 @@ export default {
             this.showMenu = false;
         },
         report() {
-            this.$http.get('report', {params: {track: 1}}).then(function(response){
+            this.$http.put('../api/report', {}, {params: {track: this.trackID}}).then(function(response){
                 this.showMenu = false;
                 alert('Вы отправили жалобу!\nСпасибо, что помогаете сделать наш сервис лучше:)');
             }, function(error){
@@ -43,6 +59,7 @@ export default {
 li {
     display: inline-block;
     width: 100%;
+    cursor: pointer;
 }
 
 li:hover {
@@ -58,6 +75,8 @@ li:hover .menuElements {
 	color: black;/*#e8e8e8;*/
 	text-align: center;
     padding: 0 10px 0 10px;
+    user-select: none;
+    
 }
 
 .menu-more-enter-active, .menu-more-leave-active {
@@ -133,7 +152,7 @@ li:hover .menuElements {
     margin: auto;
     bottom: 58px;
     width: 160px;
-    right: 0;
+    left: -65px;
     z-index: 100;
     list-style: none;
     padding: 0;

@@ -1,7 +1,7 @@
 <template>
     <div :class="isFull ? 'full-track-performer-name' : 'track-performer-name'">
         <p :class="isFull ? 'full-track-name' : 'track-name'">{{ trackName }}</p>
-        <p :class="isFull ? 'full-performer-name' : 'performer-name'">{{ performerName }}</p>
+        <p :class="isFull ? 'full-performer-name' : 'performer-name'" @click="toPerformerPage">{{ performerName }}</p>
     </div>
 </template>
 
@@ -11,8 +11,14 @@ export default {
     props: [
         'trackName',
         'performerName',
-        'isFull'
-    ]
+        'isFull',
+        'performerID'
+    ],
+    methods: {
+        toPerformerPage() {
+            this.$router.push({ name: 'performer', params: { id: this.performerID }})
+        },
+    }
 }
 </script>
 
@@ -36,6 +42,7 @@ export default {
     /*max-width: 300px;*/
     margin: auto;
 	position: absolute;
+    
 }
 
 .full-track-name {
@@ -74,10 +81,22 @@ export default {
     height: 32px;
     line-height: 32px;
     top: 32px;
+    right: 0;
     margin: auto;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    cursor: pointer;
+    width: auto;
+    position: absolute;
+}
+
+.performer-name:hover {
+    
+    /*background: -webkit-linear-gradient(left, #ffd319 20%, #ff901f 40%, #ff2975 55%, #f222ff 80%, #8c1eff 90%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;*/
+    /*color: rgb(255, 66, 66);*/
 }
 
 </style>
