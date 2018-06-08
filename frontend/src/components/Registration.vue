@@ -94,7 +94,7 @@ export default {
                     self.$router.push('performers/' + response.data.per_id)
                     self.$store.commit('performerID', response.data.per_id)
                     self.$store.commit('myPerformerID', response.data.per_id)
-                    self.$http.get('api/token').then(function(response){this.$root.setToken()});
+                    self.$http.get('../api/token').then(function(response){this.$root.setToken()});
                     
                 },
                 function(error){
@@ -143,7 +143,7 @@ export default {
 {
     position: absolute;
     /*background: linear-gradient(0deg, rgba(0, 255, 0, .2), rgba(0, 85, 255,0.2)), url(/RegistrationFon.jpg); */
-    background: linear-gradient(0deg, rgba(255, 255, 153, .3), rgba(0, 85, 255,0.3)), url(/static/mainapp/PwfWGDp7TcM.jpg); 
+    background: linear-gradient(0deg, rgba(255, 255, 153, .3), rgba(0, 85, 255,0.3)), url(/static/mainapp/images/PwfWGDp7TcM.jpg); 
     background-position:center;
     background-size: cover;
     height: 100%;

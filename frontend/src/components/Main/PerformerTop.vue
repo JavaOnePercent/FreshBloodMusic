@@ -202,7 +202,7 @@ export default {
     width: 100%;
     height: 35px;
     z-index: 50;
-    background-image: url(/static/mainapp/up.svg);
+    background-image: url(/static/mainapp/images/up.svg);
     /* background-image: url(/static/mainapp/up.svg), linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0)); */
     background-size: 35px;
     background-position: top center;
@@ -219,7 +219,7 @@ export default {
     width: 100%;
     height: 35px;
     z-index: 50;
-    background-image:url(/static/mainapp/down.svg);
+    background-image:url(/static/mainapp/images/down.svg);
     /* background-image:url(/static/mainapp/down.svg), linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0)); */
     background-size: 35px;
     background-position: bottom center;

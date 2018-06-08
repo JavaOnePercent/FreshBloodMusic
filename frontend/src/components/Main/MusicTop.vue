@@ -246,7 +246,7 @@ export default {
 }
 .next-page
 {  
-    background:url(/static/mainapp/left.png), linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
+    background:url(/static/mainapp/images/left.png), linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
     display: none;
     /* opacity: 0.4; */
     background-size: 35px;
@@ -256,7 +256,7 @@ export default {
 }
 .previous-page
 {
-    background:url(/static/mainapp/right.png), linear-gradient(90deg,rgba(255, 255, 255, 0.0), rgba(0, 0, 0, 0.5) );
+    background:url(/static/mainapp/images/right.png), linear-gradient(90deg,rgba(255, 255, 255, 0.0), rgba(0, 0, 0, 0.5) );
     display: none;
     background-size: 35px;
     /* opacity: 0.4; */

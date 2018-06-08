@@ -12,7 +12,7 @@
                 </div>
             </div>
          <div class="music-style-conteiner">
-                <img id="next" class="next" @click="leftScrol" src="/static/mainapp/left.png"/>
+                <img id="next" class="next" @click="leftScrol" src="/static/mainapp/images/left.png"/>
                 <div class="leftBevfore"></div>
                 <div id="music-style" class="music-style">
                     <a  class="janr gen" name="" @click="showGenre('all')" :class="{'choseJanr':choseGenr==='all'}">Все</a>
@@ -22,7 +22,7 @@
                         <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id)" >{{gen.name_gnr}}</a>
                     </div>
                 </div>
-                <img id="previous" class="previous" @click="rightScrol" src="/static/mainapp/right.png"/>
+                <img id="previous" class="previous" @click="rightScrol" src="/static/mainapp/images/right.png"/>
                 <div class="rightBevfore"></div>
             </div>
           <transition name="style">

@@ -1,7 +1,7 @@
 module.exports = {
     configureWebpack: {
         output: {
-            publicPath: '/static/mainapp',
+            publicPath: '',
         },
     },
     devServer: {

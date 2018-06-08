@@ -3,12 +3,15 @@ import App from './App.vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import Vuex from 'vuex'
+import VueCookie from 'vue-cookie'
 
 import profile from './components/Profile.vue'
 import settings from './components/Settings.vue'
 import main from './components/Main.vue'
 import registration from './components/Registration.vue'
 import login from './components/Login.vue'
+
+Vue.use(VueCookie);
 
 Vue.use(VueRouter)
 
@@ -27,7 +30,7 @@ Object.defineProperty(Vue.prototype,"$bus",{
 });
 
 /*Vue.http.interceptors.push(function(request) {
-    request.headers.set('X-CSRFToken', csrftoken);
+    request.headers.set('X-CSRFToken', Vue.csrfToken);
 });*/ //эта штука перехватывает все запросы на Vue и преобразует их в запрос с csrf token'ом
 
 const store = new Vuex.Store({ //глобальное хранилище vuex
@@ -138,7 +141,7 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
 })
 
 const router = new VueRouter({
-    mode: 'history',
+    //mode: 'history',
     routes: [
         { path: '/register', component: registration },
         { path: '/login', component: login },
@@ -160,21 +163,7 @@ new Vue({
     render: h => h(App),
     methods: {
         setToken() {
-            this.csrftoken = this.getCookie('csrftoken')
-        },
-        getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+            this.csrftoken = this.$cookie.get('csrftoken');
         }
     },
     created() {

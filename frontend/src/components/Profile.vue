@@ -29,7 +29,7 @@
                         <div @click="playClick(like.id)" class="likedMusic" :key="index" v-for="(like, index) in likes">
                             <!--<div class="likedMusicHover"></div>-->
                             <div class="musicLable" :style="backgroundImage(like.logo)"></div>
-                            <div class="musicLablecontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
+                            <div class="musicLablecontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
                             {{ like.performer }} - {{ like.name }}
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                                         <span style="width:90%; overflow-x: hidden"> {{ album.name_alb }}</span>
                                         <img title="Удалить альбом" @click="deleteAlbum(i)" class="albumDel" src="/static/mainapp/images/closeDropdown.svg"/>
                                         <div @click="playAlbum(album.tracks)" class="playAll"> 
-                                            <img src="/static/mainapp/play-arrow.svg"/>
+                                            <img src="/static/mainapp/images/play-arrow.svg"/>
                                             <span> Проигрывать весь альбом </span>
                                         </div>
                                         <label> жанр: {{ album.genre + " / " + album.style }}</label>
@@ -82,7 +82,7 @@
                                         <div class="Mymusic-conteiner">
                                             <div @click="playClick(track.id)" class="MyMusic" :key="j" v-for="(track, j) in album.tracks">
                                                 <!--<div class="likedMusicHover"></div>-->
-                                                <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/play-arrow.svg)"></div>
+                                                <div class="MyMusiccontrol" style="background-image: url(/static/mainapp/images/play-arrow.svg)"></div>
                                                 <div :title="track.name_trc" class="trackName">
                                                     {{ track.name_trc }}
                                                 </div>
