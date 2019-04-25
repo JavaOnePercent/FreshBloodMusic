@@ -137,7 +137,12 @@ class TrackDetail(APIView):
     def get_next(self, user):
         try:
             if user is not None:
-                track = Track.objects.get(id=TrackRecommendation.get_recommendation(user)[0])
+                recommendations = TrackRecommendation.get_recommendation(user)
+                if len(recommendations) != 0:
+                    track = Track.objects.get(id=recommendations[0])
+                else:
+                    track = Track.objects.get(id=1)
+
             else:
                 track = Track.objects.filter(id__in=TrackRecommendation.get_recommendation(user)).order_by('?')[0]
             # TrackHistoryMethods.create(track.id, user)
