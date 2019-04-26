@@ -284,12 +284,12 @@ class TrackRecommendation:
             dicttrack.update({str(d): likes})
             likes = 0
         dicttrack = sorted(dicttrack.items(), key=lambda item: -item[1])
-        print(dicttrack)
+        #print(dicttrack)
         tracks = []
         for track in dicttrack:
             tracks.append(int(track[0]))
         identracks = []
-        print(tracks)
+        #print(tracks)
         recommended_in_history = []
         for track in tracks:
             if (track,) not in identracks and (track,) not in historytracks and (track,) not in reporttracks:
@@ -301,7 +301,7 @@ class TrackRecommendation:
             if rec.trc_id.id in identracks:
                 identracks.remove(rec.trc_id.id)
             identracks.append(rec.trc_id.id)
-        print(identracks)
+        #print(identracks)
         return identracks
 
     @staticmethod

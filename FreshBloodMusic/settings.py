@@ -26,8 +26,6 @@ SECRET_KEY = 'ghp^77^#!$dr665bx505du*pgar$)@i(yz9&mfag6l+ld+9a45'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.0.7',
-    '127.0.0.1'
 ]
 
 
@@ -82,8 +80,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'music_db',
-        'USER': 'djeban',
-        'PASSWORD': 'iop139643234!QWE',
+        'USER': 'developer',
+        'PASSWORD': 'developer4321',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 
