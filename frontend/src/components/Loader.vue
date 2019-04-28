@@ -29,7 +29,7 @@
     
             <div class="description-conteiner">
                 <label for="track-name-loader">Описание</label>
-                <textarea type="text" name="description" maxlength="800"> </textarea>
+                <textarea type="text" name="description" maxlength="800" v-model="description"> </textarea>
             </div>
     
     
@@ -97,6 +97,7 @@ export default {
             dropAll: null,
             menuItems: [],
             loader:false,
+            description: ''
         }
     },
     //если шо то сносить к чертям
@@ -139,7 +140,7 @@ export default {
             this.show=!this.show;
             if(this.menuItems.length === 0)
             {
-                this.$http.get('api/genre').then(response => {response.body.forEach(this.genresIterator)})
+                this.$http.get('/api/genre').then(response => {response.body.forEach(this.genresIterator)})
             }
         },
         
@@ -150,7 +151,7 @@ export default {
         genreClick(index) {
             this.menuIndexfunc(index);
             if(this.menuItems[index].children.length === 0)
-                this.$http.get('api/genre', {params: {id: this.menuItems[index].id}}).then(response => {response.body.forEach(this.stylesIterator)});
+                this.$http.get('/api/genre', {params: {id: this.menuItems[index].id}}).then(response => {response.body.forEach(this.stylesIterator)});
         },
       
         stylesIterator(item, i, arr) { 
@@ -337,6 +338,7 @@ export default {
             }*/
             data.append('name', this.track_name_loader)
             data.append('gen_id', this.genreID)
+            data.append('description', this.description)
 
             //console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
             if (track_name_loader && track) {

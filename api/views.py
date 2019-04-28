@@ -8,22 +8,17 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from rest_framework.views import APIView
 
-from .models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory
+from .models import *
 from django.http import HttpResponse, Http404
 from .uploader import save_album, save_performer, save_track
-from .serializers import TrackSerializer, NoLinkTrackSerializer, GenreSerializer, GenreStyleSerializer, \
-    PerformerSerializer, TopTrackSerializer, FullPerformerSerializer, AlbumSerializer, LikedTrackSerializer, \
-    TrackHistorySerializer
-from .model_methods import TrackMethods, LikedTrackMethods, GenreMethods, GenreStyleMethods, PerformerMethods, \
-    AlbumMethods, TrackHistoryMethods, TrackRecommendation, TrackReportMethods
+from .serializers import *
+from .model_methods import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status, generics
 
 from rest_framework.pagination import PageNumberPagination
-
-
-from pprint import pprint
+from rest_framework.exceptions import ParseError
 
 
 @ensure_csrf_cookie
@@ -36,7 +31,6 @@ def main_view(request):  # главная
     index = file.read()
     file.close()
     return HttpResponse(index, content_type="text/html")
-    # return render(request, 'mainapp/homePage.html', {'username': auth.get_user(request).username, 'genre': Genre.objects.all()})
 
 
 @api_view(['PUT', 'DELETE', 'GET'])  # обработчик лайков
@@ -81,56 +75,73 @@ class TrackOverview(generics.ListCreateAPIView):
         track = save_track(album, name, audio)
         return Response({"index": request.POST["index"], 'id': track.id}, status=status.HTTP_201_CREATED)
 
+    def handle_exception(self, exc):
+        if type(exc) == ParseError:
+            return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
+
     def get_queryset(self):
-        gen = self.request.query_params['gen']
-        if gen != 'top':
+        try:
+            filter = self.request.query_params['filter']
+        except MultiValueDictKeyError:
+            raise ParseError('Filter param must be set')
+
+        if filter != 'popular':
             TrackOverview.serializer_class = NoLinkTrackSerializer
             TrackOverview.pagination_class = PostLimitOffsetPagination
-            sty = self.request.query_params['sty']
-            sort = self.request.query_params['sort']
+
             request = self.request
-            if gen != '' and sty == '':
-                if gen == 'fav':
-                    likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id').order_by('id')
-                    ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in likedtracks[0])
-                    tracks = Track.objects.filter(id__in=likedtracks).extra(
-                        select={'ordering': ordering}, order_by=('ordering',))
-                    '''tracks = []
-                    for track in likedtracks:
-                        trc = Track.objects.all().get(id=track[0])
-                        tracks.append(trc)'''
-                elif gen == 'rec':
-                    identracks = TrackRecommendation.get_recommendation(auth.get_user(request).id)
-                    ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
-                    tracks = Track.objects.filter(pk__in=identracks).extra(
-                        select={'ordering': ordering}, order_by=('ordering',))
-                elif gen != 'all':
-                    tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=gen)
-                else:
-                    tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
-                if gen != 'rec' and gen != 'fav':
-                    if sort == 'popular':
-                        tracks = tracks.order_by('-rating_trc')
-                    elif sort == 'time':
-                        tracks = tracks.order_by('-date_trc')
-                return tracks
-            elif sty != '' and gen == '':
-                tracks = Track.objects.select_related('alb_id__stl_id').filter(alb_id__stl_id=sty)
+
+            if filter == 'favorite':
+                likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id').order_by('id')
+                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in likedtracks[0])
+                tracks = Track.objects.filter(id__in=likedtracks).extra(
+                    select={'ordering': ordering}, order_by=('ordering',))
+            elif filter == 'recommended':
+                identracks = TrackRecommendation.get_recommendation(auth.get_user(request).id)
+                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
+                tracks = Track.objects.filter(pk__in=identracks).extra(
+                    select={'ordering': ordering}, order_by=('ordering',))
+            elif filter == 'genre':
+                try:
+                    genre = self.request.query_params['genre']
+                except MultiValueDictKeyError:
+                    raise ParseError('Filter by genre must have genre param')
+                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=genre)
+
+            elif filter == 'style':
+                try:
+                    style = self.request.query_params['style']
+                except MultiValueDictKeyError:
+                    raise ParseError('Filter by style must have style param')
+                tracks = Track.objects.select_related('alb_id__stl_id').filter(alb_id__stl_id=style)
+
+            elif filter == 'all':
+                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
+            else:
+                raise ParseError('Filter value is incorrect')
+
+            if filter != 'recommended' and filter != 'favorite':
+                try:
+                    sort = self.request.query_params['sort']
+                except MultiValueDictKeyError:
+                    sort = 'popular'
                 if sort == 'popular':
                     tracks = tracks.order_by('-rating_trc')
                 elif sort == 'time':
                     tracks = tracks.order_by('-date_trc')
-                return tracks
+            return tracks
+
         else:
+            try:
+                limit = self.request.query_params['limit']
+                interval = self.request.query_params['interval']
+            except MultiValueDictKeyError:
+                raise ParseError('Filter by popularity requires limit and interval params ')
             TrackOverview.serializer_class = TopTrackSerializer
             TrackOverview.pagination_class = None
-            month = Track.objects.order_by('rating_trc').reverse().filter(
-                date_trc__gte=date.today() - timedelta(days=31))[:1]
-            # elif per == 'week':
-            week = Track.objects.order_by('rating_trc').reverse().filter(
-                date_trc__gte=date.today() - timedelta(days=7))[:1]
-            month = month.union(week)
-            return month
+            tracks = Track.objects.order_by('-rating_trc').filter(
+                date_trc__gte=date.today() - timedelta(days=int(interval)))[:int(limit)]
+            return tracks
 
 
 class TrackDetail(APIView):
@@ -181,22 +192,42 @@ class TrackDetail(APIView):
 
 class AlbumsList(APIView):
 
-    def post(self, request, format=None):
+    def get(self, request, format=None):
+        try:
+            sort = request.query_params['sort']
+        except MultiValueDictKeyError:
+            sort = 'new'
+        if sort == 'new':
+            albums = Album.objects.all().order_by('-date_alb')
+        elif sort == 'popular':
+            albums = Album.objects.all().order_by('-rating_alb')
+        else:
+            return Response('Incorrect sort key value', status=status.HTTP_400_BAD_REQUEST)
+        ser = AlbumSerializer(albums, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
         album_name = request.POST["name"]
         gen_id = request.POST["gen_id"]
+        description = request.POST["description"]
         try:
             photo = request.FILES["photo"]
         except MultiValueDictKeyError:
             photo = None
-        # tracks = request.FILES.getlist('track')
-        # track_name = request.POST.getlist("track_name")
-        # save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo, tracks=tracks,
-        # track_name=list(track_name))
-        album = save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo)
+        album = save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo,
+                           description=description)
         return Response({"alb_id": album.id}, status=status.HTTP_201_CREATED)
 
 
 class AlbumDetail(APIView):
+
+    def get(self, request, pk):
+        try:
+            albums = Album.objects.get(pk=pk)
+        except Album.DoesNotExist:
+            return Response('Wrong album id', status=status.HTTP_400_BAD_REQUEST)
+        ser = AlbumTracksSerializer(albums)
+        return Response(ser.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, format=None):
         delete = AlbumMethods.delete(pk, auth.get_user(request).id)
@@ -225,7 +256,11 @@ def genre(request):
 class PerformersList(APIView):
 
     def get(self, request, format=None):
-        performer = Performer.objects.order_by('rating_per').reverse()[:5]
+        try:
+            limit = request.query_params['limit']
+        except MultiValueDictKeyError:
+            limit = 5
+        performer = Performer.objects.order_by('-rating_per')[:int(limit)]
         serializer = PerformerSerializer(performer, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -313,7 +348,7 @@ def register(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        newuser = User.objects.create_user(username, '1@1.ru', password).save()
+        User.objects.create_user(username, '1@1.ru', password).save()
         user = auth.authenticate(username=username, password=password)
         auth.login(request, user)
         performer = PerformerMethods.create(auth.get_user(request).id, username, '')

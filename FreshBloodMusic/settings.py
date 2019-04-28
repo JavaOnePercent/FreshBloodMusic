@@ -26,6 +26,7 @@ SECRET_KEY = 'ghp^77^#!$dr665bx505du*pgar$)@i(yz9&mfag6l+ld+9a45'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '*'
 ]
 
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

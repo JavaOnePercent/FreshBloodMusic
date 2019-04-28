@@ -3,12 +3,11 @@ import os
 import re
 import io
 
-from pprint import pprint
 from PIL import Image
 from pydub import AudioSegment
 
 from api.model_methods import AlbumMethods, TrackMethods, PerformerMethods
-from api.models import Album
+from api.models import *
 
 
 def save_track(alb_id, name, audio):
@@ -20,21 +19,17 @@ def save_track(alb_id, name, audio):
     TrackMethods.add_audio(track, audio)
     return track
 
-def save_album(user, name, genre, logo, tracks=None, track_name=None):  # сохранение альбома с треками в БД и в файлы
+
+def save_album(user, name, genre, logo, description):  # сохранение альбома с треками в БД и в файлы
     date = datetime.date.today()
-    album = AlbumMethods.create(user=user, name=name, genre=genre, date=date)
+    album = Album.objects.create(per_id=Performer.objects.get(user_id=user), name_alb=name, about_alb=description,
+                                 stl_id=GenreStyle.objects.get(id=genre), image_alb='', date_alb=date)
     directory = 'albums/' + str(album.id) + '/'
     os.mkdir(Compressor.path + directory)
     if logo is not None:
         image_alb = Compressor(logo.read(), logo.content_type, 'logo.jpg', directory).compress()
         AlbumMethods.add_image(album, image_alb)
 
-    '''pprint(track_name)
-    for i in range(len(tracks)):
-        tr_id = TrackMethods.create(album=album, name=track_name[i], date=date)
-        #pprint(track)
-        audio = Compressor(tracks[i].read(), tracks[i].content_type, str(tr_id.id) + '.mp3', directory).compress()
-        TrackMethods.add_audio(tr_id, audio)'''
     return album
 
 
@@ -46,7 +41,6 @@ def save_performer(id, name, label, description):
         image = Compressor(label.read(), label.content_type, 'logo.jpg', directory).compress()
         if is_new:
             PerformerMethods.add_image(performer, image)
-    #Compressor.remove_temp()
 
 
 def try_mkdir(directory):
@@ -55,6 +49,7 @@ def try_mkdir(directory):
         return True
     except FileExistsError:
         return False
+
 
 class Compressor:
     path = './media/'
@@ -70,19 +65,14 @@ class Compressor:
             self.compress_image()
         elif re.fullmatch(r'audio/\S*', self.type):
             self.compress_audio()
-        # f = open(self.path + self.dir + self.name, "rb")
-        # f.close()
         return self.dir + self.name
 
     def compress_image(self):
-        #src = self.save_temp()
         im = Image.open(io.BytesIO(self.bytes))
         im = im.resize((320, 320), Image.BICUBIC)
         im.save(self.path + self.dir + self.name, 'jpeg', quality=95, optimize=True)
 
     def compress_audio(self):
-        #src = self.save_temp()
-        #print(len(self.bytes))
         sound = AudioSegment.from_mp3(io.BytesIO(self.bytes))
         sound.export(self.path + self.dir + self.name, format="mp3", bitrate="128k")
 

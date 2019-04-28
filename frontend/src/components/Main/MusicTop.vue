@@ -39,7 +39,7 @@ export default {
     name: 'music-top',
     data: function() {
         return{
-            infotracks: {},
+            infotracks: [],
             animation: "",
             showDiv: true,
             isTimeout: false,
@@ -98,16 +98,11 @@ export default {
     },
     created: function() {
         this.autoFlip = setInterval(this.updatePosts, 7000);
-        this.$http.get('api/tracks', {params: {gen: 'top'}}).then(function(response){
-                //console.log(response.data);
-                this.infotracks = response.data;
-                if(this.infotracks[0]) this.$set(this.infotracks[0], 'label', 'Лучший трек этого месяца')
-                if(this.infotracks[1]) this.$set(this.infotracks[1], 'label', 'Лучший трек этой недели')
-                /*this.infotracks.forEach(function(item, i, arr) {
-                    item[2] = "/media/albums/" + item[2];
-                });*/
-                //alert(this.infotracks);
-            }, function(error){
+        this.$http.get('api/tracks', {params: {filter: 'popular', limit: 1, interval: 31}}).then(function(response){
+                this.infotracks.push(response.data[0]);
+            })
+        this.$http.get('api/tracks', {params: {filter: 'popular', limit: 1, interval: 7}}).then(function(response){
+                this.infotracks.push(response.data[0]);
             })
     }
 }

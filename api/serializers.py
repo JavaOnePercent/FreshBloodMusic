@@ -61,21 +61,40 @@ class PerformerSerializer(serializers.ModelSerializer):
 
 
 class AlbumSerializer(serializers.ModelSerializer):
-    tracks = SmallTrackSerializer(many=True, read_only=True)
     style = serializers.ReadOnlyField(source='stl_id.name_stl')
     genre = serializers.ReadOnlyField(source='stl_id.gnr_id.name_gnr')
 
     class Meta:
         model = Album
-        fields = ('name_alb', 'genre', 'style', 'image_alb', 'date_alb', 'tracks', 'id')
+        fields = ('name_alb', 'genre', 'style', 'image_alb', 'date_alb', 'id', 'about_alb', 'numplays_alb',
+                  'rating_alb')
+
+
+class FullAlbumSerializer(serializers.ModelSerializer):
+    style = serializers.ReadOnlyField(source='stl_id.name_stl')
+    genre = serializers.ReadOnlyField(source='stl_id.gnr_id.name_gnr')
+    tracks = SmallTrackSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Album
+        fields = ('name_alb', 'genre', 'style', 'image_alb', 'date_alb', 'id', 'about_alb', 'numplays_alb',
+                  'rating_alb', 'tracks')
+
+
+class AlbumTracksSerializer(serializers.ModelSerializer):
+    tracks = SmallTrackSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Album
+        fields = ('tracks', 'id')
 
 
 class FullPerformerSerializer(serializers.ModelSerializer):
-    albums = AlbumSerializer(many=True, read_only=True)
+    albums = FullAlbumSerializer(many=True, read_only=True)
 
     class Meta:
         model = Performer
-        fields = ('id', 'name_per', 'image_per', 'about_per', 'albums')
+        fields = ('id', 'name_per', 'image_per', 'about_per', 'rating_per', 'date_per', 'albums')
 
 
 class LikedTrackSerializer(serializers.ModelSerializer):

@@ -67,13 +67,22 @@ class Track(models.Model):
     #         ", ".join(album.name_alb for album in self.alb_id),)
 
 
+class LikedAlbum(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userlikedalbum')
+    album_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='albumliked')
+
+    def __int__(self):
+        return self.id
+
+
 class LikedTrack(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userliked')
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackliked')
 
     def __int__(self):
-        return self.trc_id
+        return self.id
 
 
 class TrackHistory(models.Model):

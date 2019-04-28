@@ -47,6 +47,7 @@ class PerformerMethods:
         performer = Performer.objects.get(user_id=User.objects.get(pk=user))
         return performer
 
+
 def try_mkdir(directory):
     try:
         os.mkdir(directory)
@@ -54,16 +55,8 @@ def try_mkdir(directory):
     except FileExistsError:
         return False
 
-class AlbumMethods:
-    @staticmethod
-    def create(user, name, genre, date):
-        album = Album(per_id=Performer.objects.get(user_id=user), name_alb=name,
-                      stl_id=GenreStyle.objects.get(id=genre), image_alb='', date_alb=date)
-        album.save()
 
-        # album.image_alb = str(album.id) + '/logo.jpg'
-        # album.save()
-        return album
+class AlbumMethods:
 
     @staticmethod
     def add_image(album, image_alb):
