@@ -26,13 +26,6 @@ def get_token(request):
     return HttpResponse(status=status.HTTP_200_OK)
 
 
-def main_view(request):  # главная
-    file = open('./mainapp/static/mainapp/index.html', 'r')
-    index = file.read()
-    file.close()
-    return HttpResponse(index, content_type="text/html")
-
-
 @api_view(['PUT', 'DELETE', 'GET'])  # обработчик лайков
 def likes(request):
     if request.method == 'PUT':  # добавление лайка
@@ -60,6 +53,15 @@ def likes(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+def get_performer(request):
+    user_id = auth.get_user(request).id
+    try:
+        performer = Performer.objects.get(user_id=user_id)
+    except Performer.DoesNotExist:
+        raise ParseError('User must be logged in to access this method')
+    return performer
+
+
 class PostLimitOffsetPagination(PageNumberPagination):
     page_size = 12
 
@@ -72,7 +74,7 @@ class TrackOverview(generics.ListCreateAPIView):
         album = request.POST["album"]
         audio = request.FILES["track"]
         name = request.POST["track_name"]
-        track = save_track(album, name, audio)
+        track = save_track(album, name, audio, get_performer(request))
         return Response({"index": request.POST["index"], 'id': track.id}, status=status.HTTP_201_CREATED)
 
     def handle_exception(self, exc):
@@ -124,8 +126,8 @@ class TrackOverview(generics.ListCreateAPIView):
                 try:
                     sort = self.request.query_params['sort']
                 except MultiValueDictKeyError:
-                    sort = 'popular'
-                if sort == 'popular':
+                    sort = 'popularity'
+                if sort == 'popularity':
                     tracks = tracks.order_by('-rating_trc')
                 elif sort == 'time':
                     tracks = tracks.order_by('-date_trc')
@@ -136,7 +138,7 @@ class TrackOverview(generics.ListCreateAPIView):
                 limit = self.request.query_params['limit']
                 interval = self.request.query_params['interval']
             except MultiValueDictKeyError:
-                raise ParseError('Filter by popularity requires limit and interval params ')
+                raise ParseError('Filter by popularity requires limit and interval params')
             TrackOverview.serializer_class = TopTrackSerializer
             TrackOverview.pagination_class = None
             tracks = Track.objects.order_by('-rating_trc').filter(
@@ -179,7 +181,6 @@ class TrackDetail(APIView):
         is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, track.id)
         data = dict(serializer.data)
         data["is_liked"] = is_liked
-        #serializer.data["is_liked"] = is_liked
         return Response(data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, format=None):
@@ -214,7 +215,7 @@ class AlbumsList(APIView):
             photo = request.FILES["photo"]
         except MultiValueDictKeyError:
             photo = None
-        album = save_album(user=auth.get_user(request).id, name=album_name, genre=gen_id, logo=photo,
+        album = save_album(performer=get_performer(request), name=album_name, genre=gen_id, logo=photo,
                            description=description)
         return Response({"alb_id": album.id}, status=status.HTTP_201_CREATED)
 
@@ -290,7 +291,7 @@ class PerformerDetail(APIView):
         except MultiValueDictKeyError:
             label = None
         description = request.POST["description"]
-        save_performer(pk, name, label, description)
+        save_performer(pk, name, label, description, get_performer(request))
 
         return Response(status=status.HTTP_200_OK)
 
@@ -323,7 +324,7 @@ def report(request):
 @api_view(['POST', 'GET'])
 def login(request):
     if request.method == 'GET':
-        performer = PerformerMethods.get(auth.get_user(request).id)
+        performer = get_performer(request)
         return Response({'username': auth.get_user(request).username, 'per_id': performer.id}, status=status.HTTP_200_OK)
     if request.method == 'POST':
         username = request.POST['username']
@@ -331,7 +332,7 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)
-            performer = PerformerMethods.get(auth.get_user(request).id)
+            performer = get_performer(request)
             return Response({'username': auth.get_user(request).username, 'per_id': performer.id}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

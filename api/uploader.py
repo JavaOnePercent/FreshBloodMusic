@@ -8,11 +8,15 @@ from pydub import AudioSegment
 
 from api.model_methods import AlbumMethods, TrackMethods, PerformerMethods
 from api.models import *
+from rest_framework.exceptions import ParseError
 
 
-def save_track(alb_id, name, audio):
+def save_track(alb_id, name, audio, performer):
     date = datetime.date.today()
-    album = Album.objects.get(pk=alb_id)
+    try:
+        album = Album.objects.get(pk=alb_id, per_id=performer.id)
+    except Album.DoesNotExist:
+        raise ParseError('Album for the current user does not exist')
     directory = 'albums/' + str(album.id) + '/'
     track = TrackMethods.create(album=album, name=name, date=date)
     audio = Compressor(audio.read(), audio.content_type, str(track.id) + '.mp3', directory).compress()
@@ -20,9 +24,9 @@ def save_track(alb_id, name, audio):
     return track
 
 
-def save_album(user, name, genre, logo, description):  # сохранение альбома с треками в БД и в файлы
+def save_album(performer, name, genre, logo, description):  # сохранение альбома с треками в БД и в файлы
     date = datetime.date.today()
-    album = Album.objects.create(per_id=Performer.objects.get(user_id=user), name_alb=name, about_alb=description,
+    album = Album.objects.create(per_id=performer.id, name_alb=name, about_alb=description,
                                  stl_id=GenreStyle.objects.get(id=genre), image_alb='', date_alb=date)
     directory = 'albums/' + str(album.id) + '/'
     os.mkdir(Compressor.path + directory)
@@ -33,8 +37,8 @@ def save_album(user, name, genre, logo, description):  # сохранение а
     return album
 
 
-def save_performer(id, name, label, description):
-    performer = PerformerMethods.update(id=id, name=name, description=description)
+def save_performer(id, name, label, description, performer):
+    performer = Performer.objects.get(id=id)
     directory = 'performers/' + str(performer.id) + '/'
     is_new = try_mkdir(Compressor.path + directory)
     if label is not None:

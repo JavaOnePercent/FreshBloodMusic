@@ -18,12 +18,6 @@ def get_random(all_tracks):  # возвращает рандомное знач�
 
 
 class PerformerMethods:
-    @staticmethod
-    def update(id, name, description):
-        date = datetime.date.today()
-        performer = Performer.objects.filter(id=id)
-        performer.update(name_per=name, about_per=description, date_per=date)
-        return performer[0]
 
     @staticmethod
     def create(user, name, description):

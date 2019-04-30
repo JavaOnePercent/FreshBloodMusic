@@ -6,8 +6,8 @@
                     <label class="sortirovka-name">Рекомендации</label>
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <span class="time" id="time" @click="showGenre(genre, style, 'time')" @mousedown="checkSort">времени</span>
-                        <span class="topic" id="topic" @click="showGenre(genre, style, 'popular')" @mousedown="checkSort">популярности</span>
+                        <span class="time" id="time" @click="showGenre(filter, genre, style, 'time')" @mousedown="checkSort">времени</span>
+                        <span class="topic" id="topic" @click="showGenre(filter, genre, style, 'popularity')" @mousedown="checkSort">популярности</span>
                     </div>
                 </div>
             </div>
@@ -16,8 +16,8 @@
                 <div class="leftBevfore"></div>
                 <div id="music-style" class="music-style">
                     <a  class="janr gen" name="" @click="showGenre('all')" :class="{'choseJanr':choseGenr==='all'}">Все</a>
-                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='rec'}" name="" @click="showGenre('rec')">Рекомендации</a>
-                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='fav'}" name="" @click="showGenre('fav')">Избранное</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='recommended'}" name="" @click="showGenre('recommended')">Рекомендации</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='favorite'}" name="" @click="showGenre('favorite')">Избранное</a>
                     <div class=" janr" :class="{'choseJanr':choseGenr===gen.id}" :key="index" v-for="(gen, index) in genres" >
                         <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id)" >{{gen.name_gnr}}</a>
                     </div>
@@ -29,9 +29,9 @@
                 <div v-if="showStyles" class="janrStyles-conteiner">
                 <!-- <div  class="janrStyles-conteiner"> -->
                     <div class="janrStyles">
-                        <a style=" white-space: nowrap" class="janr gen"  @click="showGenre(genres[cock].id)">Все из {{genres[cock].name_gnr}}</a>
+                        <a style=" white-space: nowrap" class="janr gen"  @click="showGenre('genre', genres[cock].id)">Все из {{genres[cock].name_gnr}}</a>
                         <div class=" janr" :key="index" v-for="(sty, index) in styles">
-                            <a style=" white-space: nowrap" :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
+                            <a style=" white-space: nowrap" :name="sty.id" @click="showGenre('style', genre, sty.id)">{{sty.name_stl}}</a>
                         </div>
                     </div>
                 </div>
@@ -64,11 +64,12 @@ export default {
             compilations:[],
             genres:[],
             styles:[],
-            url: 'track?genre=all&sort=0',
+            url: 'api/tracks',
             loading: false,
-            sort: 'popular',
+            sort: 'popularity',
             genre: '',
             style: '',
+            filter: 'all',
             showsortbutton: true,
             showStyles: false,
             choseGenr: '',
@@ -85,7 +86,7 @@ export default {
     methods: {
         showHer(index, id) {
             this.cock = index
-            this.showGenre(id)
+            this.showGenre('genre', id)
         },
         leftScrol()
         {
@@ -122,16 +123,18 @@ export default {
             }
 
         },
-        showGenre: function(message1 = null, message2 = null, message3 = null) {
+        showGenre(filter, genre = null, style = null, sort = null) {
           this.loading = true;
           var obj = {};
-          if(message1 != null || message2 != null)
-          {
+          this.filter = filter
+          //if(genre != null || style != null)
+          //{
             this.url = 'api/tracks';
             this.compilations = [];
-            if(message1 != null) {
-                this.genre = message1;
-                this.choseGenr=message1;
+            this.choseGenr= filter;
+            if(genre !== null) {
+                this.genre = genre;
+                this.choseGenr=genre;
                 if (!(isNaN(this.genre))) {
                     this.getGengeAndStyles(this.genre);
                 }
@@ -140,22 +143,31 @@ export default {
                 }
                 this.style = null;
             }
-            if(message2 != null) {
-                this.style = message2;
-                this.genre = null;
+            else
+            {
+                this.showStyles = false;
             }
-            if(message3 != null) {
-                this.sort = message3;
+            if(style !== null) {
+                this.style = style;
             }
-            if(this.genre === 'rec' || this.genre === 'fav') {
+            
+            if(sort !== null) {
+                this.sort = sort;
+            }
+            if(filter === 'recommended' || filter === 'favorite') {
                 this.showsortbutton = false;
             }
             else {
                 this.showsortbutton = true;
             }
-            obj = {params: {gen: this.genre, sty: this.style, sort: this.sort}}
-          }
-          this.$http.get(this.url, obj/*{params: {genre: message}}*/).then(function(response){
+            obj = {params: {
+                filter: this.filter,
+                genre: this.genre, 
+                style: this.style, 
+                sort: this.sort
+            }}
+          //}
+          this.$http.get(this.url, obj).then(function(response){
                 this.compilation = response.body.results;
                 for(var i = 0; i < this.compilation.length; i++)
                 {
