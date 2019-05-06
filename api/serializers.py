@@ -4,12 +4,13 @@ from api.models import Track, LikedTrack, Genre, GenreStyle, Performer, Album, T
 
 class TrackSerializer(serializers.ModelSerializer):  # сериалайзер трека для метода nextTrack
     image_alb = serializers.FileField(source='alb_id.image_alb')  # картинка альбома
+    name_alb = serializers.ReadOnlyField(source='alb_id.name_alb')  # название альбома
     name_per = serializers.ReadOnlyField(source='alb_id.per_id.name_per')  # имя исполнителя
     per_id = serializers.ReadOnlyField(source='alb_id.per_id.id')  # ид исполнителя
 
     class Meta:
         model = Track
-        fields = ('id', 'name_trc', 'audio_trc', 'image_alb', 'name_per', 'per_id')  # is_liked
+        fields = ('id', 'name_trc', 'audio_trc', 'image_alb', 'name_per', 'per_id', 'name_alb')  # is_liked
 
 
 class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека без ссылки на аудио
@@ -90,11 +91,11 @@ class AlbumTracksSerializer(serializers.ModelSerializer):
 
 
 class FullPerformerSerializer(serializers.ModelSerializer):
-    albums = FullAlbumSerializer(many=True, read_only=True)
+    # albums = FullAlbumSerializer(many=True, read_only=True)
 
     class Meta:
         model = Performer
-        fields = ('id', 'name_per', 'image_per', 'about_per', 'rating_per', 'date_per', 'albums')
+        fields = ('id', 'name_per', 'image_per', 'about_per', 'rating_per', 'date_per')  # , 'albums')
 
 
 class LikedTrackSerializer(serializers.ModelSerializer):

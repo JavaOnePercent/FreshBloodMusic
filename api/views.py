@@ -198,8 +198,14 @@ class AlbumsList(APIView):
             sort = request.query_params['sort']
         except MultiValueDictKeyError:
             sort = 'new'
+        try:
+            performer = request.query_params['performer']
+            albums = Album.objects.filter(per_id=performer)
+        except MultiValueDictKeyError:
+            albums = Album.objects.all()
+
         if sort == 'new':
-            albums = Album.objects.all().order_by('-date_alb')
+            albums = albums.order_by('-date_alb')
         elif sort == 'popular':
             albums = Album.objects.all().order_by('-rating_alb')
         else:
@@ -277,9 +283,9 @@ class PerformerDetail(APIView):
         if re.fullmatch(r'[0-9]+', pk):
             performer = self.get_object(pk)
             serializer = FullPerformerSerializer(performer)
-            for album in serializer.data["albums"]:
+            '''for album in serializer.data["albums"]:
                 for track in album["tracks"]:
-                    track["likes"] = LikedTrackMethods.likesAmount(track["id"])
+                    track["likes"] = LikedTrackMethods.likesAmount(track["id"])'''
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
