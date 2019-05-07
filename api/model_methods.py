@@ -80,14 +80,6 @@ class AlbumMethods:
 
 
 class TrackMethods:
-    @staticmethod
-    def create(album, name, date):
-        track = Track(alb_id=album, name_trc=name, audio_trc='',
-                      date_trc=date)
-        track.save()
-        # track.link_trc = str(album.id) + '/' + str(track.id) + '.mp3'
-        # track.save()
-        return track
 
     @staticmethod
     def add_audio(track, audio):

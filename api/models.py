@@ -57,6 +57,7 @@ class Track(models.Model):
     numplays_trc = models.IntegerField(default=0)
     rating_trc = models.IntegerField(default=0)
     date_trc = models.DateField()
+    duration = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name_trc
@@ -96,3 +97,13 @@ class TrackReport(models.Model):
 
     def __int__(self):
         return self.trc_id
+
+
+class Playlist(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userplaylist')
+    title = models.CharField(max_length=60)
+    image = models.FileField(default=None)
+
+    def __str__(self):
+        return self.title

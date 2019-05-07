@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'^likes$', views.likes, name='likes'),  # обработка лайкусиков
     url(r'^albums$', views.AlbumsList.as_view()),
     url(r'^albums/(?P<pk>\w+)$', views.AlbumDetail.as_view()),
+    url(r'^playlists$', views.PlaylistsList.as_view()),
+    url(r'^playlists/(?P<pk>\w+)$', views.PlaylistDetail.as_view()),
     url(r'^performers$', views.PerformersList.as_view()),
     url(r'^performers/(?P<pk>\w+)$', views.PerformerDetail.as_view()),
     url(r'^genre$', views.genre, name='genre'),

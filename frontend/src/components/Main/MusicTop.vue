@@ -99,10 +99,10 @@ export default {
     created: function() {
         this.autoFlip = setInterval(this.updatePosts, 7000);
         this.$http.get('api/tracks', {params: {filter: 'popular', limit: 1, interval: 31}}).then(function(response){
-                this.infotracks.push(response.data[0]);
+                this.$set(this.infotracks,0,response.data[0]);
             })
         this.$http.get('api/tracks', {params: {filter: 'popular', limit: 1, interval: 7}}).then(function(response){
-                this.infotracks.push(response.data[0]);
+                this.$set(this.infotracks,1,response.data[0]);
             })
     }
 }

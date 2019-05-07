@@ -119,54 +119,54 @@ export default {
             //console.log(diffHeight, scrollTop);
             if(diffHeight <= scrollTop && !this.loading) {
                 if(this.url != null)
-                    this.showGenre();
+                    this.showGenre(null,null,null,null,false);
             }
 
         },
-        showGenre(filter, genre = null, style = null, sort = null) {
-          this.loading = true;
-          var obj = {};
-          this.filter = filter
-          //if(genre != null || style != null)
-          //{
-            this.url = 'api/tracks';
-            this.compilations = [];
-            this.choseGenr= filter;
-            if(genre !== null) {
-                this.genre = genre;
-                this.choseGenr=genre;
-                if (!(isNaN(this.genre))) {
-                    this.getGengeAndStyles(this.genre);
-                }
-                else {
-                    this.getGengeAndStyles()
-                }
-                this.style = null;
-            }
-            else
-            {
-                this.showStyles = false;
-            }
-            if(style !== null) {
-                this.style = style;
-            }
-            
-            if(sort !== null) {
-                this.sort = sort;
-            }
-            if(filter === 'recommended' || filter === 'favorite') {
-                this.showsortbutton = false;
-            }
-            else {
-                this.showsortbutton = true;
-            }
-            obj = {params: {
-                filter: this.filter,
-                genre: this.genre, 
-                style: this.style, 
-                sort: this.sort
-            }}
-          //}
+        showGenre(filter, genre = null, style = null, sort = null, updateUrl=true) {
+            this.loading = true;
+            var obj = {};
+            if (updateUrl) {
+              this.filter = filter
+              //if(genre != null || style != null)
+              //{
+              this.url = 'api/tracks';
+              this.compilations = [];
+              this.choseGenr = filter;
+              if (genre !== null) {
+                  this.genre = genre;
+                  this.choseGenr = genre;
+                  if (!(isNaN(this.genre))) {
+                      this.getGengeAndStyles(this.genre);
+                  } else {
+                      this.getGengeAndStyles()
+                  }
+                  this.style = null;
+              } else {
+                  this.showStyles = false;
+              }
+              if (style !== null) {
+                  this.style = style;
+              }
+
+              if (sort !== null) {
+                  this.sort = sort;
+              }
+              if (filter === 'recommended' || filter === 'favorite') {
+                  this.showsortbutton = false;
+              } else {
+                  this.showsortbutton = true;
+              }
+              obj = {
+                  params: {
+                      filter: this.filter,
+                      genre: this.genre,
+                      style: this.style,
+                      sort: this.sort
+                  }
+              }
+              //}
+          }
           this.$http.get(this.url, obj).then(function(response){
                 this.compilation = response.body.results;
                 for(var i = 0; i < this.compilation.length; i++)

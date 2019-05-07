@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 from .models import *
 from django.http import HttpResponse, Http404
-from .uploader import save_album, save_performer, save_track
+from .uploader import save_album, save_performer, save_track, save_playlist
 from .serializers import *
 from .model_methods import *
 from rest_framework.decorators import api_view
@@ -227,6 +227,56 @@ class AlbumsList(APIView):
 
 
 class AlbumDetail(APIView):
+
+    def get(self, request, pk):
+        try:
+            albums = Album.objects.get(pk=pk)
+        except Album.DoesNotExist:
+            return Response('Wrong album id', status=status.HTTP_400_BAD_REQUEST)
+        ser = AlbumTracksSerializer(albums)
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk, format=None):
+        delete = AlbumMethods.delete(pk, auth.get_user(request).id)
+        if delete:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlaylistsList(APIView):
+
+    def get(self, request, format=None):
+        try:
+            sort = request.query_params['sort']
+        except MultiValueDictKeyError:
+            sort = 'new'
+        try:
+            performer = request.query_params['performer']
+            albums = Album.objects.filter(per_id=performer)
+        except MultiValueDictKeyError:
+            albums = Album.objects.all()
+
+        if sort == 'new':
+            albums = albums.order_by('-date_alb')
+        elif sort == 'popular':
+            albums = Album.objects.all().order_by('-rating_alb')
+        else:
+            return Response('Incorrect sort key value', status=status.HTTP_400_BAD_REQUEST)
+        ser = AlbumSerializer(albums, many=True)
+        return Response(status=status.HTTP_200_OK)
+
+    def post(self, request):
+        title = request.POST["title"]
+        try:
+            image = request.FILES["image"]
+        except MultiValueDictKeyError:
+            image = None
+        save_playlist(auth.get_user(request), title, image)
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class PlaylistDetail(APIView):
 
     def get(self, request, pk):
         try:
