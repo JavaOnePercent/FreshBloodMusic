@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Track, LikedTrack, Genre, GenreStyle, Performer, Album, TrackHistory
+from api.models import *
 
 
 class TrackSerializer(serializers.ModelSerializer):  # сериалайзер трека для метода nextTrack
@@ -20,7 +20,7 @@ class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайз�
 
     class Meta:
         model = Track
-        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'id_per')
+        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'id_per', 'rating_trc', 'duration')
 
 
 class TopTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека без ссылки на аудио
@@ -70,6 +70,29 @@ class AlbumSerializer(serializers.ModelSerializer):
         model = Album
         fields = ('name_alb', 'genre', 'style', 'image_alb', 'date_alb', 'id', 'about_alb', 'numplays_alb',
                   'rating_alb', 'name_per')
+
+
+class PlaylistSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Playlist
+        fields = ('id', 'title', 'image', 'per_id')
+
+
+class PlaylistTrackSerializer(serializers.ModelSerializer):
+    track = NoLinkTrackSerializer(source='trc_id', read_only=True)
+
+    class Meta:
+        model = PlaylistTrack
+        fields = ('id', 'track')
+
+
+class PlaylistTracksSerializer(serializers.ModelSerializer):
+    tracks = PlaylistTrackSerializer(source='pl_tracks', many=True, read_only=True)
+
+    class Meta:
+        model = Playlist
+        fields = ('id', 'title', 'image', 'per_id', 'tracks')
 
 
 '''class FullAlbumSerializer(serializers.ModelSerializer):

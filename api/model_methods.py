@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.db.models import F, Q
 
-from api.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle, TrackHistory, TrackReport
+from api.models import *
 
 
 def get_random(all_tracks):  # возвращает рандомное значение из списка
@@ -76,6 +76,18 @@ class AlbumMethods:
             else:
                 return False
         except ObjectDoesNotExist:
+            return False
+
+
+class PlaylistMethods:
+    @staticmethod
+    def delete(id: int, per_id: Performer):
+        try:
+            playlist = Playlist.objects.get(pk=id, per_id=per_id)
+            shutil.rmtree('./media/playlists/' + str(playlist.id))
+            playlist.delete()
+            return True
+        except Playlist.DoesNotExist:
             return False
 
 

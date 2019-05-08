@@ -248,23 +248,13 @@ class PlaylistsList(APIView):
 
     def get(self, request, format=None):
         try:
-            sort = request.query_params['sort']
-        except MultiValueDictKeyError:
-            sort = 'new'
-        try:
             performer = request.query_params['performer']
-            albums = Album.objects.filter(per_id=performer)
+            playlists = Playlist.objects.filter(per_id=performer)
         except MultiValueDictKeyError:
-            albums = Album.objects.all()
+            return Response('Performer param must be set', status=status.HTTP_400_BAD_REQUEST)
 
-        if sort == 'new':
-            albums = albums.order_by('-date_alb')
-        elif sort == 'popular':
-            albums = Album.objects.all().order_by('-rating_alb')
-        else:
-            return Response('Incorrect sort key value', status=status.HTTP_400_BAD_REQUEST)
-        ser = AlbumSerializer(albums, many=True)
-        return Response(status=status.HTTP_200_OK)
+        ser = PlaylistSerializer(playlists, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         title = request.POST["title"]
@@ -272,7 +262,7 @@ class PlaylistsList(APIView):
             image = request.FILES["image"]
         except MultiValueDictKeyError:
             image = None
-        save_playlist(auth.get_user(request), title, image)
+        save_playlist(get_performer(request), title, image)
         return Response(status=status.HTTP_201_CREATED)
 
 
@@ -280,14 +270,29 @@ class PlaylistDetail(APIView):
 
     def get(self, request, pk):
         try:
-            albums = Album.objects.get(pk=pk)
-        except Album.DoesNotExist:
+            playlist = Playlist.objects.get(pk=pk)
+        except Playlist.DoesNotExist:
             return Response('Wrong album id', status=status.HTTP_400_BAD_REQUEST)
-        ser = AlbumTracksSerializer(albums)
+        ser = PlaylistTracksSerializer(playlist)
         return Response(ser.data, status=status.HTTP_200_OK)
 
+    def put(self, request, pk):
+        try:
+            playlist = Playlist.objects.get(pk=pk, per_id=get_performer(request))
+        except Album.DoesNotExist:
+            return Response('Wrong playlist id or doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
+        try:
+            track = request.POST['track']
+            trc = Track.objects.get(pk=track)
+        except MultiValueDictKeyError:
+            return Response('Track id must be specified', status=status.HTTP_400_BAD_REQUEST)
+        except Track.DoesNotExist:
+            return Response('Invalid track id', status=status.HTTP_400_BAD_REQUEST)
+        PlaylistTrack.objects.create(playlist=playlist, trc_id=trc)
+        return Response(status=status.HTTP_201_CREATED)
+
     def delete(self, request, pk, format=None):
-        delete = AlbumMethods.delete(pk, auth.get_user(request).id)
+        delete = PlaylistMethods.delete(pk, get_performer(request))
         if delete:
             return Response(status=status.HTTP_200_OK)
         else:

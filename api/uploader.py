@@ -50,7 +50,7 @@ def save_playlist(user, title, image):  # сохранение альбома с
     # date = datetime.date.today()
     if 'playlists' not in os.listdir('media'):
         os.mkdir('media/playlists')
-    playlist = Playlist.objects.create(user=user, title=title)
+    playlist = Playlist.objects.create(per_id=user, title=title)
     directory = 'playlists/' + str(playlist.id) + '/'
     os.mkdir(path + directory)
     if image is not None:

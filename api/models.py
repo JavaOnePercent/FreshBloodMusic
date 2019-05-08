@@ -101,9 +101,18 @@ class TrackReport(models.Model):
 
 class Playlist(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userplaylist')
+    per_id = models.ForeignKey(Performer, on_delete=models.CASCADE, related_name='playlistpreformer')
     title = models.CharField(max_length=60)
     image = models.FileField(default=None)
 
     def __str__(self):
         return self.title
+
+
+class PlaylistTrack(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    playlist = models.ForeignKey(Playlist, on_delete=models.CASCADE, related_name='pl_tracks')
+    trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackplaylist')
+
+    def __int__(self):
+        return self.id
