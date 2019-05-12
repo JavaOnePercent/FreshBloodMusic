@@ -2,10 +2,9 @@ import re
 from datetime import date, timedelta
 
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
 from django.contrib import auth
 from django.utils.datastructures import MultiValueDictKeyError
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.views import APIView
 
 from .models import *
@@ -49,8 +48,6 @@ def likes(request):
         likes = LikedTrackMethods.get(performer)
         serializer = LikedTrackSerializer(likes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_performer(request):
@@ -80,6 +77,8 @@ class TrackOverview(generics.ListCreateAPIView):
     def handle_exception(self, exc):
         if type(exc) == ParseError:
             return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise exc
 
     def get_queryset(self):
         try:
@@ -234,6 +233,11 @@ class AlbumDetail(APIView):
         except Album.DoesNotExist:
             return Response('Wrong album id', status=status.HTTP_400_BAD_REQUEST)
         ser = AlbumTracksSerializer(albums)
+
+        data = ser.data
+        for datum in data['tracks']:
+            is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, datum['id'])
+            datum.__setitem__('is_liked', is_liked)
         return Response(ser.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, format=None):
@@ -288,8 +292,12 @@ class PlaylistDetail(APIView):
             return Response('Track id must be specified', status=status.HTTP_400_BAD_REQUEST)
         except Track.DoesNotExist:
             return Response('Invalid track id', status=status.HTTP_400_BAD_REQUEST)
-        PlaylistTrack.objects.create(playlist=playlist, trc_id=trc)
-        return Response(status=status.HTTP_201_CREATED)
+        try:
+            PlaylistTrack.objects.get(trc_id=trc, playlist=playlist)
+            return Response('Track already in playlist', status=status.HTTP_400_BAD_REQUEST)
+        except PlaylistTrack.DoesNotExist:
+            PlaylistTrack.objects.create(playlist=playlist, trc_id=trc)
+            return Response(status=status.HTTP_201_CREATED)
 
     def delete(self, request, pk, format=None):
         delete = PlaylistMethods.delete(pk, get_performer(request))

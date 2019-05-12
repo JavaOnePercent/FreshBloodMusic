@@ -108,10 +108,14 @@ class PlaylistTracksSerializer(serializers.ModelSerializer):
 
 class AlbumTracksSerializer(serializers.ModelSerializer):
     tracks = SmallTrackSerializer(many=True, read_only=True)
+    style = serializers.ReadOnlyField(source='stl_id.name_stl')
+    genre = serializers.ReadOnlyField(source='stl_id.gnr_id.name_gnr')
+    name_per = serializers.ReadOnlyField(source='per_id.name_per')
 
     class Meta:
         model = Album
-        fields = ('tracks', 'id')
+        fields = ('name_alb', 'image_alb', 'date_alb', 'id', 'about_alb', 'numplays_alb',
+                  'rating_alb', 'name_per', 'style', 'genre', 'tracks')
 
 
 class FullPerformerSerializer(serializers.ModelSerializer):
@@ -126,10 +130,11 @@ class LikedTrackSerializer(serializers.ModelSerializer):
     image_alb = serializers.FileField(source='trc_id.alb_id.image_alb')  # картинка альбома
     name_per = serializers.ReadOnlyField(source='trc_id.alb_id.per_id.name_per')  # имя исполнителя
     name_trc = serializers.ReadOnlyField(source='trc_id.name_trc')  # имя трека
+    duration = serializers.ReadOnlyField(source='trc_id.duration')
 
     class Meta:
         model = LikedTrack
-        fields = ('name_trc', 'name_per', 'image_alb', 'trc_id')
+        fields = ('name_trc', 'name_per', 'image_alb', 'trc_id', 'duration')
 
 
 class TrackHistorySerializer(serializers.ModelSerializer):
