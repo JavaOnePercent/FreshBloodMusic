@@ -286,6 +286,10 @@ class PlaylistDetail(APIView):
         except Playlist.DoesNotExist:
             return Response('Wrong album id', status=status.HTTP_400_BAD_REQUEST)
         ser = PlaylistTracksSerializer(playlist)
+        data = ser.data
+        for datum in data['tracks']:
+            is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, datum['track']['id'])
+            datum['track'].__setitem__('is_liked', is_liked)
         return Response(ser.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, format=None):
