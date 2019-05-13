@@ -314,14 +314,14 @@ class PlaylistTrackView(APIView):
 
     def post(self, request):
         try:
-            playlist = request.POST['playlist']
+            playlist = request.query_params['playlist']
             playlist = Playlist.objects.get(pk=playlist, per_id=get_performer(request))
         except Album.DoesNotExist:
             return Response('Wrong playlist id or doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
         except MultiValueDictKeyError:
             return Response('Playlist id must be specified', status=status.HTTP_400_BAD_REQUEST)
         try:
-            track = request.POST['track']
+            track = request.query_params['track']
             trc = Track.objects.get(pk=track)
         except MultiValueDictKeyError:
             return Response('Track id must be specified', status=status.HTTP_400_BAD_REQUEST)
@@ -336,14 +336,14 @@ class PlaylistTrackView(APIView):
 
     def delete(self, request):
         try:
-            playlist = request.POST['playlist']
+            playlist = request.query_params['playlist']
             playlist = Playlist.objects.get(pk=playlist, per_id=get_performer(request))
         except Album.DoesNotExist:
             return Response('Wrong playlist id or doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
         except MultiValueDictKeyError:
             return Response('Playlist id must be specified', status=status.HTTP_400_BAD_REQUEST)
         try:
-            track = request.POST['track']
+            track = request.query_params['track']
             trc = Track.objects.get(pk=track)
         except MultiValueDictKeyError:
             return Response('Track id must be specified', status=status.HTTP_400_BAD_REQUEST)

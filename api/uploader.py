@@ -100,6 +100,7 @@ path = './media/'
 def compress_image(data, file):
     im = Image.open(io.BytesIO(data))
     im = im.resize((320, 320), Image.BICUBIC)
+    im = im.convert('RGB')
     im.save(path + file, 'jpeg', quality=95, optimize=True)
 
 
