@@ -252,12 +252,20 @@ class PlaylistsList(APIView):
 
     def get(self, request, format=None):
         try:
+            track = request.query_params['track']
+        except MultiValueDictKeyError:
+            track = None
+        try:
             performer = request.query_params['performer']
-            playlists = Playlist.objects.filter(per_id=performer)
+            if track is None:
+                playlists = Playlist.objects.filter(per_id=performer)
+                ser = PlaylistSerializer(playlists, many=True)
+            else:
+                playlists = PlaylistTrack.objects.filter(trc_id=track, playlist__per_id=performer)
+                ser = PlaylistTrcSerializer(playlists, many=True)
         except MultiValueDictKeyError:
             return Response('Performer param must be set', status=status.HTTP_400_BAD_REQUEST)
 
-        ser = PlaylistSerializer(playlists, many=True)
         return Response(ser.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -280,11 +288,38 @@ class PlaylistDetail(APIView):
         ser = PlaylistTracksSerializer(playlist)
         return Response(ser.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk):
+    def delete(self, request, pk, format=None):
+        delete = PlaylistMethods.delete(pk, get_performer(request))
+        if delete:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlaylistTrackView(APIView):
+
+    '''def get(self, request):
         try:
-            playlist = Playlist.objects.get(pk=pk, per_id=get_performer(request))
+            track = request.query_params['track']
+        except MultiValueDictKeyError:
+            return Response('Track param must be set', status=status.HTTP_400_BAD_REQUEST)
+        try:
+            performer = request.query_params['performer']
+        except MultiValueDictKeyError:
+            return Response('Performer param must be set', status=status.HTTP_400_BAD_REQUEST)
+
+        playlists = PlaylistTrack.objects.filter(trc_id=track, playlist__per_id=performer)
+        ser = PlaylistTrcSerializer(playlists, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)'''
+
+    def post(self, request):
+        try:
+            playlist = request.POST['playlist']
+            playlist = Playlist.objects.get(pk=playlist, per_id=get_performer(request))
         except Album.DoesNotExist:
             return Response('Wrong playlist id or doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
+        except MultiValueDictKeyError:
+            return Response('Playlist id must be specified', status=status.HTTP_400_BAD_REQUEST)
         try:
             track = request.POST['track']
             trc = Track.objects.get(pk=track)
@@ -299,12 +334,27 @@ class PlaylistDetail(APIView):
             PlaylistTrack.objects.create(playlist=playlist, trc_id=trc)
             return Response(status=status.HTTP_201_CREATED)
 
-    def delete(self, request, pk, format=None):
-        delete = PlaylistMethods.delete(pk, get_performer(request))
-        if delete:
+    def delete(self, request):
+        try:
+            playlist = request.POST['playlist']
+            playlist = Playlist.objects.get(pk=playlist, per_id=get_performer(request))
+        except Album.DoesNotExist:
+            return Response('Wrong playlist id or doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
+        except MultiValueDictKeyError:
+            return Response('Playlist id must be specified', status=status.HTTP_400_BAD_REQUEST)
+        try:
+            track = request.POST['track']
+            trc = Track.objects.get(pk=track)
+        except MultiValueDictKeyError:
+            return Response('Track id must be specified', status=status.HTTP_400_BAD_REQUEST)
+        except Track.DoesNotExist:
+            return Response('Invalid track id', status=status.HTTP_400_BAD_REQUEST)
+        try:
+            pt = PlaylistTrack.objects.get(trc_id=trc, playlist=playlist)
+            pt.delete()
             return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except PlaylistTrack.DoesNotExist:
+            return Response('Track is not in this playlist', status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])

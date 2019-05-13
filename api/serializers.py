@@ -79,6 +79,15 @@ class PlaylistSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'image', 'per_id')
 
 
+class PlaylistTrcSerializer(serializers.ModelSerializer):
+    title = serializers.ReadOnlyField(source='playlist.title')
+    id = serializers.ReadOnlyField(source='playlist.id')
+
+    class Meta:
+        model = PlaylistTrack
+        fields = ('id', 'title')
+
+
 class PlaylistTrackSerializer(serializers.ModelSerializer):
     track = NoLinkTrackSerializer(source='trc_id', read_only=True)
 
