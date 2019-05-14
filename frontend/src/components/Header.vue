@@ -10,15 +10,19 @@
                 <div class="management">
                     <div v-if="username != ''">
                         <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
-                            <span>{{ username }}</span>
-                            <img title="загрузить"  class="user" src="/static/mainapp/images/user.svg" alt="user">
+                            <div class="user">
+                                <span>{{ username }}</span>
+                                <img src="/static/mainapp/images/user.svg" alt="user">
+                            </div>
                             <ul class="menu-drop" v-if="menuShow">
                                 <li><router-link :to="'/performers/' + performerID">Профиль</router-link></li> <!-- <a @click="openProfile">Профиль</a> -->
                                 <li><a @click="logout">Выйти</a></li>
                             </ul>
 
                         </div>
-                        <img class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader" @click='showMenu'>  
+                        <div style="width:55px; height:55px; display:inline-block; position: relative;" class="uploud-cont" @click='showMenu'>
+                            <img title="загрузить музыку" class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader">
+                        </div>  
                     </div>
                     <div v-else>
                         <router-link to="/login">Войти</router-link>
@@ -108,6 +112,7 @@ export default {
     line-height: 55px;
     box-sizing: border-box;
     float: left;
+    outline: none;
     font-size: 295%;
     width: 30%;
 }
@@ -123,15 +128,68 @@ export default {
     font-size:155%;
     width: 68%
 }
+.uploud-cont
+{
+    border-radius: 25px;
+    cursor: pointer;
+}
+.uploud-cont:after {
+  display: block;
+  position: absolute;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  content: '.';
+  color: transparent;
+  width: 1px;
+  height: 1px;
+  border-radius: 50%;
+  background: transparent;
+}
+.uploud-cont:hover:after {
+  -webkit-animation: circle .3s ease-in forwards;
+}
+@-webkit-keyframes circle {
+  0% {
+    width: 1px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    height: 1px;
+    z-index: -1;
+    background: #eee;
+    border-radius: 100%;
+  }
+  100% {
+    background: rgba(170, 170, 170, 0.2);
+    height: 45px;
+    width: 45px;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    border-radius: 35px;
+  }
+} 
+@supports not ( -webkit-animation: circle .3s ease-in forwards) {
+    .uploud-cont:hover{
+        background-color: rgba(204, 204, 204,0.3);
+    }
+}
+
 .uploadButton
 {
-    margin-top: 7.5px;
-    display: block;
-    cursor: pointer;
-    float: right;
-    pointer-events: all;
-    height: 40px;
-    width: 40px;
+    width: 25px;
+    height: auto;
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
 }
 .drop-menu:hover
 {
@@ -153,11 +211,19 @@ export default {
 }
 .drop-menu img
 {
-    margin-top: 7.5px;
-    margin-left: 1.8px;
-    float: right;
-    width: 40px;
-    height: 40px;
+    width: 25px;
+    height: auto;
+    position: relative;
+    margin-left: 5px; 
+    top: 0; left: 0; bottom: 0; right: 0;
+}
+.user 
+{
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    height: 55px;
+    font-size: 20px;
 }
 .drop-menu ul
 {

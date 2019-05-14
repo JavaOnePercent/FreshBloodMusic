@@ -1,0 +1,306 @@
+.trackListConteiner
+{
+    padding-left: 15px;
+    min-width: 519px;
+}
+.smile
+{
+    width: 180px;
+    height: auto;
+    margin: 15px auto;
+    position: relative;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: block;
+}
+.album-header
+{
+    height:183px;
+    width: 100%;
+    top:15px;
+    position: relative;
+    z-index: 50;
+    background-color: rgba(255, 255, 255, 0.6);
+} /*
+.blur {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 275px;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background-size: cover;
+    background-position: bottom;
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    filter: blur(5px);
+} */
+.blur{
+    height:183px;
+    width: 100%;
+    position: absolute;
+    overflow: hidden;
+    z-index: 50;
+    opacity: 0.3;
+    background-size: cover;
+    background-position: 50% 50%;
+}
+.blur::before{
+    height:183px;
+    width: 100%;
+}
+.blur::before {
+    z-index: -1;
+    display: block;
+    position: absolute;
+    content: ' ';
+}
+.blur::before {
+    /* background-image: url('path/to/image.jpg'); Actual image for this demo is a data-uri, see below */
+    /* Prefix free isn't picking up this one */
+    -webkit-filter: url('#blur');
+    filter: url('#blur');
+    -webkit-filter: blur(5px);
+    filter: blur(5px);
+    background-size: cover;
+    /* opacity: 1; */
+    background-image: inherit;
+    background-size: cover;
+    background-position: 50% 50%;
+    z-index: 50;
+}
+.about {
+    display: flex;
+    z-index: 99;
+    top: 15px;
+    position: relative;
+}
+.lable {
+    position: relative;
+    width: 153px;
+    left: 15px;
+    height: 153px;
+    display: block;
+}
+.name
+{
+    font-size: 35px;
+    letter-spacing: 1px;
+    height: 43px;
+    cursor: default;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
+}
+.playAll
+{
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select:none;
+    margin-top:5px;
+    margin-bottom: 5px; 
+    padding: 5px;
+    height: 30px;
+    cursor: pointer;
+    line-height: 30px;
+    font-size: 18px;
+    text-align: center;
+    background-color: rgb(255, 181, 43);
+    /* transform: skew(-10deg); */
+    width: 233.656px;
+}
+.playAll:hover
+{
+    background-color: rgb(226, 160, 38);
+    cursor: pointer;
+}
+.menu
+{
+    width:30px;
+    margin-top:5px;
+    margin-bottom: 5px; 
+    position: relative;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0.6;
+}
+.menu:hover
+{
+    cursor: pointer;
+    transform: scale(1.05);
+}
+.menu-dropdown 
+{
+    position: absolute;
+    /* outline: none; */
+    top: 50px;
+    width: 263px;
+    padding: 0;
+    margin: 0;
+    background-color: white;
+    right: 10px;
+    box-shadow: 0 7px 14px rgba(0,0,0,0.12), 0 7px 7px rgba(0,0,0,0.09);
+}
+.menu-dropdown li
+{
+    list-style-type: none;
+    padding: 10px 5px;
+    cursor: pointer
+}
+.menu-dropdown li:hover
+{
+    background-color: rgba(189, 176, 208, 0.3)
+}
+.genre, .date, .more, .author
+{
+    color: rgb(45, 45, 45);
+    letter-spacing: 1px;
+    font-size: 16px;
+    cursor: default;
+    margin-bottom: 3.4px; 
+    height: 18px;
+}
+.music
+{
+    /* height: calc(100% - 183px); */
+    background-color: white;
+    /* top: 15px; */
+    position: relative;
+    padding-top:3px; 
+    overflow: visible;
+}
+.track
+{
+    width: calc(100% - 15px);
+    height: 45px;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 6px;
+    padding-right: 15px;
+}
+.play
+{
+    width: 35px;
+    height: 100%;
+    padding-left:15px;
+    padding-right: 15px;  
+    position: relative;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.trc-logo img
+{
+    width: 45px;
+    height: 45px;
+    padding-left:15px;
+    padding-right: 15px;  
+    position: relative;
+    display: block;
+}
+.track-name
+{
+    line-height: 45px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
+    padding-right: 50px;
+}
+.track:hover
+{
+    cursor: pointer;
+    background-color: rgba(189, 176, 208, 0.3)
+}
+.track:hover .trc-logo img, .currentTrc .trc-logo img
+{
+    opacity: 0.4;
+    filter: grayscale(100%);
+}
+.trc-logo::before
+{
+    width: 35px;
+    height: 35px;
+    top: 5px;
+    left: 23px;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    content: ' ';
+    background-image: url(/static/mainapp/images/orange-arrow.svg);
+    background-size: cover;
+    background-position: 50% 50%;
+    z-index: 50;
+    display: none;
+}
+.track:hover .trc-logo::before, .currentTrc .trc-logo::before
+{
+    display: block;
+}
+.time
+{
+    font-size: 13px;
+    width: 40px;
+    line-height: 45px;
+    float: right;
+    color: rgb(45, 45, 45);
+}
+.trc-controll
+{
+    position: relative;
+    float: right;
+    display: none;
+}
+.track:hover .trc-controll
+{
+    display: flex;
+}
+.trc-controll-btn
+{
+    width: 40px;
+    position: relative;
+}
+.trc-controll-btn img
+{
+    width: 20px;
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0.6;
+}
+.like:hover img, .add-to-playlist:hover img, .trash:hover img
+{
+    opacity: 1;
+}
+.currentTrc
+{
+  background-color: rgba(189, 176, 208, 0.3)
+}
+.currentTrc .trc-controll
+{
+    display: flex;
+}
+.scroll-area {
+    margin: auto;
+    width: 100%;
+    height: 400px;
+    height: 100%;
+    height: calc(100% - 183px);
+    background-color: white;
+    top: 15px;
+    position: relative;
+    padding-top:3px; 
+}

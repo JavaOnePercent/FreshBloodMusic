@@ -11,7 +11,7 @@
             </div>
             <div class="track-name-loader-conteiner">
                 <label for="track-name-loader">Название*</label>
-                <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="40">
+                <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="22">
             </div>
     
             <div class="track-janr-loader-conteiner">
@@ -27,10 +27,10 @@
                 </ul>
             </div>
     
-            <div class="description-conteiner">
+            <!-- <div class="description-conteiner">
                 <label for="track-name-loader">Описание</label>
                 <textarea type="text" name="description" maxlength="800" v-model="description"> </textarea>
-            </div>
+            </div> -->
     
     
             <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
@@ -51,10 +51,10 @@
                     Добавить композиции
                 </label>
             </div>
-            <div id="error" class="error"><label  >{{errorMessage}} </label></div>
+            <div style='font-size: 20px;' id="error" class="error"><label  >{{errorMessage}} </label></div>
             <!--<div class="loading" v-if="loader"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>-->
-            <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "жанр" & !loader'  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
-            
+            <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "Выбрать жанр" & !loader'  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
+            <span class="description-conteiner" style="font-size: 16px;"> Обратите внимание, что длина названия одного трека не должна превышать 50 символов </span>
 
         </form>
     </div>
@@ -291,7 +291,8 @@ export default {
                     {
                         this.errorMessage = ''
                         //console.log(e.target.files[i].type)
-                        var file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "") ,"file": e.target.files[i]};
+
+                        var file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "").substr(0, 50),"file": e.target.files[i]};
                         //e.target.reset();
                         //e.target.files[i] = null;
                         //console.log(e.target.files[i].name)
@@ -318,8 +319,8 @@ export default {
             if(this.track[this.currentEdit].name.length<1)
             {
             //console.log(this.trackName);
-            this.errorMessage = "название трека не может быть пустым";
-            this.track[this.currentEdit].name = this.trackName;
+                this.errorMessage = "название трека не может быть пустым";
+                this.track[this.currentEdit].name = this.trackName;
             }
             //console.log(this.track[this.currentEdit].name.length)
         },
@@ -636,6 +637,11 @@ background-color: rgb(129, 129, 129);
 	position: absolute;
 	height: 35px;
 	width: 625px;
+    font-size: 17px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
 }
 .edit
 {
@@ -676,7 +682,7 @@ background-color: rgb(129, 129, 129);
 	margin-bottom: -25px;
 	overflow: hidden;
 	padding: 0;
-	width: 350px;
+	width: 450px;
 	height: 30px;
 	left:370px;
 	bottom: -130px; 

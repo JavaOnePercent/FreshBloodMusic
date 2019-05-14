@@ -11,6 +11,7 @@
     "core-js": "^2.6.5",
     "vue": "^2.6.10",
     "vue-cookie": "^1.1.4",
+    "vue-custom-scrollbar": "^1.0.0",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.6",
     "vuedraggable": "^2.20.0",
