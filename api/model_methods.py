@@ -1,4 +1,4 @@
-import datetime
+# import datetime
 import math
 import random
 import shutil
@@ -21,9 +21,9 @@ class PerformerMethods:
 
     @staticmethod
     def create(user, name, description):
-        date = datetime.date.today()
+        # date = datetime.date.today()
         
-        performer = Performer.objects.create(user_id=User.objects.get(pk=user), name_per=name, about_per=description, date_per=date)
+        performer = Performer.objects.create(user_id=User.objects.get(pk=user), name_per=name, about_per=description)
         is_new = try_mkdir('./media/performers/' + str(performer.id))
         shutil.copy(r'./mainapp/static/mainapp/images/cat.jpg', './media/performers/' + str(performer.id) + '/logo.jpg')
         performer = PerformerMethods.add_image(performer, 'performers/' + str(performer.id) + '/logo.jpg')
@@ -233,7 +233,7 @@ class TrackHistoryMethods:
         return tracks
 
 
-class TrackReportMethods:
+'''class TrackReportMethods:
     @staticmethod
     def create(track_id, user_id):  # добавление записи жалоб в таблицу
         if track_id is not None and user_id is not None:
@@ -246,7 +246,7 @@ class TrackReportMethods:
             else:
                 return False
         else:
-            return False
+            return False'''
 
 
 class TrackRecommendation:
@@ -255,7 +255,7 @@ class TrackRecommendation:
         userstracks = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('trc_id', 'user_id')
         likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
         historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
-        reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
+        # reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
         liked = []
         noauthtracks = []
         for track in userstracks:
@@ -283,7 +283,7 @@ class TrackRecommendation:
         #print(tracks)
         recommended_in_history = []
         for track in tracks:
-            if (track,) not in identracks and (track,) not in historytracks and (track,) not in reporttracks:
+            if (track,) not in identracks and (track,) not in historytracks:
                 identracks.append(track)
             elif (track,) in historytracks:
                 recommended_in_history.append((track,))

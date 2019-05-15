@@ -6,8 +6,8 @@
                     <label class="sortirovka-name">Рекомендации</label>
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <span class="time" id="time" @click="showGenre(genre, style, 'time')" @mousedown="checkSort">времени</span>
-                        <span class="topic" id="topic" @click="showGenre(genre, style, 'popular')" @mousedown="checkSort">популярности</span>
+                        <span class="time" id="time" @click="showGenre(filter, genre, style, 'time')" @mousedown="checkSort">времени</span>
+                        <span class="topic" id="topic" @click="showGenre(filter,genre, style, 'popularity')" @mousedown="checkSort">популярности</span>
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                         <div id="janrStyles" class="janrStyles">
                             <a style="white-space: nowrap" :class="{'choseJanr':choseGenrStyle==='all'}" class="janr gen"  @click="showGenre('genre', genres[janreid].id); choseGenrStyle = 'all'">Все из {{genres[janreid].name_gnr}}</a>
                             <div class="janr" :class="{'choseJanr':choseGenrStyle===sty.id}" :key="index" v-for="(sty, index) in styles">
-                                <a style=" white-space: nowrap" :name="sty.id" @click="showGenreStyle('genre', sty.id)">{{sty.name_stl}}</a>
+                                <a style=" white-space: nowrap" :name="sty.id" @click="showGenreStyle(sty.id)">{{sty.name_stl}}</a>
                             </div>
                         </div>
                         <div style="position:relative" v-if="needScroll('janrStyles') && !arrow.styleRight">
@@ -87,7 +87,7 @@ export default {
             compilations:[],
             genres:[],
             styles:[],
-            url: 'track?genre=all&sort=0',
+            url: 'api/tracks',
             loading: false,
             sort: 'popular',
             genre: '',
@@ -97,6 +97,7 @@ export default {
             choseGenr: '',
             choseGenrStyle:'all',
             janreid: 0,
+            filter: '',
             arrow: {
                 janrLeft: false,
                 janrRight: false,
@@ -177,18 +178,19 @@ export default {
             //console.log(diffHeight, scrollTop);
             if(diffHeight <= scrollTop && !this.loading) {
                 if(this.url != null)
-                    this.showGenre();
+                    this.showGenre(null,null,null,null,false);
             }
 
         },
-        showGenreStyle(message1, message2) {
-            this.choseGenrStyle = message2
-            this.showGenre(message1, message2)
+        showGenreStyle(styleId) {
+            this.choseGenrStyle = styleId
+            this.showGenre('style', null, styleId)
         },
-        showGenre(filter, genre = null, style = null, sort = null) {
+        showGenre(filter, genre = null, style = null, sort = null, updateUrl=true) {
           this.loading = true;
           var obj = {};
-          this.filter = filter
+          if (updateUrl) {
+            this.filter = filter
           //if(genre != null || style != null)
           //{
             this.url = 'api/tracks';
@@ -205,7 +207,7 @@ export default {
                 }
                 this.style = null;
             }
-            else
+            else if(style === null)
             {
                 this.showStyles = false;
             }
@@ -228,7 +230,7 @@ export default {
                 style: this.style, 
                 sort: this.sort
             }}
-          //}
+          }
           this.$http.get(this.url, obj).then(function(response){
                 this.compilation = response.body.results;
                 for(var i = 0; i < this.compilation.length; i++)

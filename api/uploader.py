@@ -1,4 +1,4 @@
-import datetime
+#import datetime
 import os
 import re
 import io
@@ -13,13 +13,13 @@ from django.db.models.fields.files import FieldFile
 
 
 def save_track(alb_id, name, audio, performer):
-    date = datetime.date.today()
+    #date = datetime.date.today()
     try:
         album = Album.objects.get(pk=alb_id, per_id=performer.id)
     except Album.DoesNotExist:
         raise ParseError('Album for the current user does not exist')
     directory = 'albums/' + str(album.id) + '/'
-    track = Track.objects.create(alb_id=album, name_trc=name, date_trc=date)
+    track = Track.objects.create(alb_id=album, name_trc=name)
     # track.save()
     directory += str(track.id) + '.mp3'
     duration = compress_audio(audio.read(), directory)
@@ -30,11 +30,11 @@ def save_track(alb_id, name, audio, performer):
 
 
 def save_album(performer, name, genre, logo, description):  # сохранение альбома с треками в БД и в файлы
-    date = datetime.date.today()
+    # date = datetime.datetime.now()
     if 'albums' not in os.listdir('media'):
         os.mkdir('media/albums')
     album = Album.objects.create(per_id=performer, name_alb=name, about_alb=description,
-                                 stl_id=GenreStyle.objects.get(id=genre), image_alb='', date_alb=date)
+                                 stl_id=GenreStyle.objects.get(id=genre), image_alb='')
     directory = 'albums/' + str(album.id) + '/'
     os.mkdir(path + directory)
     if logo is not None:

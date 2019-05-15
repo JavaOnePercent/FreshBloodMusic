@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 
 class Performer(models.Model):
@@ -40,7 +41,7 @@ class Album(models.Model):
     numplays_alb = models.IntegerField(default=0)
     rating_alb = models.IntegerField(default=0)
     image_alb = models.FileField(upload_to='albums', default=None)
-    date_alb = models.DateField()
+    date_alb = models.DateTimeField(default=now)
     about_alb = models.TextField(default='')
     slug = models.SlugField(max_length=30, null=True, blank=True)
 
@@ -56,7 +57,7 @@ class Track(models.Model):
     audio_trc = models.FileField(upload_to='albums', default=None)
     numplays_trc = models.IntegerField(default=0)
     rating_trc = models.IntegerField(default=0)
-    date_trc = models.DateField()
+    date_trc = models.DateField(default=now)
     duration = models.IntegerField(default=0)
 
     def __str__(self):
@@ -66,7 +67,8 @@ class Track(models.Model):
 class LikedAlbum(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userlikedalbum')
-    album_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='albumliked')
+    album_id = models.ForeignKey(Album, on_delete=models.CASCADE, related_name='albumliked')
+    date = models.DateField(default=now)
 
     def __int__(self):
         return self.id
@@ -76,6 +78,7 @@ class LikedTrack(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userliked')
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackliked')
+    date = models.DateField(default=now)
 
     def __int__(self):
         return self.id
@@ -90,13 +93,13 @@ class TrackHistory(models.Model):
         return self.trc_id
 
 
-class TrackReport(models.Model):
+'''class TrackReport(models.Model):
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userreport')
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackreport')
 
     def __int__(self):
-        return self.trc_id
+        return self.trc_id'''
 
 
 class Playlist(models.Model):
@@ -116,3 +119,23 @@ class PlaylistTrack(models.Model):
 
     def __int__(self):
         return self.id
+
+
+class LikedPlaylist(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userlikedplaylist')
+    playlist_id = models.ForeignKey(Playlist, on_delete=models.CASCADE, related_name='playlistliked')
+    date = models.DateField(default=now)
+
+    def __int__(self):
+        return self.id
+
+
+class TrackPlaysAmount(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackplays')
+    date = models.DateField(default=now)
+    amount = models.IntegerField(default=0)
+
+    def __int__(self):
+        return self.trc_id

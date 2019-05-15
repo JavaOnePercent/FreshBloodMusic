@@ -18,6 +18,7 @@ from rest_framework import status, generics
 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import ParseError
+from datetime import date
 
 
 @ensure_csrf_cookie
@@ -176,6 +177,13 @@ class TrackDetail(APIView):
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        try:
+            trc_plays = TrackPlaysAmount.objects.get(trc_id=track, date=date.today())
+        except TrackPlaysAmount.DoesNotExist:
+            trc_plays = TrackPlaysAmount.objects.create(trc_id=track)
+        trc_plays.amount += 1
+        trc_plays.save()
+
         serializer = TrackSerializer(track)
         is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, track.id)
         data = dict(serializer.data)
@@ -246,6 +254,45 @@ class AlbumDetail(APIView):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class AlbumLikes(APIView):
+
+    def get_album(self, request):
+        try:
+            album = request.query_params['album']
+            return Album.objects.get(pk=album)
+        except Album.DoesNotExist:
+            raise ParseError('Wrong album id')
+        except MultiValueDictKeyError:
+            raise ParseError('Album id must be specified')
+
+    def handle_exception(self, exc):
+        if type(exc) == ParseError:
+            return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise exc
+
+    def post(self, request):
+        album = self.get_album(request)
+        user = auth.get_user(request)
+        if type(user) == User:
+            LikedAlbum.objects.create(album_id=album, user_id=user)
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return ParseError('User must be logged in')
+
+    def delete(self, request):
+        album = self.get_album(request)
+        user = auth.get_user(request)
+        if type(user) == User:
+            try:
+                LikedAlbum.objects.get(album_id=album, user_id=user).delete()
+            except LikedAlbum.DoesNotExist:
+                return ParseError('Like instance was not found')
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return ParseError('User must be logged in')
 
 
 class PlaylistsList(APIView):
@@ -342,7 +389,7 @@ class PlaylistTrackView(APIView):
         try:
             playlist = request.query_params['playlist']
             playlist = Playlist.objects.get(pk=playlist, per_id=get_performer(request))
-        except Album.DoesNotExist:
+        except Playlist.DoesNotExist:
             return Response('Wrong playlist id or doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
         except MultiValueDictKeyError:
             return Response('Playlist id must be specified', status=status.HTTP_400_BAD_REQUEST)
@@ -359,6 +406,45 @@ class PlaylistTrackView(APIView):
             return Response(status=status.HTTP_200_OK)
         except PlaylistTrack.DoesNotExist:
             return Response('Track is not in this playlist', status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlaylistLikes(APIView):
+
+    def get_playlist(self, request):
+        try:
+            playlist = request.query_params['playlist']
+            return Playlist.objects.get(pk=playlist)
+        except Playlist.DoesNotExist:
+            raise ParseError('Wrong playlist id')
+        except MultiValueDictKeyError:
+            raise ParseError('Playlist id must be specified')
+
+    def handle_exception(self, exc):
+        if type(exc) == ParseError:
+            return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise exc
+
+    def post(self, request):
+        playlist = self.get_playlist(request)
+        user = auth.get_user(request)
+        if type(user) == User:
+            LikedPlaylist.objects.create(playlist_id=playlist, user_id=user)
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return ParseError('User must be logged in')
+
+    def delete(self, request):
+        playlist = self.get_playlist(request)
+        user = auth.get_user(request)
+        if type(user) == User:
+            try:
+                LikedPlaylist.objects.get(playlist_id=playlist, user_id=user).delete()
+            except LikedPlaylist.DoesNotExist:
+                return ParseError('Like instance was not found')
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return ParseError('User must be logged in')
 
 
 @api_view(['GET'])
@@ -433,7 +519,7 @@ def history(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['PUT'])
+'''@api_view(['PUT'])
 def report(request):
     if request.method == 'PUT':
         track = request.query_params['track']
@@ -441,7 +527,7 @@ def report(request):
         if result:
             return Response(status=status.HTTP_201_CREATED)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)'''
 
 
 @api_view(['POST', 'GET'])
