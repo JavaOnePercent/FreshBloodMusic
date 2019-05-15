@@ -264,13 +264,19 @@ class AlbumDetail(APIView):
 class AlbumLikes(APIView):
 
     def get(self, request):
-        user = auth.get_user(request)
-        if type(user) == User:
-            albums = LikedAlbum.objects.filter(user_id=user)
-            ser = LikedAlbumSerializer(albums, many=True)
-            return Response(ser.data, status=status.HTTP_200_OK)
-        else:
-            return ParseError('User must be logged in')
+        try:
+            performer = request.query_params['performer']
+            try:
+                user_id = Performer.objects.get(pk=performer).user_id
+            except Performer.DoesNotExist:
+                raise ParseError('Incorrect performer id')
+        except MultiValueDictKeyError:
+            user_id = auth.get_user(request)
+            if type(user_id) != User:
+                raise ParseError('User must be logged in')
+        albums = LikedAlbum.objects.filter(user_id=user_id)
+        ser = LikedAlbumSerializer(albums, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
 
     def get_album(self, request):
         try:
@@ -432,13 +438,19 @@ class PlaylistTrackView(APIView):
 class PlaylistLikes(APIView):
 
     def get(self, request):
-        user = auth.get_user(request)
-        if type(user) == User:
-            playlists = LikedPlaylist.objects.filter(user_id=user)
-            ser = LikedPlaylistSerializer(playlists, many=True)
-            return Response(ser.data, status=status.HTTP_200_OK)
-        else:
-            return ParseError('User must be logged in')
+        try:
+            performer = request.query_params['performer']
+            try:
+                user_id = Performer.objects.get(pk=performer).user_id
+            except Performer.DoesNotExist:
+                raise ParseError('Incorrect performer id')
+        except MultiValueDictKeyError:
+            user_id = auth.get_user(request)
+            if type(user_id) != User:
+                raise ParseError('User must be logged in')
+        playlists = LikedPlaylist.objects.filter(user_id=user_id)
+        ser = LikedPlaylistSerializer(playlists, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
 
     def get_playlist(self, request):
         try:
