@@ -198,6 +198,28 @@ class LikedTrackMethods:
         return is_liked
 
 
+class LikedAlbumMethods:
+    @staticmethod
+    def check_if_liked(user_id, album_id):  # проверка лайкнут ли альбом
+        try:
+            LikedAlbum.objects.get(user_id=user_id, album_id=album_id)
+            is_liked = True
+        except ObjectDoesNotExist:
+            is_liked = False
+        return is_liked
+
+
+class LikedPlaylistMethods:
+    @staticmethod
+    def check_if_liked(user_id, playlist_id):  # проверка лайкнут ли альбом
+        try:
+            LikedPlaylist.objects.get(user_id=user_id, playlist_id=playlist_id)
+            is_liked = True
+        except ObjectDoesNotExist:
+            is_liked = False
+        return is_liked
+
+
 class TrackHistoryMethods:
     @staticmethod
     def create(track_id, user_id):  # добавление записи истории в таблицу

@@ -157,3 +157,22 @@ class TrackHistorySerializer(serializers.ModelSerializer):
         model = TrackHistory
         fields = ('name_trc', 'name_per', 'image_alb', 'id', 'audio_trc')
 
+
+class LikedPlaylistSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='playlist_id.id')
+    image = serializers.FileField(source='playlist_id.image')
+    title = serializers.ReadOnlyField(source='playlist_id.title')
+
+    class Meta:
+        model = LikedPlaylist
+        fields = ('id', 'image', 'title')
+
+
+class LikedAlbumSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source='album_id.id')
+    image = serializers.FileField(source='album_id.image_alb')
+    title = serializers.ReadOnlyField(source='album_id.name_alb')
+
+    class Meta:
+        model = LikedPlaylist
+        fields = ('id', 'image', 'title')

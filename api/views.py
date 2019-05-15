@@ -218,6 +218,9 @@ class AlbumsList(APIView):
         else:
             return Response('Incorrect sort key value', status=status.HTTP_400_BAD_REQUEST)
         ser = AlbumSerializer(albums, many=True)
+        for datum in ser.data:
+            is_liked = LikedAlbumMethods.check_if_liked(auth.get_user(request), datum['id'])
+            datum.__setitem__('is_liked', is_liked)
         return Response(ser.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -243,10 +246,12 @@ class AlbumDetail(APIView):
         ser = AlbumTracksSerializer(albums)
 
         data = ser.data
+        is_liked = LikedAlbumMethods.check_if_liked(auth.get_user(request), pk)
+        data.__setitem__('is_liked', is_liked)
         for datum in data['tracks']:
             is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, datum['id'])
             datum.__setitem__('is_liked', is_liked)
-        return Response(ser.data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, format=None):
         delete = AlbumMethods.delete(pk, auth.get_user(request).id)
@@ -257,6 +262,15 @@ class AlbumDetail(APIView):
 
 
 class AlbumLikes(APIView):
+
+    def get(self, request):
+        user = auth.get_user(request)
+        if type(user) == User:
+            albums = LikedAlbum.objects.filter(user_id=user)
+            ser = LikedAlbumSerializer(albums, many=True)
+            return Response(ser.data, status=status.HTTP_200_OK)
+        else:
+            return ParseError('User must be logged in')
 
     def get_album(self, request):
         try:
@@ -307,13 +321,18 @@ class PlaylistsList(APIView):
             if track is None:
                 playlists = Playlist.objects.filter(per_id=performer)
                 ser = PlaylistSerializer(playlists, many=True)
+                data = ser.data
+                for datum in data:
+                    is_liked = LikedPlaylistMethods.check_if_liked(auth.get_user(request), datum['id'])
+                    datum.__setitem__('is_liked', is_liked)
             else:
                 playlists = PlaylistTrack.objects.filter(trc_id=track, playlist__per_id=performer)
                 ser = PlaylistTrcSerializer(playlists, many=True)
+
+            return Response(ser.data, status=status.HTTP_200_OK)
+
         except MultiValueDictKeyError:
             return Response('Performer param must be set', status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(ser.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         title = request.POST["title"]
@@ -334,10 +353,12 @@ class PlaylistDetail(APIView):
             return Response('Wrong album id', status=status.HTTP_400_BAD_REQUEST)
         ser = PlaylistTracksSerializer(playlist)
         data = ser.data
+        is_liked = LikedPlaylistMethods.check_if_liked(auth.get_user(request), pk)
+        data.__setitem__('is_liked', is_liked)
         for datum in data['tracks']:
             is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, datum['track']['id'])
             datum['track'].__setitem__('is_liked', is_liked)
-        return Response(ser.data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, format=None):
         delete = PlaylistMethods.delete(pk, get_performer(request))
@@ -409,6 +430,15 @@ class PlaylistTrackView(APIView):
 
 
 class PlaylistLikes(APIView):
+
+    def get(self, request):
+        user = auth.get_user(request)
+        if type(user) == User:
+            playlists = LikedPlaylist.objects.filter(user_id=user)
+            ser = LikedPlaylistSerializer(playlists, many=True)
+            return Response(ser.data, status=status.HTTP_200_OK)
+        else:
+            return ParseError('User must be logged in')
 
     def get_playlist(self, request):
         try:

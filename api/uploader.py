@@ -98,7 +98,19 @@ path = './media/'
 
 
 def compress_image(data, file):
-    im = Image.open(io.BytesIO(data))
+    im: Image = Image.open(io.BytesIO(data))
+    if im.width > im.height:
+        big = im.width
+        small = im.height
+        left = int((big - small) / 2)
+        box = (left, 0, left + small, small)
+    else:
+        big = im.height
+        small = im.width
+        top = int((big - small) / 2)
+        box = (0, top, small, top + small)
+
+    im = im.crop(box)
     im = im.resize((320, 320), Image.BICUBIC)
     im = im.convert('RGB')
     im.save(path + file, 'jpeg', quality=95, optimize=True)
