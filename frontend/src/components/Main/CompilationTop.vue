@@ -89,7 +89,7 @@ export default {
             styles:[],
             url: 'api/tracks',
             loading: false,
-            sort: 'popular',
+            sort: 'popularity',
             genre: '',
             style: '',
             showsortbutton: true,
