@@ -20,7 +20,7 @@ class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайз�
 
     class Meta:
         model = Track
-        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'id_per', 'rating_trc', 'duration')
+        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'id_per', 'rating_trc', 'duration', 'alb_id')
 
 
 class TopTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека без ссылки на аудио
@@ -36,7 +36,7 @@ class TopTrackSerializer(serializers.ModelSerializer):  # сериалайзер
 
 
 class SmallTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека только с именем
-    #likes = serializers.IntegerField()
+    # likes = serializers.IntegerField()
 
     class Meta:
         model = Track
@@ -165,7 +165,7 @@ class LikedPlaylistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LikedPlaylist
-        fields = ('id', 'image', 'title')
+        fields = ('id', 'image', 'title')  # , 'date')
 
 
 class LikedAlbumSerializer(serializers.ModelSerializer):
@@ -175,4 +175,4 @@ class LikedAlbumSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LikedPlaylist
-        fields = ('id', 'image', 'title')
+        fields = ('id', 'image', 'title')  # , 'date')
