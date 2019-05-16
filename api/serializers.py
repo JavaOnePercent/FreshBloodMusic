@@ -99,10 +99,11 @@ class PlaylistTrackSerializer(serializers.ModelSerializer):
 
 class PlaylistTracksSerializer(serializers.ModelSerializer):
     tracks = PlaylistTrackSerializer(source='pl_tracks', many=True, read_only=True)
+    name_per = serializers.ReadOnlyField(source='per_id.name_per')
 
     class Meta:
         model = Playlist
-        fields = ('id', 'title', 'image', 'per_id', 'tracks')
+        fields = ('id', 'title', 'image', 'per_id', 'tracks', 'name_per')
 
 
 '''class FullAlbumSerializer(serializers.ModelSerializer):
