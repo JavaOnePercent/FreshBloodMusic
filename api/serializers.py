@@ -73,10 +73,11 @@ class AlbumSerializer(serializers.ModelSerializer):
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
+    name_per = serializers.ReadOnlyField(source='per_id.name_per')
 
     class Meta:
         model = Playlist
-        fields = ('id', 'title', 'image', 'per_id')
+        fields = ('id', 'title', 'image', 'per_id', 'name_per')
 
 
 class PlaylistTrcSerializer(serializers.ModelSerializer):
@@ -162,17 +163,21 @@ class LikedPlaylistSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='playlist_id.id')
     image = serializers.FileField(source='playlist_id.image')
     title = serializers.ReadOnlyField(source='playlist_id.title')
+    per_id = serializers.ReadOnlyField(source='playlist_id.per_id.id')
+    name_per = serializers.ReadOnlyField(source='playlist_id.per_id.name_per')
 
     class Meta:
         model = LikedPlaylist
-        fields = ('id', 'image', 'title')  # , 'date')
+        fields = ('id', 'image', 'title', 'per_id', 'name_per')  # , 'date')
 
 
 class LikedAlbumSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='album_id.id')
     image = serializers.FileField(source='album_id.image_alb')
     title = serializers.ReadOnlyField(source='album_id.name_alb')
+    per_id = serializers.ReadOnlyField(source='album_id.per_id.id')
+    name_per = serializers.ReadOnlyField(source='album_id.per_id.name_per')
 
     class Meta:
         model = LikedPlaylist
-        fields = ('id', 'image', 'title')  # , 'date')
+        fields = ('id', 'image', 'title', 'per_id', 'name_per')  # , 'date')
