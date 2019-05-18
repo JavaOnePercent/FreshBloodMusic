@@ -3,6 +3,8 @@ import math
 import random
 import shutil
 import os
+import nmslib
+import numpy as np
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -153,6 +155,7 @@ class LikedTrackMethods:
             return True
         else:
             return False
+
     @staticmethod
     def add_increment(track_id):
         if track_id is not None:
@@ -191,33 +194,36 @@ class LikedTrackMethods:
     @staticmethod
     def check_if_liked(user_id, track_id):  # проверка лайкнут ли трек
         try:
-            is_liked = True
-            LikedTrack.objects.get(user_id=user_id, trc_id=track_id)
+            if type(user_id) == User:
+                LikedTrack.objects.get(user_id=user_id, trc_id=track_id)
+                return True
+            return False
         except ObjectDoesNotExist:
-            is_liked = False
-        return is_liked
+            return False
 
 
 class LikedAlbumMethods:
     @staticmethod
     def check_if_liked(user_id, album_id):  # проверка лайкнут ли альбом
         try:
-            LikedAlbum.objects.get(user_id=user_id, album_id=album_id)
-            is_liked = True
+            if type(user_id) == User:
+                LikedAlbum.objects.get(user_id=user_id, album_id=album_id)
+                return True
+            return False
         except ObjectDoesNotExist:
-            is_liked = False
-        return is_liked
+            return False
 
 
 class LikedPlaylistMethods:
     @staticmethod
     def check_if_liked(user_id, playlist_id):  # проверка лайкнут ли альбом
         try:
-            LikedPlaylist.objects.get(user_id=user_id, playlist_id=playlist_id)
-            is_liked = True
+            if type(user_id) == User:
+                LikedPlaylist.objects.get(user_id=user_id, playlist_id=playlist_id)
+                return True
+            return False
         except ObjectDoesNotExist:
-            is_liked = False
-        return is_liked
+            return False
 
 
 class TrackHistoryMethods:
@@ -237,11 +243,6 @@ class TrackHistoryMethods:
                     if count > 49:
                         hist.delete()  # здесь бы надо закодить, чтобы переписывать старые записи из таблицы, а не все время плодить новые индексы
                         count -= 1
-            '''for index, hist in enumerate(history):
-                if hist != history.last():
-                    TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)
-                else:
-                    TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)'''
             TrackHistory.objects.filter(user_id=user, trc_id=track).delete()
             TrackHistory(user_id=user, trc_id=track).save()
             return True
@@ -272,8 +273,43 @@ class TrackHistoryMethods:
 
 
 class TrackRecommendation:
+
     @staticmethod
-    def get_recommendation(authuser):
+    def get_recommendation(user_id):
+        liked_tracks = LikedTrack.objects.filter(user_id=user_id).values_list('trc_id', 'plays_amount')
+        if liked_tracks.count() > 0:
+            plays_amount = 0
+            user_features = 0
+            for liked_track in liked_tracks:
+                this_features = np.load('features/' + str(liked_track[0]) + '.npy')
+                this_features *= liked_track[1]
+                user_features += this_features
+                plays_amount += liked_track[1]
+            user_features /= plays_amount
+
+        tracks = Track.objects.all().values_list('id')
+        features_list = []
+        for track in tracks:
+            features = np.load('features/' + str(track[0]) + '.npy')
+            features_list.append(features)
+
+        data = np.array(features_list)
+        index = nmslib.init(method='hnsw', space='cosinesimil')
+        index.addDataPointBatch(data)
+        index.createIndex({'post': 2})
+
+        # query for the nearest neighbours of the first datapoint
+        ids, distances = index.knnQuery(data[0], k=10)
+
+        track_ids = []
+        for id in ids:
+            track_ids.append(tracks[int(id)][0])
+
+        # print(len(track_ids), track_ids)
+        return track_ids
+
+    @staticmethod
+    def get_recommendation_old(authuser):
         userstracks = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('trc_id', 'user_id')
         likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
         historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')

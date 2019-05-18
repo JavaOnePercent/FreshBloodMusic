@@ -1,6 +1,10 @@
-Django
-django-rest-framework
-Pillow
+django
+djangorestframework
+pillow
 pydub
 pymysql
-
+tensorflow
+keras
+kapre
+librosa
+nmslib

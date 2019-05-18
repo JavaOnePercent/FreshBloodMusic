@@ -1,6 +1,4 @@
-#import datetime
 import os
-import re
 import io
 
 from PIL import Image
@@ -10,19 +8,21 @@ from api.model_methods import AlbumMethods, TrackMethods, PerformerMethods
 from api.models import *
 from rest_framework.exceptions import ParseError
 from django.db.models.fields.files import FieldFile
+from FreshBloodMusic.apps import KerasConfig
 
 
 def save_track(alb_id, name, audio, performer):
-    #date = datetime.date.today()
     try:
         album = Album.objects.get(pk=alb_id, per_id=performer.id)
     except Album.DoesNotExist:
         raise ParseError('Album for the current user does not exist')
+    if 'features' not in os.listdir('.'):
+        os.mkdir('features')
     directory = 'albums/' + str(album.id) + '/'
     track = Track.objects.create(alb_id=album, name_trc=name)
     # track.save()
     directory += str(track.id) + '.mp3'
-    duration = compress_audio(audio.read(), directory)
+    duration = compress_audio(audio.read(), directory, str(track.id))
     track.duration = int(duration)
     track.save()
     TrackMethods.add_audio(track, directory)
@@ -64,8 +64,11 @@ def save_playlist(user, title, image):  # сохранение альбома с
     return playlist
 
 
-def save_performer(id, name, label, description, performer):
-    performer = Performer.objects.get(id=id)
+def save_performer(name, label, description, performer):
+    # performer = Performer.objects.get(id=id)
+    performer.name_per = name
+    performer.about_per = description
+    performer.save()
     if 'performers' not in os.listdir('media'):
         os.mkdir('media/performers')
     directory = 'performers/' + str(performer.id) + '/'
@@ -116,8 +119,9 @@ def compress_image(data, file):
     im.save(path + file, 'jpeg', quality=95, optimize=True)
 
 
-def compress_audio(data, file):
+def compress_audio(data, file, track_id):
     sound = AudioSegment.from_mp3(io.BytesIO(data))
     sound.export(path + file, format="mp3", bitrate="128k")
+    KerasConfig.model.predict_features(path + file, 'features/' + track_id + '.npy')
     return sound.duration_seconds
 

@@ -48,6 +48,10 @@ def likes(request):
         performer = request.query_params['performer']
         likes = LikedTrackMethods.get(performer)
         serializer = LikedTrackSerializer(likes, many=True)
+        data = serializer.data
+        for datum in data:
+            is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request), datum['trc_id'])
+            datum.__setitem__('is_liked', is_liked)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -94,15 +98,26 @@ class TrackOverview(generics.ListCreateAPIView):
             request = self.request
 
             if filter == 'favorite':
-                likedtracks = LikedTrack.objects.filter(user_id=auth.get_user(request).id).values_list('trc_id').order_by('id')
-                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in likedtracks[0])
-                tracks = Track.objects.filter(id__in=likedtracks).extra(
-                    select={'ordering': ordering}, order_by=('ordering',))
+                user = auth.get_user(request)
+                if type(user) == User:
+                    likedtracks = LikedTrack.objects.filter(user_id=user.id).values_list('trc_id').order_by('id')
+                    if likedtracks.count() > 0:
+                        ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in likedtracks[0])
+                        tracks = Track.objects.filter(id__in=likedtracks).extra(
+                            select={'ordering': ordering}, order_by=('ordering',))
+                    else:
+                        tracks = likedtracks
+                else:
+                    raise ParseError('User must be logged in to access favorite tracks')
             elif filter == 'recommended':
-                identracks = TrackRecommendation.get_recommendation(auth.get_user(request).id)
-                ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
-                tracks = Track.objects.filter(pk__in=identracks).extra(
-                    select={'ordering': ordering}, order_by=('ordering',))
+                user = auth.get_user(request)
+                if type(user) == User:
+                    identracks = TrackRecommendation.get_recommendation(user.id)
+                    ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
+                    tracks = Track.objects.filter(pk__in=identracks).extra(
+                        select={'ordering': ordering}, order_by=('ordering',))
+                else:
+                    raise ParseError('User must be logged in to access recommended tracks')
             elif filter == 'genre':
                 try:
                     genre = self.request.query_params['genre']
@@ -183,11 +198,15 @@ class TrackDetail(APIView):
             trc_plays = TrackPlaysAmount.objects.create(trc_id=track)
         trc_plays.amount += 1
         trc_plays.save()
-
+        user_id = auth.get_user(request).id
         serializer = TrackSerializer(track)
-        is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, track.id)
+        is_liked = LikedTrackMethods.check_if_liked(user_id, track.id)
         data = dict(serializer.data)
         data["is_liked"] = is_liked
+        if is_liked:
+            liked_track = LikedTrack.objects.get(user_id=user_id, trc_id=track.id)
+            liked_track.plays_amount += 1
+            liked_track.save()
         return Response(data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk, format=None):
@@ -300,7 +319,7 @@ class AlbumLikes(APIView):
             LikedAlbum.objects.create(album_id=album, user_id=user)
             return Response(status=status.HTTP_201_CREATED)
         else:
-            return ParseError('User must be logged in')
+            raise ParseError('User must be logged in')
 
     def delete(self, request):
         album = self.get_album(request)
@@ -474,7 +493,7 @@ class PlaylistLikes(APIView):
             LikedPlaylist.objects.create(playlist_id=playlist, user_id=user)
             return Response(status=status.HTTP_201_CREATED)
         else:
-            return ParseError('User must be logged in')
+            raise ParseError('User must be logged in')
 
     def delete(self, request):
         playlist = self.get_playlist(request)
@@ -542,9 +561,12 @@ class PerformerDetail(APIView):
         except MultiValueDictKeyError:
             label = None
         description = request.POST["description"]
-        save_performer(pk, name, label, description, get_performer(request))
-
-        return Response(status=status.HTTP_200_OK)
+        performer = get_performer(request)
+        if performer.id == int(pk):
+            save_performer(name, label, description, performer)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response('Specified performer doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT', 'GET'])
@@ -556,9 +578,13 @@ def history(request):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'GET':
-        tracks = TrackHistoryMethods.get(auth.get_user(request).id)
-        serializer = TrackHistorySerializer(tracks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        user = auth.get_user(request)
+        if type(user) == User:
+            tracks = TrackHistoryMethods.get(user.id)
+            serializer = TrackHistorySerializer(tracks, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response('User must be logged in to access this method', status=status.HTTP_400_BAD_REQUEST)
 
 
 '''@api_view(['PUT'])

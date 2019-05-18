@@ -79,6 +79,7 @@ class LikedTrack(models.Model):
     user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='userliked')
     trc_id = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='trackliked')
     date = models.DateField(default=now)
+    plays_amount = models.IntegerField(default=1)
 
     def __int__(self):
         return self.id

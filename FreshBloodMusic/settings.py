@@ -41,8 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+
 ]
+if os.environ.get('RUN_MAIN', None) == 'true':
+    INSTALLED_APPS.append('FreshBloodMusic.apps.KerasConfig')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
