@@ -11,6 +11,7 @@
         <div class="Loaderplay"><span class="cssload-main"><span class="cssload-main-inner"></span></span></div>
         <h2> Подождите, нам надо подготовиться. </h2>
         </div>
+        <Notifications> </Notifications>
         <router-view v-if="!loading" @login="loadFromHistory" ></router-view>
         <top-player></top-player>
     </div>
@@ -25,6 +26,7 @@ import loader from './components/Loader.vue'
 import topPlayer from './components/TopPlayer.vue'
 
 import NewProfile from './components/NewProfile/NewProfile.vue'
+import Notifications from './components/Notifications/Notifications.vue'
 // import userPlaylists from './components/userPlaylists/userPlaylists.vue'
 
 export default {
@@ -42,6 +44,7 @@ export default {
         loader,
         topPlayer,
         NewProfile,
+        Notifications,
         // userPlaylists
     },
     created() {
@@ -78,7 +81,9 @@ export default {
             else
                 this.$bus.$emit('set-current-track', null)
             this.loading = false
-        }, error => {this.$bus.$emit('set-current-track', null)});
+        }, error => {this.$bus.$emit('set-current-track', null)
+                        this.loading = false
+        });
         }
     }
 }

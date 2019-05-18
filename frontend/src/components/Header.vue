@@ -8,7 +8,7 @@
                     </div>
                 </router-link>
                 <div class="management">
-                    <div v-if="username != ''">
+                    <div style="height:55px" v-if="username != ''">
                         <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
                             <div class="user">
                                 <span>{{ username }}</span>
@@ -73,6 +73,7 @@ export default {
 .row
 {
     margin: 0 auto;
+    height: 55px;
 }
 .row:after
 {
@@ -126,7 +127,8 @@ export default {
     box-sizing: border-box;
     float: right;
     font-size:155%;
-    width: 68%
+    width: 68%;
+    height: 55px;
 }
 .uploud-cont
 {
@@ -282,5 +284,8 @@ li a
 .management a:nth-of-type(n+1)
 {
     padding-right:5px; 
+}
+* {
+    outline: none
 }
 </style>

@@ -7,16 +7,20 @@
                 <img class="lable" :src="lable" alt="">
                 <div style="display:flex; flex-direction: column; left: 30px; position:relative; width: calc(100% - 183px);">
                     <span class="name"> {{albumName}} </span>
-                    <span v-if="albumType == 'album'" class="genre"> {{albumGenre}} • {{albumStyle}} </span>
-                    <span v-else class="author">Автор: {{name}} </span>
-                    <span v-if="albumType == 'album'" class="date">Исполнитель: {{name}} • {{getCorrectDate(albumDate)}} </span>
+                    <span v-if="albumType === 'album' || albumType === 'albumsLikes'" class="genre"> {{albumGenre}} • {{albumStyle}} </span>
+                    <span v-else class="author">Автор плейлиста: {{name}} </span>
+                    <span v-if="albumType === 'album' || albumType === 'albumsLikes'" class="date">Исполнитель: {{name}} • {{getCorrectDate(albumDate)}} </span>
                     <span v-else class="date"> </span>
                     <span class="more"> {{length}} </span>
                     <div style="display:flex; position:relative; height: 50px;">
                         <div @click="playAlbum(album)" class="playAll"> 
                             <span> Проигрывать весь альбом </span>
                         </div>
-                        <div v-if="albumType !== 'liked'" v-click-outside="changeShowMenu" id="menu" style="display:flex; position:relative; height: 50px;">
+                        <div v-if="albumType !== 'liked'" class="heart" :class="{AlbumLiked:Liked}" @click="LikeAlbumAndPlaylist()"> 
+                            <img v-if='!Liked' src="/static/mainapp/images/white-heart.svg">
+                            <img v-else src="/static/mainapp/images/orange heart.svg">
+                        </div>
+                        <div v-if="albumType !== 'liked' && albumType !== 'playlistsLikes' && albumType !== 'albumsLikes' && this.$route.path !== '/' && this.$route.params.id == this.$store.state.myPerformerID " v-click-outside="changeShowMenu" id="menu" style="display:flex; position:relative; height: 50px;">
                             <img class="menu" src="/static/mainapp/images/menu.svg" alt="больше" @click="showMenu = !showMenu">
                             <div v-show="showMenu">
                                 <ul  class="menu-dropdown" :key="index" v-for="(elem, index) in menu" >
@@ -33,7 +37,7 @@
         <vue-custom-scrollbar id='father' class="scroll-area"  :settings="settings">
             <div class="music">
                 <span style="width: 100%; text-alaight:center; display: block; text-align: center;" v-if="album.length === 0 && albumType === 'liked'">
-                    Неужели вам ничего не нравится? <br> Просто нажмите на сердечко рядом с понравившейся вам копозицией 
+                    Неужели вам ничего не нравится? <br> Просто нажмите на сердечко рядом с понравившейся вам копозицией!
                 </span>
                 <div :class="{currentTrc:current_trc===index}" class="track" :key="index" v-for="(track, index) in album" @click="playClick(track.id)">
                     <div v-if="track.img_trc" class="trc-logo"> 
@@ -44,7 +48,7 @@
                     <span class="time"> {{getCorrectTime(track.duration)}} </span>
                     <div class="trc-controll">
                         <span class="trc-controll-btn like" @click.stop="likeTrack(track, index)">
-                            <img v-if="!track.is_liked && albumType != 'liked'" src="/static/mainapp/images/empty-heart.svg" title="мне нравится">
+                            <img v-if="!track.is_liked && albumType !== 'liked'" src="/static/mainapp/images/empty-heart.svg" title="мне нравится">
                             <img v-else src="/static/mainapp/images/heart.svg" title="мне нравится">
                         </span>
                         <span class="trc-controll-btn add-to-playlist" @click.stop="current_trc=current_trc===index?null:index">
@@ -80,7 +84,7 @@ import userPlaylists from '../../../components/userPlaylists/userPlaylists.vue'
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 export default {
     name: 'trackList',
-    props: ['albumType', 'albumType', 'albumId', 'lable', 'albumName', 'albumGenre', 'albumStyle', 'albumDate', 'name', 'AlbumStatus'],
+    props: ['albumType', 'albumId', 'lable', 'AlbumStatus'],
     data() {
         return {
             album: [],
@@ -98,6 +102,12 @@ export default {
                 wheelPropagation: true,
                 wheelSpeed: 0.2,
             },
+            albumName: '',
+            name: '',
+            albumGenre: '',
+            albumStyle: '',
+            albumDate: new Date(),
+            Liked: false
         }
     },
     computed: {
@@ -120,8 +130,8 @@ export default {
         vueCustomScrollbar
     },
     watch: {
-        albumId: 'getData',
         albumType: 'getData',
+        albumId: 'getData',
         status: 'changeDeleted'
     },
     created() {
@@ -133,6 +143,7 @@ export default {
     },
     methods: {
         getData() {
+            console.log('чо')
             this.status = 'alive'
             if (!this.AlbumStatus)
             {
@@ -141,21 +152,38 @@ export default {
             }
             switch (this.albumType) {
                 case 'album':
+                    this.albumType = 'album'
                     this.getAlbum()
                     break;
                 case 'liked':
+                    this.albumType = 'liked'
                     this.getLiked()
                     break;
                 case 'playlist':
+                    this.albumType = 'playlist'
                     this.getPlaylist()
+                    break;
+                case 'playlistsLikes':
+                    this.albumType = 'playlistsLikes'
+                    this.getPlaylist()
+                    break;
+                case 'albumsLikes':
+                    this.albumType = 'albumsLikes'
+                    this.getAlbum()
                     break;
                 }
         },
         getAlbum() {
             var self = this
             this.$http.get('../api/albums/' + this.albumId).then(function(response){
+                    this.albumGenre = response.body.genre
+                    this.albumStyle = response.body.style
+                    this.albumDate = response.body.date_alb
+                    this.albumName = response.body.name_alb
+                    this.name = response.body.name_per
                 console.log('music',response.body)
                 self.album = []
+                self.Liked = response.body.is_liked
                 response.body.tracks.map(function(item){
                     self.album.push(item)
                 });
@@ -166,6 +194,8 @@ export default {
         getLiked() {
             var id = this.$route.params.id;
             this.$http.get('../api/likes', {params: {performer: id}}).then(function(response){
+                this.albumName = 'Мне нравится'
+                this.name = this.$store.state.username
                 console.log(response.body)
                 this.album = []
                 for(var i = 0; i < response.body.length; i++)
@@ -182,7 +212,10 @@ export default {
             var self = this
             console.log('playlists')
             this.$http.get('../api/playlists/' + this.albumId).then(function(response){
-                console.log(response.body.tracks)
+                console.log(response.body)
+                this.albumName = response.body.title
+                this.name = response.body.name_per
+                self.Liked = response.body.is_liked
                 self.album = []
                 response.body.tracks.map(function(item) {
                     self.album.push({name_trc: item.track.name_trc, performer: item.track.name_per,
@@ -226,6 +259,7 @@ export default {
            this.showDelateConfirmation=true 
         },
         changeDeleted() {
+            // this.$emit('updateLiked', true)
             if(this.status == 'dead')
             this.$emit('changeDeleted', this.albumId)
         },
@@ -247,6 +281,7 @@ export default {
             var self = this
             this.$http.delete('../api/playlist_tracks?playlist=' + this.albumId + '&track=' + trac_id).then(function(response){
                 console.log('спасибо папаша')
+                this.$bus.$emit('likeNot', 'вы удалили песню из плейлиста ' + this.albumName)
                 this.album.splice(index, 1)
                 this.albumLength(this.album)
             });
@@ -255,7 +290,9 @@ export default {
             switch (this.albumType) {
                 case 'liked':
                     this.dislike(track, index)
-                    this.album.splice(index, 1)
+                    if (this.$route.params.id == this.$store.state.myPerformerID)
+                        this.album.splice(index, 1)
+
                     this.albumLength(this.album)
                     break;
                 default:
@@ -268,19 +305,59 @@ export default {
         like(track, index) {
             this.$http.put('../api/likes', {}, {
                 params: {track_id: track.id},
-                headers: {'X-CSRFToken': this.$root.csrftoken}
             }).then(function(response){
                 this.album[index].is_liked = true
+                this.$bus.$emit('likeNot', 'вам понравилась песня ' + this.album[index].name_trc) //лайк
             }); 
         },
         dislike(track, index) {
             this.$http.delete('../api/likes', {
                 params: {track_id: track.id},
-                headers: {'X-CSRFToken': this.$root.csrftoken}
             }).then(function(response){
                 this.album[index].is_liked = false
+                this.$bus.$emit('likeNot', 'вам больше не нравится ' + this.album[index].name_trc) //лайк
             }); 
         },
+        LikeAlbumAndPlaylist() {
+            var url
+            switch (this.albumType) {
+                case 'album':
+                    url = '../api/album_likes?album='
+                    break;
+                case 'playlist':
+                    url = '../api/playlist_likes?playlist='
+                    break;
+                case 'albumsLikes':
+                    url = '../api/album_likes?album='
+                    break;
+                case 'playlistsLikes':
+                    url = '../api/playlist_likes?playlist='
+                    break
+            }
+            if (this.Liked)
+                this.AlbumDislike(url)
+            else
+                this.AlbumLiked(url)
+
+        },
+        AlbumLiked(url) {
+            this.$http.post(url + this.albumId)
+            .then(function(response){
+                this.Liked = true
+                // this.$emit('updateLiked', true)
+                this.$bus.$emit('updateLiked', true)
+                this.$bus.$emit('likeNot', 'вам понравился плейлист ' + this.albumName) //лайк
+            }); 
+        },
+        AlbumDislike(url) {
+            this.$http.delete(url + this.albumId)
+            .then(function(response){
+                this.Liked = false
+                // this.$emit('updateLiked', true)
+                this.$bus.$emit('updateLiked', true)
+                this.$bus.$emit('likeNot', 'вам больше не нравится ' + this.albumName) //лайк
+            }); 
+        }
     }
 }
 </script>

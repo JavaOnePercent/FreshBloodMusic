@@ -1,13 +1,14 @@
 <template>
     <div class="userPlaylists-Conteiner">
         <vue-custom-scrollbar id="inside" class="scroll-area"  :settings="settings">
-            <ul  class="menu-dropdown">
-                <li :key="index" v-for="(userPlaylist, index) in userPlaylists" @click="putToUserPlaylist(userPlaylist.id); $emit('close')">
+            <ul v-if='userPlaylists.length > 0'  class="menu-dropdown">
+                <li :key="index" v-for="(userPlaylist, index) in userPlaylists" @click="putToUserPlaylist(userPlaylist.id, index); $emit('close')">
                 {{userPlaylist.title}} 
                 <span class="tick" v-if='AddedTo(userPlaylist.id)' @click.stop=""> {{userPlaylist.title}} <img src="/static/mainapp/images/tick.svg"> </span>
                 <img v-else class="plus" src="/static/mainapp/images/orange_plus.svg">
                 </li>
             </ul>
+            <ul v-else  class="menu-dropdown"><li @click="$emit('close')">Вы можете создать плейлист в своём профиле в разделе "плейлисты"</li></ul> 
         </vue-custom-scrollbar>
     </div>
 </template>
@@ -49,11 +50,12 @@ export default {
                 });
             });
         },
-        putToUserPlaylist(id) {
+        putToUserPlaylist(id, index) {
             console.log(this.trc_id)
             var self = this
             this.$http.post('../api/playlist_tracks?playlist=' + id + '&track=' + this.trc_id).then(function(response){
                 console.log('спасибо папаша')
+                this.$bus.$emit('likeNot', 'вы добавили песню в плейлист ' + this.userPlaylists[index].title)
             });
         },
         getCoordinate() {

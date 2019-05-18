@@ -154,10 +154,6 @@ export default {
     {
         margin: 0;
     }
-    .btn
-    {
-        margin-top:29.3px;
-    }
     .previous-page
     {
         left: 93.5%;
@@ -189,7 +185,7 @@ export default {
     .text
     {
         float: left;
-        width: 45%;
+        width: 55%;
         text-align: left;
         position: relative;
     }
@@ -201,10 +197,6 @@ export default {
         line-height:60px;
     }
     .text :nth-child(5)
-    {
-        margin-top:37.3px;
-    }
-    .btn
     {
         margin-top:37.3px;
     }
@@ -273,7 +265,7 @@ export default {
 {
     cursor:default;
     position: relative;
-    font-size: 20px;
+    font-size: 17px;
 }
 .text :nth-child(2)
 {

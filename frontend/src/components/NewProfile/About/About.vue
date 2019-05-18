@@ -10,7 +10,9 @@
         </div>
 
         <div class="controll">
-            <div class="controll-btn"> Настройки </div>
+            <router-link to="/settings" v-if="this.$route.params.id == this.$store.state.myPerformerID">
+                <div class="controll-btn settings"> Настройки </div>
+            </router-link>
             <div class="controll-btn"> Статистика </div>
             <div class="controll-btn"> Уведомления </div>
         </div>

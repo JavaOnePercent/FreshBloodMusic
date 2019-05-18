@@ -7,7 +7,7 @@
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
                         <span class="time" id="time" @click="showGenre(filter, genre, style, 'time')" @mousedown="checkSort">времени</span>
-                        <span class="topic" id="topic" @click="showGenre(filter,genre, style, 'popularity')" @mousedown="checkSort">популярности</span>
+                        <span class="topic" id="topic" @click="showGenre(filter, genre, style, 'popularity')" @mousedown="checkSort">популярности</span>
                     </div>
                 </div>
             </div>
@@ -21,11 +21,11 @@
                     <div class="leftBevfore"></div>
                 </div>
                 <div id="music-style" class="music-style">
-                    <a  class="janr gen" name="" @click="showGenre('all')" :class="{'choseJanr':choseGenr==='all'}">Все</a>
-                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='recommended'}" name="" @click="showGenre('recommended')">Рекомендации</a>
-                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='favorite'}" name="" @click="showGenre('favorite')">Избранное</a>
+                    <a  class="janr gen" name="" @click="showGenre('all');  choseGenr ='all'; genre = null" :class="{'choseJanr':choseGenr==='all'}">Все</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='recommended'}" name="" @click="showGenre('recommended'); choseGenr ='recommended'">Рекомендации</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='favorite'}" name="" @click="showGenre('favorite'); choseGenr ='favorite' ">Избранное</a>
                     <div class=" janr" :class="{'choseJanr':choseGenr===gen.id}" :key="index" v-for="(gen, index) in genres" >
-                        <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id)" >{{gen.name_gnr}}</a>
+                        <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id); choseGenr = gen.id; choseGenrStyle = 'all'" >{{gen.name_gnr}}</a>
                     </div>
                 </div>
                 <div style="position:relative" v-if="needScroll('music-style') && !arrow.janrRight">
@@ -64,7 +64,7 @@
                 <div class="cover-cont">
                     <div class="play btn" @click="playClick(index)"><img src="/static/mainapp/images/playButton.svg" alt="play" title="воспроизвести"></div>
                     <div class="turn btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>
-                    <div class="album btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/album.svg" alt="tunr" title="перейти ко всему альбому"></div>                    
+                    <div class="album btn" @click="showAlbum = true; choseTrc=index "><img src="/static/mainapp/images/album.svg" alt="tunr" title="перейти ко всему альбому"></div>                    
                     <img class="cover" :src="compilation.image_alb" alt="обложка">
                     <img class="disk" :src="compilation.image_alb" alt="disk">
                 </div>
@@ -75,10 +75,22 @@
             </div>
         </div>
         </transition>
+
+
+    <div v-if="showAlbum">
+        <div class="album-modal">
+            <TrackList style="height: 80%; top:-15px; position: relative;" :albumType="'album'" :albumId="compilations[choseTrc].alb_id" :lable="compilations[choseTrc].image_alb"
+            :AlbumStatus='true'> </TrackList>
+        </div>
+        <div id='bg' class='bg' @click="showAlbum=false"></div>
+    </div>
+
+
     </div>
 </template>
 
 <script>
+import TrackList from '../NewProfile/TrackList/TrackList.vue'
 export default {
     name: 'main-compilation',
     data: function() {
@@ -90,11 +102,11 @@ export default {
             url: 'api/tracks',
             loading: false,
             sort: 'popularity',
-            genre: '',
+            genre: null,
             style: '',
             showsortbutton: true,
             showStyles: false,
-            choseGenr: '',
+            choseGenr: 'all',
             choseGenrStyle:'all',
             janreid: 0,
             filter: '',
@@ -103,13 +115,17 @@ export default {
                 janrRight: false,
                 styleLeft: false,
                 styleRight: false 
-            }
+            },
+            showAlbum: false,  //убрать если что
+            choseTrc: null
           //hoverClass: 'disk'
         }
     },
+    components: {
+        TrackList,
+    },
     mounted(){
         document.body.addEventListener("scroll", this.onScroll, false);
-
     },
     beforeDestroy () { 
         document.body.removeEventListener("scroll", this.onScroll, false);
@@ -184,9 +200,10 @@ export default {
         },
         showGenreStyle(styleId) {
             this.choseGenrStyle = styleId
-            this.showGenre('style', null, styleId)
+            this.showGenre('style', this.genres[this.janreid].id, styleId)
         },
         showGenre(filter, genre = null, style = null, sort = null, updateUrl=true) {
+            console.log(filter, genre, style)
           this.loading = true;
           var obj = {};
           if (updateUrl) {
@@ -195,15 +212,17 @@ export default {
           //{
             this.url = 'api/tracks';
             this.compilations = [];
-            this.choseGenr= filter;
+            // this.choseGenr= filter;
             if(genre !== null) {
                 this.genre = genre;
-                this.choseGenr=genre;
+                // this.choseGenr=genre;
                 if (!(isNaN(this.genre))) {
                     this.getGengeAndStyles(this.genre);
+                    console.log('1')
                 }
                 else {
                     this.getGengeAndStyles()
+                    console.log('2')
                 }
                 this.style = null;
             }
@@ -257,6 +276,7 @@ export default {
             }, function(error){
                 this.loading = false;
             })
+            console.log('genre', this.genre)
         },
         toQueueClick: function(index) {
             //this.$emit('trackclicked');
@@ -277,16 +297,17 @@ export default {
                     this.genres = response.data;
                     this.styles = null;
                 }
-                else
+                else {
                     this.styles = response.data;
                     if(this.styles!=null && this.styles.length!=0 )
                     {
-                        this.showStyles=true;
+                        this.showStyles = true;
                     }
                     else
                     {
                         this.showStyles=false;
                     }
+                }
             }, function(error){
             })
         }
@@ -822,4 +843,29 @@ export default {
 .style-leave-active {
   transform: translatey(40px);
 } */
+
+
+.album-modal
+{
+    z-index: 9999;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    width: 650px;
+    max-height: 800px;
+}
+.bg
+{
+    bottom: 0px;
+    z-index: 9998;
+    position: fixed;
+    overflow-y: hidden;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
 </style>

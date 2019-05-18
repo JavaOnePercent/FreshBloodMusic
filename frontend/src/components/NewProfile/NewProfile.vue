@@ -1,22 +1,24 @@
 <template>
-    <div v-if="!error" style="width:100%; height:calc(100% - 55px); background-color: rgb(189, 176, 208);top:55px; position: relative">
+    <div v-if="!error" style="width:100%; height:calc(100% - 55px); background-color: rgb(215, 215, 240);top:55px; position: relative">
         <div class="ProfileConteiner">
             <div style="width: 350px; background-color: rgba(255, 255, 255,0.6);"> 
                 <UserAlbums @changeAlbum="albumId=$event" @changeAlbumLable="albumLable=$event"
                 @changeAlbumName="albumName=$event" @changeAlbumGenre="albumGenre=$event" @changeAlbumDate="albumDate=$event"
                 @changeAlbumStyle='albumStyle=$event' @changeAlbumType='albumType=$event'
-                :deleted='deleted' @changeAlbumStatus='AlbumStatus=!$event' :playlist_created='playlist_created' @playlist_created='playlist_created=$event'> </UserAlbums>
+                :deleted='deleted' @changeAlbumStatus='AlbumStatus=!$event' :playlist_created='playlist_created'
+                @playlist_created='playlist_created=$event'> </UserAlbums>
             </div>
             <div class="rightColumn">
                 <About :logo="logo" :name="name" :description="description"> </About>
-                <TrackList v-if="albumType !== 'AddPlaylist'" style="height: 63%" :albumType="albumType" :albumId="albumId" :lable="albumLable" :albumName='albumName'
-                :albumGenre='albumGenre' :albumStyle='albumStyle' :albumDate='albumDate' :name='name' @changeDeleted='deleted=$event' :AlbumStatus='AlbumStatus'> </TrackList>
+                <TrackList  v-if="albumType !== 'AddPlaylist'" style="height: 63%; padding-left:15px" :albumType="albumType" :albumId="albumId" :lable="albumLable" :albumName='albumName'
+                :albumGenre='albumGenre' :albumStyle='albumStyle' :albumDate='albumDate' :name='name'
+                @changeDeleted='deleted=$event' :AlbumStatus='AlbumStatus'> </TrackList>
                 <CreatePlayList @playlist_created='playlist_created=$event' v-else> </CreatePlayList>
             </div>
         </div>
     </div>
-    <div v-else style="width:100%; height:calc(100% - 55px); background-color: rgb(189, 176, 208);top:55px; position: relative">
-        Ты забрался так далеко, и ради чего?
+    <div v-else style="width:100%; height:calc(100% - 55px); background-color: rgb(215, 215, 240);top:55px; position: relative" class="error">
+        <h1>Ты забрался так далеко, и ради чего?</h1>
     </div>
 </template>
 
@@ -45,7 +47,7 @@ export default {
             deleted: null,
             AlbumStatus: true,
             playList: false,
-            playlist_created: false
+            playlist_created: false,
         }
     },
     components: {
@@ -107,5 +109,13 @@ export default {
     /* width: 793px; */
     width: 60%;
     flex-direction: column;
+}
+.error h1
+{
+    margin: 0;
+    top: 45px;
+    display: block;
+    text-align: center;
+    position: relative;
 }
 </style>

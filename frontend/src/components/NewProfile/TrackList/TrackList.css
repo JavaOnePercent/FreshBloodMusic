@@ -1,6 +1,6 @@
 .trackListConteiner
 {
-    padding-left: 15px;
+    /* padding-left: 15px; */
     min-width: 519px;
 }
 .smile
@@ -303,4 +303,38 @@
     top: 15px;
     position: relative;
     padding-top:3px; 
+}
+.heart
+{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    margin-top: 5px;
+    margin-left: 10px;
+    box-sizing: border-box;
+    position: relative;
+    border: 2.5px solid rgb(255, 181, 43);
+    /* background-color: rgb(255,255,255); */
+    background-color: rgb(255, 181, 43);
+}
+.heart:hover
+{
+    cursor: pointer;
+    background-color: rgb(226, 160, 38);
+    border: 2.5px solid rgb(226, 160, 38);
+}
+.heart img
+{
+    width: 23px;
+    height: 23px;
+    top: 3px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    margin: auto
+}
+.AlbumLiked
+{
+    background-color: white !important;
 }

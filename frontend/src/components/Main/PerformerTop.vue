@@ -1,19 +1,20 @@
 <template>
     <div class="performer-top" @mouseenter="mouseEnter" @mouseleave="mouseLeave">
         
-        <div class="prev-button" v-show="isHovered" @click="show('prev')"></div>
-        <div class="next-button" v-show="isHovered" @click="show('next')"></div>
+        <div class="prev-button" v-show="isHovered" @click="show('prev')"> <img src="/static/mainapp/images/up.svg"></div>
+        <div class="next-button" v-show="isHovered" @click="show('next')"> <img src="/static/mainapp/images/down.svg"></div>
         <div class="performers">
-            <transition :name="animation" mode="in-out">
-                <div v-if="compositors[0]" v-show="showDiv" @click="goToPerformer(compositors[0].id)" class="performer">
+            <transition-group :name="animation" mode="in-out">
+                <div v-show="currInd===index" :key="index" v-for='(performer, index) in performers' @click="goToPerformer(performer.id)" class="performer">
                     <label class="performer-text">
-                        Лучший исполнитель этого месяца
+                        Лучший исполнитель по мнению слушателей
+                        <!-- {{currInd + 1}} место -->
                     </label>
-                    <img class="performer-image" :src="compositors[0].image_per" alt="обложка">
-                    <label class="performer-name">{{ compositors[0].name_per}}</label>
+                    <img class="performer-image" :src="performer.image_per" alt="обложка">
+                    <label class="performer-name">{{ performer.name_per}}</label>
                 </div>
-            </transition>
-            <transition :name="animation" mode="out-in">
+            </transition-group>
+            <!-- <transition :name="animation" mode="out-in">
                 <div v-if="compositors[1]" v-show="!showDiv" @click="goToPerformer(compositors[1].id)" class="performer">
                     <label class="performer-text">
                         Лучший исполнитель этого месяца
@@ -21,7 +22,7 @@
                     <img class="performer-image" :src="compositors[1].image_per" alt="обложка">
                     <label class="performer-name">{{ compositors[1].name_per}}</label>
                 </div>
-            </transition>
+            </transition> -->
         </div>
     </div>
 </template>
@@ -37,7 +38,8 @@ export default {
             animation: "",
             showDiv: true,
             isTimeout: false,
-            autoFlip: null
+            autoFlip: null,
+            currInd: 0
         }
     },
     watch: {
@@ -57,27 +59,31 @@ export default {
             return arr;
         },
         carousel(sD) {
-            if(sD)
-                if(this.compositors[0] === this.performers[this.performers.length - 1])
-                    this.compositors[1] = this.performers[0]
-                else if(this.compositors[1] === this.performers[this.performers.length - 1])
-                    this.compositors[1] = this.performers[1]
-                else
-                    this.compositors[1] = this.performers[this.performers.indexOf(this.compositors[1]) + 2]
+            // if(sD)
+            //     if(this.compositors[0] === this.performers[this.performers.length - 1])
+            //         this.compositors[1] = this.performers[0]
+            //     else if(this.compositors[1] === this.performers[this.performers.length - 1])
+            //         this.compositors[1] = this.performers[1]
+            //     else
+            //         this.compositors[1] = this.performers[this.performers.indexOf(this.compositors[1]) + 2]
+            // else
+            //     if(this.compositors[1] === this.performers[this.performers.length - 1])
+            //         this.compositors[0] = this.performers[0]
+            //     else if(this.compositors[0] === this.performers[this.performers.length - 1])
+            //         this.compositors[0] = this.performers[1]
+            //     else
+            //         this.compositors[0] = this.performers[this.performers.indexOf(this.compositors[0]) + 2]
+            if((this.performers.length-1)===this.currInd)
+                this.currInd = 0
             else
-                if(this.compositors[1] === this.performers[this.performers.length - 1])
-                    this.compositors[0] = this.performers[0]
-                else if(this.compositors[0] === this.performers[this.performers.length - 1])
-                    this.compositors[0] = this.performers[1]
-                else
-                    this.compositors[0] = this.performers[this.performers.indexOf(this.compositors[0]) + 2]
+            this.currInd++
         },
         updatePosts: function () {
             if(!this.isTimeout)
             {
                 this.isTimeout = true
                 var self = this
-                setTimeout(function() { self.isTimeout=false }, 500);
+                setTimeout(function() { self.isTimeout=false }, 200);
                 this.showDiv=!this.showDiv
                 this.animation = "animation";
             }
@@ -91,11 +97,11 @@ export default {
                     this.animation = "animation1";
                 this.isTimeout = true;
                 var self = this
-                setTimeout(function() { self.isTimeout=false }, 500);
+                setTimeout(function() { self.isTimeout=false }, 200);
                 //this.animation = "";
-                this.showDiv=!this.showDiv
+                this.showDiv = !this.showDiv
                 clearInterval(this.autoFlip)
-                this.autoFlip = setInterval(this.updatePosts, 7000);
+                this.autoFlip = setInterval(this.updatePosts, 6000);
             }
         },
         mouseEnter() {
@@ -106,7 +112,7 @@ export default {
         },
         showBest() {
             this.$http.get('api/performers').then(response => {
-                //console.log(response.data)
+                console.log('performers', response.data)
                 
                 this.performers = this.shuffle(response.data)
                 this.compositors = [this.performers[0], this.performers[1]]
@@ -121,7 +127,7 @@ export default {
     created() {
         this.showBest()
         var self = this
-        setTimeout(function() { self.autoFlip = setInterval(self.updatePosts, 7000); }, 3500);
+        setTimeout(function() { self.autoFlip = setInterval(self.updatePosts, 6000); }, 3500);
         
     }
 }
@@ -202,13 +208,17 @@ export default {
     width: 100%;
     height: 35px;
     z-index: 50;
-    background-image: url(/static/mainapp/images/up.svg);
-    /* background-image: url(/static/mainapp/up.svg), linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0)); */
-    background-size: 35px;
+    /* background-image: url(/static/mainapp/images/up.svg); */
+    background-image:linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
+    /* background-size: 35px;
     background-position: top center;
-    background-repeat: no-repeat;
+    background-repeat: no-repeat; */
     border: none;
     cursor: pointer;
+}
+.prev-button img
+{
+    width: 25px;
 }
 
 .next-button 
@@ -219,12 +229,16 @@ export default {
     width: 100%;
     height: 35px;
     z-index: 50;
-    background-image:url(/static/mainapp/images/down.svg);
-    /* background-image:url(/static/mainapp/down.svg), linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0)); */
-    background-size: 35px;
+    /* background:url(/static/mainapp/images/left.png), linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
+    background-image:url(/static/mainapp/images/down.svg); */
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.0));
+    /* background-size: 35px;
     background-position: bottom center;
-    background-repeat: no-repeat;
+    background-repeat: no-repeat; */
     cursor: pointer;
+}
+.next-button  img{
+    width: 25px;
 }
 
 .performer-name

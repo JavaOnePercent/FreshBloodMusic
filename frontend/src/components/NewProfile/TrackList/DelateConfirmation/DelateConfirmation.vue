@@ -50,11 +50,13 @@ export default {
         deleteAlbum() {
             this.$http.delete('../api/albums/' + this.albumId, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(
                 response => {
+                this.$bus.$emit('updateLiked', true)
             })
         },
         deletePlaylist() {
             this.$http.delete('../api/playlists/' + this.albumId, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(
                 response => {
+                this.$bus.$emit('updateLiked', true)
             })
         }
     }
