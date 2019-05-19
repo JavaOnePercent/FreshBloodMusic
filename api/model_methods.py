@@ -240,8 +240,8 @@ class TrackHistoryMethods:
                 last = last.id
                 count = history.count()
                 for hist in history:
-                    if count > 49:
-                        hist.delete()  # здесь бы надо закодить, чтобы переписывать старые записи из таблицы, а не все время плодить новые индексы
+                    if count > 9:
+                        hist.delete()
                         count -= 1
             TrackHistory.objects.filter(user_id=user, trc_id=track).delete()
             TrackHistory(user_id=user, trc_id=track).save()
@@ -277,6 +277,7 @@ class TrackRecommendation:
     @staticmethod
     def get_recommendation(user_id):
         liked_tracks = LikedTrack.objects.filter(user_id=user_id).values_list('trc_id', 'plays_amount')
+        track_ids = []
         if liked_tracks.count() > 0:
             plays_amount = 0
             user_features = 0
@@ -287,23 +288,24 @@ class TrackRecommendation:
                 plays_amount += liked_track[1]
             user_features /= plays_amount
 
-        tracks = Track.objects.all().values_list('id')
-        features_list = []
-        for track in tracks:
-            features = np.load('features/' + str(track[0]) + '.npy')
-            features_list.append(features)
+            history_tracks = TrackHistory.objects.all().filter(user_id=user_id).values_list('trc_id')
 
-        data = np.array(features_list)
-        index = nmslib.init(method='hnsw', space='cosinesimil')
-        index.addDataPointBatch(data)
-        index.createIndex({'post': 2})
+            tracks = Track.objects.filter(~Q(id__in=history_tracks)).values_list('id')
+            features_list = []
+            for track in tracks:
+                features = np.load('features/' + str(track[0]) + '.npy')
+                features_list.append(features)
 
-        # query for the nearest neighbours of the first datapoint
-        ids, distances = index.knnQuery(data[0], k=10)
+            data = np.array(features_list)
+            index = nmslib.init(method='hnsw', space='cosinesimil')
+            index.addDataPointBatch(data)
+            index.createIndex({'post': 2})
 
-        track_ids = []
-        for id in ids:
-            track_ids.append(tracks[int(id)][0])
+            # query for the nearest neighbours of the first datapoint
+            ids, distances = index.knnQuery(user_features, k=12)
+
+            for id_ in ids:
+                track_ids.append(tracks[int(id_)][0])
 
         # print(len(track_ids), track_ids)
         return track_ids

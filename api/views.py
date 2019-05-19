@@ -198,7 +198,7 @@ class TrackDetail(APIView):
             trc_plays = TrackPlaysAmount.objects.create(trc_id=track)
         trc_plays.amount += 1
         trc_plays.save()
-        user_id = auth.get_user(request).id
+        user_id = auth.get_user(request)
         serializer = TrackSerializer(track)
         is_liked = LikedTrackMethods.check_if_liked(user_id, track.id)
         data = dict(serializer.data)
