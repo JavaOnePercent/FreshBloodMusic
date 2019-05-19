@@ -11,6 +11,8 @@ import main from './components/Main.vue'
 import registration from './components/Registration.vue'
 import login from './components/Login.vue'
 
+import NewProfile from './components/NewProfile/NewProfile.vue'
+
 Vue.use(VueCookie);
 
 Vue.use(VueRouter)
@@ -52,7 +54,7 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         historyTracks: [],
         username: '',
         myPerformerID: 0,
-        currentTrack: null
+        currentTrack: null,
     },
     mutations: {
         currentTime (state, val) {
@@ -145,7 +147,7 @@ const router = new VueRouter({
     routes: [
         { path: '/register', component: registration },
         { path: '/login', component: login },
-        { path: '/performers/:id', name: 'performer', component: profile },
+        { path: '/performers/:id', name: 'performer', component: NewProfile },
         { path: '/settings', component: settings },
         { path: '/', component: main },
     ],
@@ -171,3 +173,12 @@ new Vue({
     }
 
 }).$mount('#app')
+Vue.directive('click-outside', {
+    bind(el, binding) {
+        el.addEventListener('click', e => e.stopPropagation());
+        document.body.addEventListener('click', binding.value);
+    },
+    unbind(el, binding) {
+        document.body.removeEventListener('click', binding.value);
+    }
+});

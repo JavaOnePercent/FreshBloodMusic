@@ -1,0 +1,91 @@
+
+.userAlbumsConteiner
+{
+    position: relative;
+    /* height: calc(100% + 55px); */
+    /* height: 100%; */
+    min-height: 100%;
+    width: 350px;
+    /* background-color: rgba(255, 255, 255,0.6); */
+    padding: 15px;
+    padding-bottom:55px;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    align-content: flex-start;
+    overflow: hidden;
+    /* padding-bottom: 125px;  */
+}
+.category-name
+{
+    font-size: 25px;
+    width: 100%;
+    padding: 0 10px;
+    cursor: default;
+}
+.music
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+.album
+{
+    top: 10px;
+    width: 160px;
+    height: 190px;
+    margin-bottom: 15px;
+    position: relative;
+    /* box-sizing: border-box; */
+}
+.album img
+{
+    width: 140px;
+    height: 140px;
+    margin: auto;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+}
+.album-name
+{
+    margin: auto;
+    position: absolute;
+    top: 157px;
+    text-align: center;
+    width: 100%;
+    font-size: 13px;
+    cursor: inherit;
+}
+.album:not([class*="chousen"]):hover
+{
+    outline: 3px solid rgba(255, 181, 43, 0.5);
+    cursor: pointer;
+    /* border: 2px solid rgb(255, 181, 43); */
+}
+.chousen
+{
+    outline: 3px solid rgb(255, 181, 43);
+    cursor: default;
+}
+.dead
+{
+    opacity: 0.4;
+    filter: grayscale(100%);
+}
+.addPlaylist
+{
+    opacity: 0.6;
+    background-color: rgb(204, 204, 204);
+    padding: 25px;
+    box-sizing: border-box;
+}
+.scroll-area {
+    position: relative;
+    margin: auto;
+    width: 600px;
+    height: 400px;
+    height: 100%;
+    width: 350px;
+}

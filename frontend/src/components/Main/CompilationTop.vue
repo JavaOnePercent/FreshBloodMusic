@@ -6,56 +6,91 @@
                     <label class="sortirovka-name">Рекомендации</label>
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <span class="time" id="time" @click="showGenre(genre, style, 'time')" @mousedown="checkSort">времени</span>
-                        <span class="topic" id="topic" @click="showGenre(genre, style, 'popular')" @mousedown="checkSort">популярности</span>
+                        <span class="time" id="time" @click="showGenre(filter, genre, style, 'time')" @mousedown="checkSort">времени</span>
+                        <span class="topic" id="topic" @click="showGenre(filter, genre, style, 'popularity')" @mousedown="checkSort">популярности</span>
                     </div>
                 </div>
             </div>
          <div class="music-style-conteiner">
-                <img id="next" class="next" @click="leftScrol" src="/static/mainapp/images/left.png"/>
-                <div class="leftBevfore"></div>
+            <div  style="display: flex;
+                    max-width: 1143px; 
+                    min-width: 775px;
+                    margin: 0 auto">
+                <div style="position:relative"  v-if="needScroll('music-style') && !arrow.janrLeft">
+                    <img id="next" class="next" @click="leftScrol('music-style')" src="/static/mainapp/images/left.png"/>
+                    <div class="leftBevfore"></div>
+                </div>
                 <div id="music-style" class="music-style">
-                    <a  class="janr gen" name="" @click="showGenre('all')" :class="{'choseJanr':choseGenr==='all'}">Все</a>
-                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='rec'}" name="" @click="showGenre('rec')">Рекомендации</a>
-                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='fav'}" name="" @click="showGenre('fav')">Избранное</a>
+                    <a  class="janr gen" name="" @click="showGenre('all');  choseGenr ='all'; genre = null" :class="{'choseJanr':choseGenr==='all'}">Все</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='recommended'}" name="" @click="showGenre('recommended'); choseGenr ='recommended'">Рекомендации</a>
+                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='favorite'}" name="" @click="showGenre('favorite'); choseGenr ='favorite' ">Избранное</a>
                     <div class=" janr" :class="{'choseJanr':choseGenr===gen.id}" :key="index" v-for="(gen, index) in genres" >
-                        <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id)" >{{gen.name_gnr}}</a>
+                        <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id); choseGenr = gen.id; choseGenrStyle = 'all'" >{{gen.name_gnr}}</a>
                     </div>
                 </div>
-                <img id="previous" class="previous" @click="rightScrol" src="/static/mainapp/images/right.png"/>
-                <div class="rightBevfore"></div>
+                <div style="position:relative" v-if="needScroll('music-style') && !arrow.janrRight">
+                    <img id="previous" class="previous" @click="rightScrol('music-style')" src="/static/mainapp/images/right.png"/>
+                    <div class="rightBevfore"></div>
+                </div>
             </div>
-          <transition name="style">
+        </div>
+            <transition name="style">
                 <div v-if="showStyles" class="janrStyles-conteiner">
-                <!-- <div  class="janrStyles-conteiner"> -->
-                    <div class="janrStyles">
-                        <a style=" white-space: nowrap" class="janr gen"  @click="showGenre(genres[cock].id)">Все из {{genres[cock].name_gnr}}</a>
-                        <div class=" janr" :key="index" v-for="(sty, index) in styles">
-                            <a style=" white-space: nowrap" :name="sty.id" @click="showGenre(null, sty.id)">{{sty.name_stl}}</a>
+                    <div style="display: flex;
+                                max-width: 1143px; 
+                                min-width: 775px;
+                                margin: 0 auto">
+                        <div style="position:relative"  v-if="needScroll('janrStyles') && !arrow.styleLeft">
+                            <img id="next" class="next" style="background-color:rgb(211, 147, 29)" @click="leftScrol('janrStyles')" src="/static/mainapp/images/left.png"/>
+                            <div style="background: linear-gradient(to left, rgba(66, 160, 189, 0), rgba(211, 147, 29,1));" class="leftBevfore"></div>
+                        </div>
+                        <div id="janrStyles" class="janrStyles">
+                            <a style="white-space: nowrap" :class="{'choseJanr':choseGenrStyle==='all'}" class="janr gen"  @click="showGenre('genre', genres[janreid].id); choseGenrStyle = 'all'">Все из {{genres[janreid].name_gnr}}</a>
+                            <div class="janr" :class="{'choseJanr':choseGenrStyle===sty.id}" :key="index" v-for="(sty, index) in styles">
+                                <a style=" white-space: nowrap" :name="sty.id" @click="showGenreStyle(sty.id)">{{sty.name_stl}}</a>
+                            </div>
+                        </div>
+                        <div style="position:relative" v-if="needScroll('janrStyles') && !arrow.styleRight">
+                            <img style="background-color:rgb(211, 147, 29)" id="previous" class="previous" @click="rightScrol('janrStyles')" src="/static/mainapp/images/right.png"/>
+                            <div style="background: linear-gradient(to left,rgba(211, 147, 29,1), rgba(66, 160, 189, 0));" class="rightBevfore"></div>
                         </div>
                     </div>
                 </div>
             </transition>
         </div>
-        <div class="compilation convert" ref="list">
+        <transition name="style2">
+        <div v-if="compilations.length >= 1" class="compilation convert" ref="list">
             <div class="music" :key="index" v-for="(compilation, index) in compilations">
-             <div class="cover-cont">
-                <div class="play btn" @click="playClick(index)"><img src="/static/mainapp/images/playButton.svg" alt="play" title="воспроизвести"></div>
-                <div class="turn btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>
-                <div class="album btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/album.svg" alt="tunr" title="перейти ко всему альбому"></div>                    
-                <img class="cover" :src="compilation.image_alb" alt="обложка">
-                <img class="disk" :src="compilation.image_alb" alt="disk">
-            </div>
-            <div class="name-cont">
-                <span :title="compilation.name_trc" class="group-name">{{ compilation.name_trc}}</span>
-                <span class="music-name" @click="toPerformerPage(compilation.id_per)">{{ compilation.name_per}}</span>
+                <div class="cover-cont">
+                    <div class="play btn" @click="playClick(index)"><img src="/static/mainapp/images/playButton.svg" alt="play" title="воспроизвести"></div>
+                    <div class="turn btn" @click="toQueueClick(index)"><img src="/static/mainapp/images/playlist.svg" alt="tunr" title="в очередь"></div>
+                    <div class="album btn" @click="showAlbum = true; choseTrc=index "><img src="/static/mainapp/images/album.svg" alt="tunr" title="перейти ко всему альбому"></div>                    
+                    <img class="cover" :src="compilation.image_alb" alt="обложка">
+                    <img class="disk" :src="compilation.image_alb" alt="disk">
+                </div>
+                <div class="name-cont">
+                    <span :title="compilation.name_trc" class="group-name">{{ compilation.name_trc}}</span>
+                    <span class="music-name" @click="toPerformerPage(compilation.id_per)">{{ compilation.name_per}}</span>
+                </div>
             </div>
         </div>
+        </transition>
+
+
+    <div v-if="showAlbum">
+        <div class="album-modal">
+            <TrackList style="height: 80%; top:-15px; position: relative;" :albumType="'album'" :albumId="compilations[choseTrc].alb_id" :lable="compilations[choseTrc].image_alb"
+            :AlbumStatus='true'> </TrackList>
+        </div>
+        <div id='bg' class='bg' @click="showAlbum=false"></div>
     </div>
+
+
     </div>
 </template>
 
 <script>
+import TrackList from '../NewProfile/TrackList/TrackList.vue'
 export default {
     name: 'main-compilation',
     data: function() {
@@ -64,17 +99,30 @@ export default {
             compilations:[],
             genres:[],
             styles:[],
-            url: 'track?genre=all&sort=0',
+            url: 'api/tracks',
             loading: false,
-            sort: 'popular',
-            genre: '',
+            sort: 'popularity',
+            genre: null,
             style: '',
             showsortbutton: true,
             showStyles: false,
-            choseGenr: '',
-            cock: 0
+            choseGenr: 'all',
+            choseGenrStyle:'all',
+            janreid: 0,
+            filter: '',
+            arrow: {
+                janrLeft: false,
+                janrRight: false,
+                styleLeft: false,
+                styleRight: false 
+            },
+            showAlbum: false,  //убрать если что
+            choseTrc: null
           //hoverClass: 'disk'
         }
+    },
+    components: {
+        TrackList,
     },
     mounted(){
         document.body.addEventListener("scroll", this.onScroll, false);
@@ -84,22 +132,50 @@ export default {
     },
     methods: {
         showHer(index, id) {
-            this.cock = index
-            this.showGenre(id)
+            this.janreid = index
+            this.showGenre('genre', id)
         },
-        leftScrol()
+        needStyleScroll(value) {
+            if (document.getElementById(value)) {
+                var block = document.getElementById(value);
+                var leftScroll = block.scrollLeft === 0
+                var rightScroll = block.scrollWidth - block.scrollLeft ==  block.clientWidth
+                if(value === 'music-style') {
+                    this.arrow.janrLeft = leftScroll ? true : false
+                    this.arrow.janrRight = rightScroll? true : false 
+                } else {
+                    console.log(block.scrollLeft)
+                    this.arrow.styleLeft = leftScroll ? true : false
+                    this.arrow.styleRight = rightScroll? true : false 
+                }
+            }
+        },
+        needScroll(value)
         {
-            document.getElementById('music-style').scrollLeft -= 300;
+            this.needStyleScroll(value)
+            if (document.getElementById(value)) {
+                var block = document.getElementById(value);
+                var hasHorScroll = block.scrollWidth > block.clientWidth;
+                return hasHorScroll
+            }
         },
-        rightScrol()
+        leftScrol(value)
         {
-            document.getElementById('music-style').scrollLeft += 300;
+            console.log(document.getElementById(value).scrollLeft)
+            document.getElementById(value).scrollLeft -= 300;
+            this.needStyleScroll(value)
         },
-      
+        rightScrol(value)
+        {
+            console.log(document.getElementById(value))
+            document.getElementById(value).scrollLeft += 300;
+            console.log('вонючий гей', document.getElementById(value).offsetWidth - 300 )
+            this.needStyleScroll(value)
+        },
         toPerformerPage(id) {
             this.$router.push({ name: 'performer', params: { id: id }})
         },
-        checkSort(e)
+       checkSort(e)
         {
             e.preventDefault();
             document.getElementById('time').style="background-color: rgba(192,192,192,0);border-bottom: none;line-height: 1";
@@ -118,44 +194,63 @@ export default {
             //console.log(diffHeight, scrollTop);
             if(diffHeight <= scrollTop && !this.loading) {
                 if(this.url != null)
-                    this.showGenre();
+                    this.showGenre(null,null,null,null,false);
             }
 
         },
-        showGenre: function(message1 = null, message2 = null, message3 = null) {
+        showGenreStyle(styleId) {
+            this.choseGenrStyle = styleId
+            this.showGenre('style', this.genres[this.janreid].id, styleId)
+        },
+        showGenre(filter, genre = null, style = null, sort = null, updateUrl=true) {
+            console.log(filter, genre, style)
           this.loading = true;
           var obj = {};
-          if(message1 != null || message2 != null)
-          {
+          if (updateUrl) {
+            this.filter = filter
+          //if(genre != null || style != null)
+          //{
             this.url = 'api/tracks';
             this.compilations = [];
-            if(message1 != null) {
-                this.genre = message1;
-                this.choseGenr=message1;
+            // this.choseGenr= filter;
+            if(genre !== null) {
+                this.genre = genre;
+                // this.choseGenr=genre;
                 if (!(isNaN(this.genre))) {
                     this.getGengeAndStyles(this.genre);
+                    console.log('1')
                 }
                 else {
                     this.getGengeAndStyles()
+                    console.log('2')
                 }
                 this.style = null;
             }
-            if(message2 != null) {
-                this.style = message2;
-                this.genre = null;
+            else if(style === null)
+            {
+                this.showStyles = false;
             }
-            if(message3 != null) {
-                this.sort = message3;
+            if(style !== null) {
+                this.style = style;
             }
-            if(this.genre === 'rec' || this.genre === 'fav') {
+            
+            if(sort !== null) {
+                this.sort = sort;
+            }
+            if(filter === 'recommended' || filter === 'favorite') {
                 this.showsortbutton = false;
             }
             else {
                 this.showsortbutton = true;
             }
-            obj = {params: {gen: this.genre, sty: this.style, sort: this.sort}}
+            obj = {params: {
+                filter: this.filter,
+                genre: this.genre, 
+                style: this.style, 
+                sort: this.sort
+            }}
           }
-          this.$http.get(this.url, obj/*{params: {genre: message}}*/).then(function(response){
+          this.$http.get(this.url, obj).then(function(response){
                 this.compilation = response.body.results;
                 for(var i = 0; i < this.compilation.length; i++)
                 {
@@ -181,6 +276,7 @@ export default {
             }, function(error){
                 this.loading = false;
             })
+            console.log('genre', this.genre)
         },
         toQueueClick: function(index) {
             //this.$emit('trackclicked');
@@ -194,7 +290,6 @@ export default {
 				id: this.compilations[index].id
 			});
         },
-        //для Илюши
         getGengeAndStyles: function (message = null) {
             this.$http.get('api/genre', {params: {id: message}}).then(function(response){
                 // console.log(response.data)
@@ -202,16 +297,17 @@ export default {
                     this.genres = response.data;
                     this.styles = null;
                 }
-                else
+                else {
                     this.styles = response.data;
                     if(this.styles!=null && this.styles.length!=0 )
                     {
-                        this.showStyles=true;
+                        this.showStyles = true;
                     }
                     else
                     {
                         this.showStyles=false;
                     }
+                }
             }, function(error){
             })
         }
@@ -235,7 +331,7 @@ export default {
 }
 .recommendations .music-style, .recommendations .janrStyles
 {
-    flex-basis: 100px;
+    /* flex-basis: 100px; */
     display: flex;
     height: 40px;
     font-size: 20px;
@@ -332,11 +428,11 @@ export default {
     margin: 0 auto;
     position: relative;
     display: block;
-    justify-content: center; 
+    justify-content: center;
+    z-index: 100;
 }
 .music-style
 { 
-    scroll-behavior: smooth;
     display: block;
     /* background-color: rgb(85, 85, 85); */
     position: relative;
@@ -344,15 +440,18 @@ export default {
     /* padding-left: 15px;
     padding-right: 15px; */
     box-sizing: border-box;
-    margin: 0 auto;
-    max-width: 1143px; 
-    min-width: 775px;
+    /* margin: 0 auto; */
+    /* max-width: 1143px; 
+    min-width: 775px; */
+    width: 100%;
     color: white;
     overflow-x: scroll;
     white-space: nowrap;
     -ms-overflow-style: none;
+    padding-left: 15px;
+    padding-right: 15px;
 }
-.music-style::-webkit-scrollbar { display: none; }
+.music-style::-webkit-scrollbar, .janrStyles::-webkit-scrollbar { display: none; }
 
 .janrStyles-conteiner
 {
@@ -368,20 +467,32 @@ export default {
     margin: 0 auto;
     position: relative;
     justify-content: center;
+    z-index: 80;
 }
 
 .janrStyles
 {
-    justify-content:unset;
+    /* justify-content:unset;
     position: relative;
     height: 40px;
-    /* padding-left: 15px;
-    padding-right: 15px; */
+    padding-left: 15px;
+    padding-right: 15px;
     box-sizing: border-box;
     margin: 0 auto;
     max-width: 1143px; 
     min-width: 915px; 
+    color: white; */
+
+    box-sizing: border-box;
+    width: 100%;
     color: white;
+    overflow-x: scroll;
+    white-space: nowrap;
+    -ms-overflow-style: none;
+    padding-left: 15px;
+    padding-right: 15px;
+    white-space: nowrap;
+    -ms-overflow-style: none;
 }
 .janrStyles .janr:hover
 {
@@ -412,7 +523,7 @@ export default {
     border-bottom: 5px solid rgb(126, 50, 44);
     box-sizing: border-box; 
     line-height: 1.8;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.25)
+    /* box-shadow: 0 3px 6px rgba(0,0,0,0.25) */
     /* box-shadow: 0 6px 12px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22); */
 }
 .choseJanr
@@ -420,6 +531,7 @@ export default {
     border-bottom: 5px solid rgb(126, 50, 44);
     box-sizing: border-box; 
     line-height: 1.8;
+    position: relative;
 }
 .gen
 {
@@ -658,11 +770,21 @@ export default {
     top: 15%;
 }
 .style-enter-active, .style-leave-active {
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 .style-enter, .style-leave-active {
-    height: 0px;
+    height: 0;
 }
+.style2-enter-active, .style2-leave-active {
+    transition: opacity 0.3s
+}
+.style2-enter, .style2-leave-active {
+    opacity: 0.5
+}
+.style-enter-active *,.style-leave-active *{
+    visibility: hidden;
+}
+
 .album
 {
     top: 39.5%;
@@ -721,4 +843,29 @@ export default {
 .style-leave-active {
   transform: translatey(40px);
 } */
+
+
+.album-modal
+{
+    z-index: 9999;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    width: 650px;
+    max-height: 800px;
+}
+.bg
+{
+    bottom: 0px;
+    z-index: 9998;
+    position: fixed;
+    overflow-y: hidden;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
 </style>

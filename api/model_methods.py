@@ -1,15 +1,17 @@
-import datetime
+# import datetime
 import math
 import random
 import shutil
 import os
+import nmslib
+import numpy as np
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.db.models import F, Q
 
-from api.models import Track, LikedTrack, Album, Performer, Genre, GenreStyle, TrackHistory, TrackReport
+from api.models import *
 
 
 def get_random(all_tracks):  # возвращает рандомное значение из списка
@@ -18,18 +20,12 @@ def get_random(all_tracks):  # возвращает рандомное знач�
 
 
 class PerformerMethods:
-    @staticmethod
-    def update(id, name, description):
-        date = datetime.date.today()
-        performer = Performer.objects.filter(id=id)
-        performer.update(name_per=name, about_per=description, date_per=date)
-        return performer[0]
 
     @staticmethod
     def create(user, name, description):
-        date = datetime.date.today()
+        # date = datetime.date.today()
         
-        performer = Performer.objects.create(user_id=User.objects.get(pk=user), name_per=name, about_per=description, date_per=date)
+        performer = Performer.objects.create(user_id=User.objects.get(pk=user), name_per=name, about_per=description)
         is_new = try_mkdir('./media/performers/' + str(performer.id))
         shutil.copy(r'./mainapp/static/mainapp/images/cat.jpg', './media/performers/' + str(performer.id) + '/logo.jpg')
         performer = PerformerMethods.add_image(performer, 'performers/' + str(performer.id) + '/logo.jpg')
@@ -47,6 +43,7 @@ class PerformerMethods:
         performer = Performer.objects.get(user_id=User.objects.get(pk=user))
         return performer
 
+
 def try_mkdir(directory):
     try:
         os.mkdir(directory)
@@ -54,16 +51,8 @@ def try_mkdir(directory):
     except FileExistsError:
         return False
 
-class AlbumMethods:
-    @staticmethod
-    def create(user, name, genre, date):
-        album = Album(per_id=Performer.objects.get(user_id=user), name_alb=name,
-                      stl_id=GenreStyle.objects.get(id=genre), image_alb='', date_alb=date)
-        album.save()
 
-        # album.image_alb = str(album.id) + '/logo.jpg'
-        # album.save()
-        return album
+class AlbumMethods:
 
     @staticmethod
     def add_image(album, image_alb):
@@ -92,15 +81,19 @@ class AlbumMethods:
             return False
 
 
-class TrackMethods:
+class PlaylistMethods:
     @staticmethod
-    def create(album, name, date):
-        track = Track(alb_id=album, name_trc=name, audio_trc='',
-                      date_trc=date)
-        track.save()
-        # track.link_trc = str(album.id) + '/' + str(track.id) + '.mp3'
-        # track.save()
-        return track
+    def delete(id: int, per_id: Performer):
+        try:
+            playlist = Playlist.objects.get(pk=id, per_id=per_id)
+            shutil.rmtree('./media/playlists/' + str(playlist.id))
+            playlist.delete()
+            return True
+        except Playlist.DoesNotExist:
+            return False
+
+
+class TrackMethods:
 
     @staticmethod
     def add_audio(track, audio):
@@ -162,6 +155,7 @@ class LikedTrackMethods:
             return True
         else:
             return False
+
     @staticmethod
     def add_increment(track_id):
         if track_id is not None:
@@ -200,11 +194,36 @@ class LikedTrackMethods:
     @staticmethod
     def check_if_liked(user_id, track_id):  # проверка лайкнут ли трек
         try:
-            is_liked = True
-            LikedTrack.objects.get(user_id=user_id, trc_id=track_id)
+            if type(user_id) == User:
+                LikedTrack.objects.get(user_id=user_id, trc_id=track_id)
+                return True
+            return False
         except ObjectDoesNotExist:
-            is_liked = False
-        return is_liked
+            return False
+
+
+class LikedAlbumMethods:
+    @staticmethod
+    def check_if_liked(user_id, album_id):  # проверка лайкнут ли альбом
+        try:
+            if type(user_id) == User:
+                LikedAlbum.objects.get(user_id=user_id, album_id=album_id)
+                return True
+            return False
+        except ObjectDoesNotExist:
+            return False
+
+
+class LikedPlaylistMethods:
+    @staticmethod
+    def check_if_liked(user_id, playlist_id):  # проверка лайкнут ли альбом
+        try:
+            if type(user_id) == User:
+                LikedPlaylist.objects.get(user_id=user_id, playlist_id=playlist_id)
+                return True
+            return False
+        except ObjectDoesNotExist:
+            return False
 
 
 class TrackHistoryMethods:
@@ -221,14 +240,9 @@ class TrackHistoryMethods:
                 last = last.id
                 count = history.count()
                 for hist in history:
-                    if count > 49:
-                        hist.delete()  # здесь бы надо закодить, чтобы переписывать старые записи из таблицы, а не все время плодить новые индексы
+                    if count > 9:
+                        hist.delete()
                         count -= 1
-            '''for index, hist in enumerate(history):
-                if hist != history.last():
-                    TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)
-                else:
-                    TrackHistory.objects.filter(id=hist.id + 1).update(user_id=hist.user_id, trc_id=hist.trc_id)'''
             TrackHistory.objects.filter(user_id=user, trc_id=track).delete()
             TrackHistory(user_id=user, trc_id=track).save()
             return True
@@ -242,7 +256,7 @@ class TrackHistoryMethods:
         return tracks
 
 
-class TrackReportMethods:
+'''class TrackReportMethods:
     @staticmethod
     def create(track_id, user_id):  # добавление записи жалоб в таблицу
         if track_id is not None and user_id is not None:
@@ -255,16 +269,53 @@ class TrackReportMethods:
             else:
                 return False
         else:
-            return False
+            return False'''
 
 
 class TrackRecommendation:
+
     @staticmethod
-    def get_recommendation(authuser):
+    def get_recommendation(user_id):
+        liked_tracks = LikedTrack.objects.filter(user_id=user_id).values_list('trc_id', 'plays_amount')
+        track_ids = []
+        if liked_tracks.count() > 0:
+            plays_amount = 0
+            user_features = 0
+            for liked_track in liked_tracks:
+                this_features = np.load('features/' + str(liked_track[0]) + '.npy')
+                this_features *= liked_track[1]
+                user_features += this_features
+                plays_amount += liked_track[1]
+            user_features /= plays_amount
+
+            history_tracks = TrackHistory.objects.all().filter(user_id=user_id).values_list('trc_id')
+
+            tracks = Track.objects.filter(~Q(id__in=history_tracks)).values_list('id')
+            features_list = []
+            for track in tracks:
+                features = np.load('features/' + str(track[0]) + '.npy')
+                features_list.append(features)
+
+            data = np.array(features_list)
+            index = nmslib.init(method='hnsw', space='cosinesimil')
+            index.addDataPointBatch(data)
+            index.createIndex({'post': 2})
+
+            # query for the nearest neighbours of the first datapoint
+            ids, distances = index.knnQuery(user_features, k=12)
+
+            for id_ in ids:
+                track_ids.append(tracks[int(id_)][0])
+
+        # print(len(track_ids), track_ids)
+        return track_ids
+
+    @staticmethod
+    def get_recommendation_old(authuser):
         userstracks = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('trc_id', 'user_id')
         likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
         historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
-        reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
+        # reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
         liked = []
         noauthtracks = []
         for track in userstracks:
@@ -292,7 +343,7 @@ class TrackRecommendation:
         #print(tracks)
         recommended_in_history = []
         for track in tracks:
-            if (track,) not in identracks and (track,) not in historytracks and (track,) not in reporttracks:
+            if (track,) not in identracks and (track,) not in historytracks:
                 identracks.append(track)
             elif (track,) in historytracks:
                 recommended_in_history.append((track,))

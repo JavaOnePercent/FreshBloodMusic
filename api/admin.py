@@ -1,5 +1,5 @@
 from django.contrib import admin
-from api.models import Performer, Genre, GenreStyle, Album, Track, LikedTrack, TrackHistory, TrackReport
+from api.models import *
 
 admin.site.register(Performer)
 admin.site.register(Genre)
@@ -8,4 +8,3 @@ admin.site.register(Album)
 admin.site.register(Track)
 admin.site.register(LikedTrack)
 admin.site.register(TrackHistory)
-admin.site.register(TrackReport)
