@@ -6,8 +6,8 @@
                     <label class="sortirovka-name">Рекомендации</label>
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <span class="time" id="time" @click="showGenre(filter, genre, style, 'time')" @mousedown="checkSort">времени</span>
-                        <span class="topic" id="topic" @click="showGenre(filter, genre, style, 'popularity')" @mousedown="checkSort">популярности</span>
+                        <span class="time" id="time" @click="showGenre(filter, genre, style, 'time')" @mousedown="checkSort">все</span>
+                        <span class="topic" id="topic" @click="showGenre(filter, genre, style, 'popularity')" @mousedown="checkSort">сначала новые</span>
                     </div>
                 </div>
             </div>
@@ -21,8 +21,8 @@
                     <div class="leftBevfore"></div>
                 </div>
                 <div id="music-style" class="music-style">
-                    <a  class="janr gen" name="" @click="showGenre('all');  choseGenr ='all'; genre = null" :class="{'choseJanr':choseGenr==='all'}">Все</a>
-                    <a  class="janr gen" :class="{'choseJanr':choseGenr==='recommended'}" name="" @click="showGenre('recommended'); choseGenr ='recommended'">Рекомендации</a>
+                    <a  class="janr gen" name="" @click="showGenre('all');  choseGenr ='all'; genre = null" :class="{'choseJanr':choseGenr==='all'}">Все жанры</a>
+                    <!-- <a  class="janr gen" :class="{'choseJanr':choseGenr==='recommended'}" name="" @click="showGenre('recommended'); choseGenr ='recommended'">Рекомендации</a> -->
                     <a  class="janr gen" :class="{'choseJanr':choseGenr==='favorite'}" name="" @click="showGenre('favorite'); choseGenr ='favorite' ">Избранное</a>
                     <div class=" janr" :class="{'choseJanr':choseGenr===gen.id}" :key="index" v-for="(gen, index) in genres" >
                         <a style=" white-space: nowrap"  :name="gen.id" @click="showHer(index, gen.id); choseGenr = gen.id; choseGenrStyle = 'all'" >{{gen.name_gnr}}</a>
@@ -366,6 +366,7 @@ export default {
     line-height: 40px;
     float: left;
     width: 30%;
+    margin-right: 10%;
     font-size: 30px;
 }
 .sort
@@ -377,7 +378,7 @@ export default {
     /* color: rgba(0,0,0,0.55); */
     font-size: 20px;
     line-height: 40px;
-    width: 70%;
+    /* width: 70%; */
     float: left;
 }
 .sort label
