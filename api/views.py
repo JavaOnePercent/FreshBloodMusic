@@ -268,7 +268,7 @@ class AlbumDetail(APIView):
         is_liked = LikedAlbumMethods.check_if_liked(auth.get_user(request), pk)
         data.__setitem__('is_liked', is_liked)
         for datum in data['tracks']:
-            is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, datum['id'])
+            is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request), datum['id'])
             datum.__setitem__('is_liked', is_liked)
         return Response(data, status=status.HTTP_200_OK)
 

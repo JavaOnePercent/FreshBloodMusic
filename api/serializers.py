@@ -32,7 +32,7 @@ class TopTrackSerializer(serializers.ModelSerializer):  # сериалайзер
 
     class Meta:
         model = Track
-        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'rating_trc', 'name_gnr', 'name_stl', 'id_per')
+        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'audio_trc', 'rating_trc', 'name_gnr', 'name_stl', 'id_per')
 
 
 class SmallTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека только с именем
@@ -70,7 +70,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
         fields = ('name_alb', 'genre', 'style', 'image_alb', 'date_alb', 'id', 'about_alb', 'numplays_alb',
-                  'rating_alb', 'name_per', 'image_per')
+                  'rating_alb', 'name_per', 'image_per', 'per_id')
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
