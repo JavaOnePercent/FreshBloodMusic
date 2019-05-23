@@ -5,6 +5,7 @@ import shutil
 import os
 import nmslib
 import numpy as np
+from datetime import date, timedelta
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -151,7 +152,8 @@ class LikedTrackMethods:
         if track_id is not None and user_id is not None:
             track = Track.objects.get(pk=track_id)
             user = User.objects.get(pk=user_id)
-            LikedTrack(user_id=user, trc_id=track).save()
+            if LikedTrack.objects.filter(user_id=user, trc_id=track).count() == 0:
+                LikedTrack(user_id=user, trc_id=track).save()
             return True
         else:
             return False
@@ -179,7 +181,6 @@ class LikedTrackMethods:
             return True
         else:
             return False
-
 
     @staticmethod
     def remove_like(track_id, user_id):  # удаление лайка из таблицы
@@ -275,10 +276,25 @@ class TrackHistoryMethods:
 class TrackRecommendation:
 
     @staticmethod
-    def get_recommendation(user_id):
-        liked_tracks = LikedTrack.objects.filter(user_id=user_id).values_list('trc_id', 'plays_amount')
+    def get_recommendation(user_id, limit, interval=None, genre_id=None, style_id=None):
+        history_tracks = TrackHistory.objects.all().filter(user_id=user_id).values_list('trc_id')
+        likes_kwargs = {}
+        tracks_kwargs = {}
+
+        if style_id is not None:
+            likes_kwargs['trc_id__alb_id__stl_id'] = style_id
+            tracks_kwargs['alb_id__stl_id'] = style_id,
+        elif genre_id is not None:
+            likes_kwargs['trc_id__alb_id__stl_id__gnr_id'] = genre_id
+            tracks_kwargs['alb_id__stl_id__gnr_id'] = genre_id,
+
+        if interval is not None:
+            tracks_kwargs['date_trc__gte'] = date.today() - timedelta(days=int(interval))
+
+        liked_tracks = LikedTrack.objects.filter(user_id=user_id, **likes_kwargs).values_list('trc_id', 'plays_amount')
+        tracks = Track.objects.filter(~Q(id__in=history_tracks), **tracks_kwargs).values_list('id')
         track_ids = []
-        if liked_tracks.count() > 0:
+        if liked_tracks.count() > 0 and tracks.count() > 0:
             plays_amount = 0
             user_features = 0
             for liked_track in liked_tracks:
@@ -288,9 +304,6 @@ class TrackRecommendation:
                 plays_amount += liked_track[1]
             user_features /= plays_amount
 
-            history_tracks = TrackHistory.objects.all().filter(user_id=user_id).values_list('trc_id')
-
-            tracks = Track.objects.filter(~Q(id__in=history_tracks)).values_list('id')
             features_list = []
             for track in tracks:
                 features = np.load('features/' + str(track[0]) + '.npy')
@@ -302,7 +315,7 @@ class TrackRecommendation:
             index.createIndex({'post': 2})
 
             # query for the nearest neighbours of the first datapoint
-            ids, distances = index.knnQuery(user_features, k=12)
+            ids, distances = index.knnQuery(user_features, k=limit)
 
             for id_ in ids:
                 track_ids.append(tracks[int(id_)][0])
@@ -310,7 +323,7 @@ class TrackRecommendation:
         # print(len(track_ids), track_ids)
         return track_ids
 
-    @staticmethod
+    '''@staticmethod
     def get_recommendation_old(authuser):
         userstracks = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('trc_id', 'user_id')
         likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
@@ -373,4 +386,4 @@ class TrackRecommendation:
                 dict.update({str(iden[0]): [iden[1]]})
             else:
                 dict[str(iden[0])].append(iden[1])
-        return dict
+        return dict'''

@@ -85,6 +85,12 @@ class TrackOverview(generics.ListCreateAPIView):
         else:
             raise exc
 
+    @staticmethod
+    def get_tracks_by_ids(ids):
+        ordering = 'FIELD(id, %s)' % ','.join(str(id_) for id_ in ids)
+        return Track.objects.filter(pk__in=ids).extra(
+            select={'ordering': ordering}, order_by=('ordering',))
+
     def get_queryset(self):
         try:
             filter = self.request.query_params['filter']
@@ -96,6 +102,13 @@ class TrackOverview(generics.ListCreateAPIView):
             TrackOverview.pagination_class = PostLimitOffsetPagination
 
             request = self.request
+
+            try:
+                sort = self.request.query_params['sort']
+            except MultiValueDictKeyError:
+                sort = 'popularity'
+
+            recommendation_kwargs = {}
 
             if filter == 'favorite':
                 user = auth.get_user(request)
@@ -109,43 +122,46 @@ class TrackOverview(generics.ListCreateAPIView):
                         tracks = likedtracks
                 else:
                     raise ParseError('User must be logged in to access favorite tracks')
-            elif filter == 'recommended':
-                user = auth.get_user(request)
-                if type(user) == User:
-                    identracks = TrackRecommendation.get_recommendation(user.id)
-                    ordering = 'FIELD(id, %s)' % ','.join(str(id) for id in identracks)
-                    tracks = Track.objects.filter(pk__in=identracks).extra(
-                        select={'ordering': ordering}, order_by=('ordering',))
-                else:
-                    raise ParseError('User must be logged in to access recommended tracks')
-            elif filter == 'genre':
-                try:
-                    genre = self.request.query_params['genre']
-                except MultiValueDictKeyError:
-                    raise ParseError('Filter by genre must have genre param')
-                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').filter(alb_id__stl_id__gnr_id=genre)
-
-            elif filter == 'style':
-                try:
-                    style = self.request.query_params['style']
-                except MultiValueDictKeyError:
-                    raise ParseError('Filter by style must have style param')
-                tracks = Track.objects.select_related('alb_id__stl_id').filter(alb_id__stl_id=style)
-
-            elif filter == 'all':
-                tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
             else:
-                raise ParseError('Filter value is incorrect')
+                if filter == 'genre':
+                    try:
+                        genre = self.request.query_params['genre']
+                    except MultiValueDictKeyError:
+                        raise ParseError('Filter by genre must have genre param')
+                    recommendation_kwargs['genre_id'] = genre
 
-            if filter != 'recommended' and filter != 'favorite':
-                try:
-                    sort = self.request.query_params['sort']
-                except MultiValueDictKeyError:
-                    sort = 'popularity'
-                if sort == 'popularity':
-                    tracks = tracks.order_by('-rating_trc')
-                elif sort == 'time':
-                    tracks = tracks.order_by('-date_trc')
+                elif filter == 'style':
+                    try:
+                        style = self.request.query_params['style']
+                    except MultiValueDictKeyError:
+                        raise ParseError('Filter by style must have style param')
+                    recommendation_kwargs['style_id'] = style
+
+                elif filter == 'all':
+                    # tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
+                    id_tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60)
+                    tracks = self.get_tracks_by_ids(id_tracks)
+                else:
+                    raise ParseError('Filter value is incorrect')
+
+                if sort == 'time':
+                    id_tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60,
+                                                                       **recommendation_kwargs)
+                elif sort == 'popularity':
+                    id_tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=12, interval=1,
+                                                                       **recommendation_kwargs)
+                    id_tracks1 = TrackRecommendation.get_recommendation(auth.get_user(request), limit=12, interval=7,
+                                                                        **recommendation_kwargs)
+                    id_tracks2 = TrackRecommendation.get_recommendation(auth.get_user(request), limit=12, interval=30,
+                                                                        **recommendation_kwargs)
+                    id_tracks.extend(id_tracks1)
+                    id_tracks.extend(id_tracks2)
+                    id_tracks3 = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60-len(id_tracks),
+                                                                        **recommendation_kwargs)
+                    id_tracks.extend(id_tracks3)
+                else:
+                    raise ParseError('Incorrect value of the sort parameter')
+                tracks = self.get_tracks_by_ids(id_tracks)
             return tracks
 
         else:
@@ -164,15 +180,11 @@ class TrackOverview(generics.ListCreateAPIView):
 class TrackDetail(APIView):
     def get_next(self, user):
         try:
-            if user is not None:
-                recommendations = TrackRecommendation.get_recommendation(user)
-                if len(recommendations) != 0:
-                    track = Track.objects.get(id=recommendations[0])
-                else:
-                    track = Track.objects.get(id=1)
-
+            recommendations = TrackRecommendation.get_recommendation(user, limit=1)
+            if len(recommendations) != 0:
+                track = Track.objects.get(id=recommendations[0])
             else:
-                track = Track.objects.filter(id__in=TrackRecommendation.get_recommendation(user)).order_by('?')[0]
+                track = Track.objects.get(id=1)
             # TrackHistoryMethods.create(track.id, user)
             return track
         except Track.DoesNotExist:
@@ -381,7 +393,7 @@ class PlaylistDetail(APIView):
         is_liked = LikedPlaylistMethods.check_if_liked(auth.get_user(request), pk)
         data.__setitem__('is_liked', is_liked)
         for datum in data['tracks']:
-            is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request).id, datum['track']['id'])
+            is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request), datum['track']['id'])
             datum['track'].__setitem__('is_liked', is_liked)
         return Response(data, status=status.HTTP_200_OK)
 
