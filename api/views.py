@@ -19,6 +19,7 @@ from rest_framework import status, generics
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import ParseError
 from datetime import date
+from django.db.models import CharField, Value
 
 
 @ensure_csrf_cookie
@@ -68,6 +69,68 @@ class PostLimitOffsetPagination(PageNumberPagination):
     page_size = 12
 
 
+class SearchView(generics.ListAPIView):
+    pagination_class = PostLimitOffsetPagination
+
+    def handle_exception(self, exc):
+        if type(exc) == ParseError:
+            return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise exc
+
+    def get_queryset(self):
+        request = self.request
+        try:
+            query = request.query_params['query']
+        except MultiValueDictKeyError:
+            raise ParseError('query parameter must be specified')
+        tracks = Track.objects.filter(name_trc__icontains=query).values('id',
+                                                                        rating=F('rating_trc'),
+                                                                        name=F('name_trc'),
+                                                                        image=F('alb_id__image_alb'),
+                                                                        type=Value('track', CharField()))
+        albums = Album.objects.filter(name_alb__icontains=query).values('id',
+                                                                        rating=F('rating_alb'),
+                                                                        name=F('name_alb'),
+                                                                        image=F('image_alb'),
+                                                                        type=Value('album', CharField()))
+        performers = Performer.objects.filter(name_per__icontains=query).values('id',
+                                                                        rating=F('rating_per'),
+                                                                        name=F('name_per'),
+                                                                        image=F('image_per'),
+                                                                        type=Value('performer', CharField()))
+        result = tracks.union(albums, performers)
+        result = result.order_by('-rating')
+        length = len(tracks)
+        try:
+            suggest = request.query_params['suggest']
+            if suggest != 'false':
+                result = result[:10]
+                length = 10
+        except MultiValueDictKeyError:
+            pass
+
+        recommended_tracks = TrackRecommendation.filter_query_by_recommendation(user_id=auth.get_user(request),
+                                                                                tracks=tracks, length=length)
+        result = list(result)
+        i = 0
+        for index, res in enumerate(result):
+            if res['type'] == 'track':
+                result[index] = recommended_tracks[i]
+                i += 1
+
+        return result
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(page)
+
+        return Response(queryset)
+
+
 class TrackOverview(generics.ListCreateAPIView):
     serializer_class = NoLinkTrackSerializer
     pagination_class = PostLimitOffsetPagination
@@ -84,12 +147,6 @@ class TrackOverview(generics.ListCreateAPIView):
             return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
         else:
             raise exc
-
-    @staticmethod
-    def get_tracks_by_ids(ids):
-        ordering = 'FIELD(id, %s)' % ','.join(str(id_) for id_ in ids)
-        return Track.objects.filter(pk__in=ids).extra(
-            select={'ordering': ordering}, order_by=('ordering',))
 
     def get_queryset(self):
         try:
@@ -138,30 +195,28 @@ class TrackOverview(generics.ListCreateAPIView):
                     recommendation_kwargs['style_id'] = style
 
                 elif filter == 'all':
-                    # tracks = Track.objects.select_related('alb_id__stl_id__gnr_id').all()
-                    id_tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60)
-                    tracks = self.get_tracks_by_ids(id_tracks)
+                    pass
                 else:
                     raise ParseError('Filter value is incorrect')
 
                 if sort == 'time':
-                    id_tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60,
-                                                                       **recommendation_kwargs)
+                    tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60,
+                                                                    **recommendation_kwargs)
                 elif sort == 'popularity':
-                    id_tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=12, interval=1,
-                                                                       **recommendation_kwargs)
+                    tracks = TrackRecommendation.get_recommendation(auth.get_user(request), limit=12, interval=1,
+                                                                    **recommendation_kwargs)
                     id_tracks1 = TrackRecommendation.get_recommendation(auth.get_user(request), limit=12, interval=7,
-                                                                        **recommendation_kwargs)
+                                                                        **recommendation_kwargs, added_tracks=tracks)
+                    tracks.extend(id_tracks1)
                     id_tracks2 = TrackRecommendation.get_recommendation(auth.get_user(request), limit=12, interval=30,
-                                                                        **recommendation_kwargs)
-                    id_tracks.extend(id_tracks1)
-                    id_tracks.extend(id_tracks2)
-                    id_tracks3 = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60-len(id_tracks),
-                                                                        **recommendation_kwargs)
-                    id_tracks.extend(id_tracks3)
+                                                                        **recommendation_kwargs, added_tracks=tracks)
+
+                    tracks.extend(id_tracks2)
+                    id_tracks3 = TrackRecommendation.get_recommendation(auth.get_user(request), limit=60-len(tracks),
+                                                                        **recommendation_kwargs, added_tracks=tracks)
+                    tracks.extend(id_tracks3)
                 else:
                     raise ParseError('Incorrect value of the sort parameter')
-                tracks = self.get_tracks_by_ids(id_tracks)
             return tracks
 
         else:
@@ -182,7 +237,7 @@ class TrackDetail(APIView):
         try:
             recommendations = TrackRecommendation.get_recommendation(user, limit=1)
             if len(recommendations) != 0:
-                track = Track.objects.get(id=recommendations[0])
+                track = Track.objects.get(id=recommendations[0].id)
             else:
                 track = Track.objects.get(id=1)
             # TrackHistoryMethods.create(track.id, user)
@@ -196,7 +251,7 @@ class TrackDetail(APIView):
         except Track.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
+    def get(self, request, pk):
         if re.fullmatch(r'[0-9]+', pk):
             track = self.get_object(pk)
         elif pk == 'next':

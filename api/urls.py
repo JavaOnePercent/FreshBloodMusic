@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     url(r'^token$', views.get_token, name='get_token'),  # token
     url(r'^tracks$', views.TrackOverview.as_view(), name='tracks'),
+    url(r'^search$', views.SearchView.as_view()),
     url(r'^tracks/(?P<pk>\w+)$', views.TrackDetail.as_view()),
     url(r'^likes$', views.likes, name='likes'),  # обработка лайкусиков
     url(r'^albums$', views.AlbumsList.as_view()),

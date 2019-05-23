@@ -275,25 +275,15 @@ class TrackHistoryMethods:
 
 class TrackRecommendation:
 
+    '''@staticmethod
+    def get_tracks_by_ids(ids):
+        ordering = 'FIELD(id, %s)' % ','.join(str(id_) for id_ in ids)
+        return Track.objects.filter(pk__in=ids).extra(
+            select={'ordering': ordering}, order_by=('ordering',))'''
+
     @staticmethod
-    def get_recommendation(user_id, limit, interval=None, genre_id=None, style_id=None):
-        history_tracks = TrackHistory.objects.all().filter(user_id=user_id).values_list('trc_id')
-        likes_kwargs = {}
-        tracks_kwargs = {}
-
-        if style_id is not None:
-            likes_kwargs['trc_id__alb_id__stl_id'] = style_id
-            tracks_kwargs['alb_id__stl_id'] = style_id,
-        elif genre_id is not None:
-            likes_kwargs['trc_id__alb_id__stl_id__gnr_id'] = genre_id
-            tracks_kwargs['alb_id__stl_id__gnr_id'] = genre_id,
-
-        if interval is not None:
-            tracks_kwargs['date_trc__gte'] = date.today() - timedelta(days=int(interval))
-
-        liked_tracks = LikedTrack.objects.filter(user_id=user_id, **likes_kwargs).values_list('trc_id', 'plays_amount')
-        tracks = Track.objects.filter(~Q(id__in=history_tracks), **tracks_kwargs).values_list('id')
-        track_ids = []
+    def calculate_recommendations(liked_tracks, tracks, limit):
+        recommended_tracks = []
         if liked_tracks.count() > 0 and tracks.count() > 0:
             plays_amount = 0
             user_features = 0
@@ -305,9 +295,15 @@ class TrackRecommendation:
             user_features /= plays_amount
 
             features_list = []
-            for track in tracks:
-                features = np.load('features/' + str(track[0]) + '.npy')
-                features_list.append(features)
+
+            if type(tracks[0]) == dict:
+                for track in tracks:
+                    features = np.load('features/' + str(track['id']) + '.npy')
+                    features_list.append(features)
+            else:
+                for track in tracks:
+                    features = np.load('features/' + str(track.id) + '.npy')
+                    features_list.append(features)
 
             data = np.array(features_list)
             index = nmslib.init(method='hnsw', space='cosinesimil')
@@ -318,72 +314,54 @@ class TrackRecommendation:
             ids, distances = index.knnQuery(user_features, k=limit)
 
             for id_ in ids:
-                track_ids.append(tracks[int(id_)][0])
+                recommended_tracks.append(tracks[int(id_)])
 
-        # print(len(track_ids), track_ids)
+            return recommended_tracks
+
+    @staticmethod
+    def filter_query_by_recommendation(user_id, tracks, length):
+        if type(user_id) == User:
+            liked_tracks = LikedTrack.objects.filter(user_id=user_id).values_list('trc_id', 'plays_amount')
+            recommended_tracks = TrackRecommendation.calculate_recommendations(liked_tracks, tracks, length)
+            return recommended_tracks
+        else:
+            return list(tracks.order_by('-rating_trc'))
+
+    @staticmethod
+    def get_recommendation(user_id, limit, interval=None, genre_id=None, style_id=None, added_tracks=None):
+        likes_kwargs = {}
+        tracks_kwargs = {}
+        added_tracks_ids = []
+        if added_tracks is not None:
+            for track in added_tracks:
+                added_tracks_ids.append(track.id)
+
+        if style_id is not None:
+            likes_kwargs['trc_id__alb_id__stl_id'] = style_id
+            tracks_kwargs['alb_id__stl_id'] = style_id,
+        elif genre_id is not None:
+            likes_kwargs['trc_id__alb_id__stl_id__gnr_id'] = genre_id
+            tracks_kwargs['alb_id__stl_id__gnr_id'] = genre_id,
+
+        if interval is not None:
+            tracks_kwargs['date_trc__gte'] = date.today() - timedelta(days=int(interval))
+
+        if type(user_id) == User:
+            history_tracks = TrackHistory.objects.all().filter(user_id=user_id).values_list('trc_id')
+            avoided_tracks = []
+            for track in history_tracks:
+                avoided_tracks.append(track[0])
+            avoided_tracks.extend(added_tracks_ids)
+
+            liked_tracks = LikedTrack.objects.filter(user_id=user_id, **likes_kwargs).values_list('trc_id', 'plays_amount')
+            tracks = Track.objects.filter(~Q(id__in=avoided_tracks), **tracks_kwargs)
+
+            # query for the nearest neighbours of the first datapoint
+            if limit == 'max':
+                track_ids = TrackRecommendation.calculate_recommendations(liked_tracks, tracks, len(tracks))
+            else:
+                track_ids = TrackRecommendation.calculate_recommendations(liked_tracks, tracks, limit)
+        else:
+            return list(Track.objects.filter(~Q(id__in=added_tracks_ids), **tracks_kwargs).order_by('-rating_trc'))
+
         return track_ids
-
-    '''@staticmethod
-    def get_recommendation_old(authuser):
-        userstracks = LikedTrack.objects.all().filter(~Q(user_id=authuser)).values_list('trc_id', 'user_id')
-        likedtracks = LikedTrack.objects.all().filter(user_id=authuser).values_list('trc_id')
-        historytracks = TrackHistory.objects.all().filter(user_id=authuser).values_list('trc_id')
-        # reporttracks = TrackReport.objects.all().filter(user_id=authuser).values_list('trc_id')
-        liked = []
-        noauthtracks = []
-        for track in userstracks:
-            if (track[0],) not in likedtracks:
-                noauthtracks.append(track)
-        for auth in likedtracks:
-            liked.append(auth[0])
-        dict = TrackRecommendation.dict_trans(userstracks)
-        dictiden = TrackRecommendation.dictiden_trans(noauthtracks)
-        dicttrack = {}
-        likes = 0
-        for d in dictiden.keys():
-            for u in dictiden[d]:
-                likes = likes + ((math.fabs(len(set(liked) & set(dict[str(u)])))) /
-                                 (math.fabs(len(set(liked) | set(dict[str(u)])))))
-            likes = likes / len(dictiden[d])
-            dicttrack.update({str(d): likes})
-            likes = 0
-        dicttrack = sorted(dicttrack.items(), key=lambda item: -item[1])
-        #print(dicttrack)
-        tracks = []
-        for track in dicttrack:
-            tracks.append(int(track[0]))
-        identracks = []
-        #print(tracks)
-        recommended_in_history = []
-        for track in tracks:
-            if (track,) not in identracks and (track,) not in historytracks:
-                identracks.append(track)
-            elif (track,) in historytracks:
-                recommended_in_history.append((track,))
-        rec_in_hist = TrackHistory.objects.filter(trc_id__in=recommended_in_history, user_id=authuser).order_by('id')
-        for rec in rec_in_hist:
-            if rec.trc_id.id in identracks:
-                identracks.remove(rec.trc_id.id)
-            identracks.append(rec.trc_id.id)
-        #print(identracks)
-        return identracks
-
-    @staticmethod
-    def dict_trans(tuple):
-        dict = {}
-        for iden in tuple:
-            if str(iden[1]) not in dict.keys():
-                dict.update({str(iden[1]): [iden[0]]})
-            else:
-                dict[str(iden[1])].append(iden[0])
-        return dict
-
-    @staticmethod
-    def dictiden_trans(tuple):
-        dict = {}
-        for iden in tuple:
-            if str(iden[0]) not in dict.keys():
-                dict.update({str(iden[0]): [iden[1]]})
-            else:
-                dict[str(iden[0])].append(iden[1])
-        return dict'''
