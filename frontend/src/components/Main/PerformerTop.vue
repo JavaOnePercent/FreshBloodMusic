@@ -91,13 +91,13 @@ export default {
         show(e){
             if(!this.isTimeout)
             {
+                this.isTimeout = true;
                 if(e === 'next')
                     this.animation = "animation";
                 else if(e === 'prev')
                     this.animation = "animation1";
-                this.isTimeout = true;
                 var self = this
-                setTimeout(function() { self.isTimeout=false }, 200);
+                setTimeout(function() { self.isTimeout=false }, 800);
                 //this.animation = "";
                 this.showDiv = !this.showDiv
                 clearInterval(this.autoFlip)

@@ -7,6 +7,7 @@
                         BoysBand
                     </div>
                 </router-link>
+                <Search> </search>
                 <div class="management">
                     <div style="height:55px" v-if="username != ''">
                         <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
@@ -35,12 +36,17 @@
 </template>
 
 <script>
+import Search from './Search/Search.vue'
+
 export default {
   name: 'header-container',
   data() {
         return {  
             menuShow:false
         }
+    },
+    components: {
+        Search
     },
     methods: {
         showMenu() {
@@ -115,7 +121,8 @@ export default {
     float: left;
     outline: none;
     font-size: 295%;
-    width: 30%;
+    margin-right: 15px;
+    /* width: 30%; */
 }
 .management
 {
@@ -127,7 +134,7 @@ export default {
     box-sizing: border-box;
     float: right;
     font-size:155%;
-    width: 68%;
+    /* width: 68%; */
     height: 55px;
 }
 .uploud-cont
@@ -288,4 +295,5 @@ li a
 * {
     outline: none
 }
+
 </style>

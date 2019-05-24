@@ -6,8 +6,9 @@
             <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
         </div>
         <div class="playlistName-conteiner">
-            <label for="playlistName">Плейлист</label>
-            <input class="playlistName" type="text" name="playlistName" placeholder="" v-model='playlistName' maxlength="23">
+            <label for="playlistName">Плейлист<span style="font-size:12px">( обязательное поле )</span></label>
+            <input :class="{'error':error!=''}" class="playlistName" type="text" name="playlistName" placeholder="" v-model='playlistName' @change="error=''" maxlength="23">
+            <span>{{error}}</span>
             <div @click="send" class="playAll"> 
                 <span> Создать плейлист </span>
             </div>
@@ -22,7 +23,8 @@ export default {
         return {
             imgStyle:'camera',
             playlistName:'',
-            lable: ''
+            lable: '',
+            error: ''
         }
     },
     methods: {
@@ -60,6 +62,12 @@ export default {
         },
         send:function () 
         {
+            if (this.playlistName.length === 0)
+            {
+                this.error='поле "плейлист" не может быть пустым'
+                return
+            }
+
             var playlistName = this.playlistName
             var lable = this.lable
             var data = new FormData()
@@ -177,6 +185,10 @@ input
 {
     background-color: rgb(226, 160, 38);
     cursor: pointer;
+}
+.error
+{
+    border: 2px solid rgb(226, 160, 38);
 }
 
 </style>

@@ -255,7 +255,7 @@ class TrackDetail(APIView):
         if re.fullmatch(r'[0-9]+', pk):
             track = self.get_object(pk)
         elif pk == 'next':
-            track = self.get_next(auth.get_user(request).id)
+            track = self.get_next(auth.get_user(request))
         else:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

@@ -10,7 +10,7 @@
             </div>
             <div class="rightColumn">
                 <About :logo="logo" :name="name" :description="description"> </About>
-                <TrackList  v-if="albumType !== 'AddPlaylist'" style="height: 63%; padding-left:15px" :albumType="albumType" :albumId="albumId" :lable="albumLable" :albumName='albumName'
+                <TrackList  v-if="albumType !== 'AddPlaylist'" style="height: calc(100% - 275px); padding-left:15px" :albumType="albumType" :albumId="albumId" :lable="albumLable" :albumName='albumName'
                 :albumGenre='albumGenre' :albumStyle='albumStyle' :albumDate='albumDate' :name='name'
                 @changeDeleted='deleted=$event' :AlbumStatus='AlbumStatus'> </TrackList>
                 <CreatePlayList @playlist_created='playlist_created=$event' v-else> </CreatePlayList>
@@ -107,6 +107,7 @@ export default {
     height: auto;
     display: flex;
     /* width: 793px; */
+    padding-bottom: 55px;
     width: 60%;
     flex-direction: column;
 }

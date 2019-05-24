@@ -3,7 +3,9 @@
         <div class="about"> 
             <img :src="logo" alt="аватарка" class="ProfileImg" />
             <div style="height: auto;" >
-                <span class="name"> {{name}} </span>
+                <h1 style="margin:0">
+                    <span class="name"> {{name}} </span>
+                </h1>
                 <br>
                 <span class="description"> {{description}} </span>
             </div>

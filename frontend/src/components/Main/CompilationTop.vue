@@ -6,8 +6,8 @@
                     <label class="sortirovka-name">Рекомендации</label>
                     <div class="sort" v-if="showsortbutton">
                         <label>Отсортировать по:</label>
-                        <span class="time" id="time" @click="showGenre(filter, genre, style, 'time')" @mousedown="checkSort">все</span>
-                        <span class="topic" id="topic" @click="showGenre(filter, genre, style, 'popularity')" @mousedown="checkSort">сначала новые</span>
+                        <span class="time" :class="{'currentStyle':choseSort==='time'}" id="time" @click="showGenre(filter, genre, style, 'time'); choseSort = 'time'">все</span>
+                        <span class="topic" :class="{'currentStyle':choseSort==='popularity'}" id="topic" @click="showGenre(filter, genre, style, 'popularity'); choseSort = 'popularity'" >сначала новые</span>
                     </div>
                 </div>
             </div>
@@ -117,7 +117,8 @@ export default {
                 styleRight: false 
             },
             showAlbum: false,  //убрать если что
-            choseTrc: null
+            choseTrc: null,
+            choseSort: 'popularity'
           //hoverClass: 'disk'
         }
     },
@@ -393,9 +394,9 @@ export default {
 .sort span:hover, .sort span:active
 {
     cursor: pointer;
-    background-color: rgba(192,192,192,0.8);
+    background-color: rgba(192,192,192,0.6);
     border-bottom: 2px solid currentColor;
-    line-height: 0.85
+    /* line-height: 0.85 */
 }
 .time:before
 {
@@ -411,12 +412,13 @@ export default {
     content: '⚡';
     margin-right:5px; 
 }
-.topic
+
+/* .topic
 {
     background-color: rgba(192,192,192,0.8);
     border-bottom: 2px solid currentColor;
     line-height: 0.85;color: rgb(0,0,0)
-}
+} */
 /*рекомендации*/
 .music-style-conteiner
 {
@@ -511,7 +513,7 @@ export default {
 {
     padding: 0 15px;
     position: relative;
-    width: 110%;
+    /* width: 110%; */
     height: 100%;
     display: block;
 }
@@ -868,5 +870,12 @@ export default {
     top: 0;
     left: 0;
     background: rgba(0, 0, 0, 0.6);
+}
+.currentStyle 
+{
+    background-color: rgba(192,192,192,0.6);
+    border-bottom: 2px solid currentColor;
+    line-height: 0.85;
+    color: rgb(0,0,0)
 }
 </style>

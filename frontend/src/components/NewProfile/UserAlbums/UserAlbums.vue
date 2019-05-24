@@ -25,7 +25,8 @@
             </div>
             <div :key="albumLike.id" v-for="(albumLike, index) in albumsLikes" :class='{chousen:(albumId==albumLike.id && type=="albumsLikes")}' class="album"
             @click='openAlbum("albumsLikes", albumLike.id, albumLike.image, albumLike.title, index)'>
-                <img :src="albumLike.image">
+                <img v-if="albumLike.image" :src="albumLike.image">
+                <img v-else src="/static/mainapp/images/playlist.png" alt="">
                 <span class="album-name"> <span style="font-size: 12px; color: rgb(95, 95, 95)">Альбом</span> <br> {{albumLike.title}} </span>
             </div>
         </div>
@@ -37,7 +38,8 @@
             </div>
             <div :key="index" v-for="(playlist, index) in playlists" :class='{chousen:(albumId==playlist.playlist.id && type=="playlist")}' class="album"
                 @click='openAlbum("playlist", playlist.playlist.id, playlist.playlist.image, playlist.playlist.title, index)'>
-                <img :class='{dead:playlist.isDeleted}'  :src="playlist.playlist.image">
+                <img v-if="playlist.playlist.image" :class='{dead:playlist.isDeleted}'  :src="playlist.playlist.image">
+                <img v-else :class='{dead:playlist.isDeleted}' src="/static/mainapp/images/playlist.png" alt="">
                 <span class="album-name"> {{playlist.playlist.title}} </span>
             </div>
         </div>
@@ -217,7 +219,6 @@ export default {
             else {
                 if(this.type === 'playlistsLikes' || this.type === 'albumsLikes')
                     this.openAlbum('liked')
-                console.log(' ты чо')
                 this.getPlayListLikes();
                 this.getAlbumsLikes();
                 this.updateLiked = false

@@ -4,7 +4,8 @@
             <div class="blur" :style="{backgroundImage: getUrlAlbum()}"> 
             </div>
             <div class="about">
-                <img class="lable" :src="lable" alt="">
+                <img v-if="lable" class="lable" :src="lable" alt="">
+                <img v-else class="lable" src="/static/mainapp/images/playlist.png" alt="">
                 <div style="display:flex; flex-direction: column; left: 30px; position:relative; width: calc(100% - 183px);">
                     <span class="name"> {{albumName}} </span>
                     <span v-if="albumType === 'album' || albumType === 'albumsLikes'" class="genre"> {{albumGenre}} • {{albumStyle}} </span>
@@ -84,7 +85,7 @@ import userPlaylists from '../../../components/userPlaylists/userPlaylists.vue'
 import vueCustomScrollbar from 'vue-custom-scrollbar'
 export default {
     name: 'trackList',
-    props: ['albumType', 'albumId', 'lable', 'AlbumStatus'],
+    props: ['albumType', 'albumId', 'lable', 'AlbumStatus', 'albumName'],
     data() {
         return {
             album: [],
@@ -226,8 +227,10 @@ export default {
             });
         },
         getUrlAlbum() {
-            if(this.lable)
-            return 'url(' + this.lable + ')'
+            if (this.lable)
+                return 'url(' + this.lable + ')'
+            else 
+                return 'url(/static/mainapp/images/playlist.png)'
         },
         albumLength(mass) {
             if (mass.length > 1)

@@ -57,7 +57,7 @@ export default {
     top: 55px;
     right: 15px;
     width: 540px;
-    z-index: 1000
+    z-index: 1000000
 }
 .toast {
     overflow: hidden;

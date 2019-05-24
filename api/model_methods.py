@@ -316,7 +316,7 @@ class TrackRecommendation:
             for id_ in ids:
                 recommended_tracks.append(tracks[int(id_)])
 
-            return recommended_tracks
+        return recommended_tracks
 
     @staticmethod
     def filter_query_by_recommendation(user_id, tracks, length):

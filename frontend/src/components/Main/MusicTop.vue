@@ -185,7 +185,7 @@ export default {
     .text
     {
         float: left;
-        width: 55%;
+        width: calc(100% - 360px);
         text-align: left;
         position: relative;
     }

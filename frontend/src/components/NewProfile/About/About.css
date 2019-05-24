@@ -50,7 +50,7 @@
     }
     .ProfileImg + div
     {
-        width:calc(100% - 260px);
+        width:calc(100% - 183px);
         padding-right: 15px;
         box-sizing: border-box;
     }
@@ -78,6 +78,7 @@ span {
 }
 .aboutConteiner
 {
+    height: 260px;
     padding-left: 15px;
     padding-top: 15px;
     box-sizing: border-box;
@@ -97,9 +98,10 @@ span {
     text-overflow: ellipsis;
     display: block;
     color: #222;
-    font-size: 50px;
-    line-height: 43px;
-    height: 43px;
+    white-space: nowrap;
+    font-size: 1.2em;
+    /* line-height: 43px;
+    height: 43px; */
     letter-spacing: 2px;
 }
 .description
