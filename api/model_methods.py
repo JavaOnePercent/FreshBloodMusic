@@ -282,9 +282,9 @@ class TrackRecommendation:
             select={'ordering': ordering}, order_by=('ordering',))'''
 
     @staticmethod
-    def calculate_recommendations(liked_tracks, tracks, limit):
+    def calculate_recommendations(liked_tracks, tracks, limit, only_similar=False):
         recommended_tracks = []
-        if liked_tracks.count() > 0 and tracks.count() > 0:
+        if len(liked_tracks) > 0 and tracks.count() > 0:
             plays_amount = 0
             user_features = 0
             for liked_track in liked_tracks:
@@ -313,8 +313,13 @@ class TrackRecommendation:
             # query for the nearest neighbours of the first datapoint
             ids, distances = index.knnQuery(user_features, k=limit)
 
-            for id_ in ids:
-                recommended_tracks.append(tracks[int(id_)])
+            if only_similar:
+                for i, id_ in enumerate(ids):
+                    if distances[i] < 0.2:
+                        recommended_tracks.append(tracks[int(id_)])
+            else:
+                for id_ in ids:
+                    recommended_tracks.append(tracks[int(id_)])
 
         return recommended_tracks
 

@@ -79,50 +79,66 @@ class SearchView(generics.ListAPIView):
             raise exc
 
     def get_queryset(self):
-        request = self.request
-        try:
-            query = request.query_params['query']
-        except MultiValueDictKeyError:
-            raise ParseError('query parameter must be specified')
-        tracks = Track.objects.filter(name_trc__icontains=query).values('id',
-                                                                        rating=F('rating_trc'),
-                                                                        name=F('name_trc'),
-                                                                        image=F('alb_id__image_alb'),
-                                                                        type=Value('track', CharField()))
-        albums = Album.objects.filter(name_alb__icontains=query).values('id',
-                                                                        rating=F('rating_alb'),
-                                                                        name=F('name_alb'),
-                                                                        image=F('image_alb'),
-                                                                        type=Value('album', CharField()))
-        performers = Performer.objects.filter(name_per__icontains=query).values('id',
-                                                                        rating=F('rating_per'),
-                                                                        name=F('name_per'),
-                                                                        image=F('image_per'),
-                                                                        type=Value('performer', CharField()))
-        result = tracks.union(albums, performers)
-        result = result.order_by('-rating')
-        length = len(tracks)
-        try:
-            suggest = request.query_params['suggest']
-            if suggest != 'false':
-                result = result[:10]
-                length = 10
-        except MultiValueDictKeyError:
-            pass
-
-        recommended_tracks = TrackRecommendation.filter_query_by_recommendation(user_id=auth.get_user(request),
-                                                                                tracks=tracks, length=length)
-        result = list(result)
-        i = 0
-        for index, res in enumerate(result):
-            if res['type'] == 'track':
-                result[index] = recommended_tracks[i]
-                i += 1
-
-        return result
+        pass
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        try:
+            track = request.query_params['track']
+            track = Track.objects.get(pk=track)
+        except MultiValueDictKeyError:
+            track = None
+        except Track.DoesNotExist:
+            raise ParseError('Track id is invalid')
+        if track is not None:
+            tracks = Track.objects.all()
+            queryset = TrackRecommendation.calculate_recommendations([(track.id, 1)], tracks, tracks.count(),
+                                                                     only_similar=True)
+            ser = TrackSerializer(queryset, many=True)
+            queryset = ser.data
+        else:
+            request = self.request
+
+            try:
+                query = request.query_params['query']
+            except MultiValueDictKeyError:
+                raise ParseError('query parameter must be specified')
+            tracks = Track.objects.filter(name_trc__icontains=query).values('id',
+                                                                            rating=F('rating_trc'),
+                                                                            name=F('name_trc'),
+                                                                            image=F('alb_id__image_alb'),
+                                                                            type=Value('track', CharField()))
+            albums = Album.objects.filter(name_alb__icontains=query).values('id',
+                                                                            rating=F('rating_alb'),
+                                                                            name=F('name_alb'),
+                                                                            image=F('image_alb'),
+                                                                            type=Value('album', CharField()))
+            performers = Performer.objects.filter(name_per__icontains=query).values('id',
+                                                                                    rating=F('rating_per'),
+                                                                                    name=F('name_per'),
+                                                                                    image=F('image_per'),
+                                                                                    type=Value('performer',
+                                                                                               CharField()))
+            result = tracks.union(albums, performers)
+            result = result.order_by('-rating')
+            length = len(tracks)
+            try:
+                suggest = request.query_params['suggest']
+                if suggest != 'false':
+                    result = result[:10]
+                    length = 10
+            except MultiValueDictKeyError:
+                pass
+
+            recommended_tracks = TrackRecommendation.filter_query_by_recommendation(user_id=auth.get_user(request),
+                                                                                    tracks=tracks, length=length)
+            result = list(result)
+            i = 0
+            for index, res in enumerate(result):
+                if res['type'] == 'track':
+                    result[index] = recommended_tracks[i]
+                    i += 1
+
+            queryset = result
 
         page = self.paginate_queryset(queryset)
         if page is not None:
