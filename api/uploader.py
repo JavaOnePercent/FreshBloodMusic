@@ -16,8 +16,6 @@ def save_track(alb_id, name, audio, performer):
         album = Album.objects.get(pk=alb_id, per_id=performer.id)
     except Album.DoesNotExist:
         raise ParseError('Album for the current user does not exist')
-    if 'features' not in os.listdir('.'):
-        os.mkdir('features')
     directory = 'albums/' + str(album.id) + '/'
     track = Track.objects.create(alb_id=album, name_trc=name)
     # track.save()
@@ -31,8 +29,6 @@ def save_track(alb_id, name, audio, performer):
 
 def save_album(performer, name, genre, logo, description):  # сохранение альбома с треками в БД и в файлы
     # date = datetime.datetime.now()
-    if 'albums' not in os.listdir('media'):
-        os.mkdir('media/albums')
     album = Album.objects.create(per_id=performer, name_alb=name, about_alb=description,
                                  stl_id=GenreStyle.objects.get(id=genre), image_alb='')
     directory = 'albums/' + str(album.id) + '/'
@@ -48,8 +44,6 @@ def save_album(performer, name, genre, logo, description):  # сохранени
 
 def save_playlist(user, title, image):  # сохранение альбома с треками в БД и в файлы
     # date = datetime.date.today()
-    if 'playlists' not in os.listdir('media'):
-        os.mkdir('media/playlists')
     playlist = Playlist.objects.create(per_id=user, title=title)
     directory = 'playlists/' + str(playlist.id) + '/'
     os.mkdir(path + directory)
@@ -69,8 +63,7 @@ def save_performer(name, label, description, performer):
     performer.name_per = name
     performer.about_per = description
     performer.save()
-    if 'performers' not in os.listdir('media'):
-        os.mkdir('media/performers')
+
     directory = 'performers/' + str(performer.id) + '/'
     is_new = try_mkdir(path + directory)
     if label is not None:

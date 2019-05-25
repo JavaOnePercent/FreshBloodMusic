@@ -10,7 +10,7 @@ from datetime import date, timedelta
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.files import FieldFile, ImageFieldFile
-from django.db.models import F, Q
+from django.db.models import F, Q, IntegerField, Value
 
 from api.models import *
 
@@ -282,26 +282,49 @@ class TrackRecommendation:
             select={'ordering': ordering}, order_by=('ordering',))'''
 
     @staticmethod
-    def calculate_recommendations(liked_tracks, tracks, limit, only_similar=False):
+    def calculate_features(tracks):
+        plays_amount = 0
+        user_features = 0
+        for liked_track in tracks:
+            this_features = np.load('features/' + str(liked_track[0]) + '.npy')
+            this_features *= liked_track[1]
+            user_features += this_features
+            plays_amount += liked_track[1]
+        user_features /= plays_amount
+        return user_features
+
+    @staticmethod
+    def calculate_recommendations(liked_tracks, instances, limit, only_similar=False):
         recommended_tracks = []
-        if len(liked_tracks) > 0 and tracks.count() > 0:
-            plays_amount = 0
-            user_features = 0
-            for liked_track in liked_tracks:
-                this_features = np.load('features/' + str(liked_track[0]) + '.npy')
-                this_features *= liked_track[1]
-                user_features += this_features
-                plays_amount += liked_track[1]
-            user_features /= plays_amount
+        if len(liked_tracks) > 0 and instances.count() > 0:
+
+            user_features = TrackRecommendation.calculate_features(liked_tracks)
 
             features_list = []
 
-            if type(tracks[0]) == dict:
-                for track in tracks:
-                    features = np.load('features/' + str(track['id']) + '.npy')
+            if type(instances[0]) == dict:
+                for instance in instances:
+                    if instance['type'] == 'track':
+                        features = np.load('features/' + str(instance['id']) + '.npy')
+                    elif instance['type'] == 'album':
+                        try:
+                            features = np.load('features/albums/' + str(instance['id']) + '.npy')
+                        except FileNotFoundError:
+                            features = TrackRecommendation.calculate_features(
+                                Track.objects.filter(alb_id=instance['id']).values_list(
+                                    'id', Value(1, IntegerField())))
+                            np.save('features/albums/' + str(instance['id']), features)
+                    else:
+                        try:
+                            features = np.load('features/performers/' + str(instance['id']) + '.npy')
+                        except FileNotFoundError:
+                            features = TrackRecommendation.calculate_features(
+                                Track.objects.filter(alb_id__per_id=instance['id']).values_list(
+                                    'id', Value(1, IntegerField())))
+                            np.save('features/performers/' + str(instance['id']), features)
                     features_list.append(features)
             else:
-                for track in tracks:
+                for track in instances:
                     features = np.load('features/' + str(track.id) + '.npy')
                     features_list.append(features)
 
@@ -316,21 +339,24 @@ class TrackRecommendation:
             if only_similar:
                 for i, id_ in enumerate(ids):
                     if distances[i] < 0.2:
-                        recommended_tracks.append(tracks[int(id_)])
+                        recommended_tracks.append(instances[int(id_)])
+                    else:
+                        break
             else:
-                for id_ in ids:
-                    recommended_tracks.append(tracks[int(id_)])
+                for i, id_ in enumerate(ids):
+                    recommended_tracks.append(instances[int(id_)])
+                    # recommended_tracks[-1]['distance'] = distances[i]
 
         return recommended_tracks
 
-    @staticmethod
+    '''@staticmethod
     def filter_query_by_recommendation(user_id, tracks, length):
         if type(user_id) == User:
             liked_tracks = LikedTrack.objects.filter(user_id=user_id).values_list('trc_id', 'plays_amount')
             recommended_tracks = TrackRecommendation.calculate_recommendations(liked_tracks, tracks, length)
             return recommended_tracks
         else:
-            return list(tracks.order_by('-rating_trc'))
+            return list(tracks.order_by('-rating_trc'))'''
 
     @staticmethod
     def get_recommendation(user_id, limit, interval=None, genre_id=None, style_id=None, added_tracks=None):
