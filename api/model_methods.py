@@ -296,7 +296,7 @@ class TrackRecommendation:
     @staticmethod
     def calculate_recommendations(liked_tracks, instances, limit, only_similar=False):
         recommended_tracks = []
-        if len(liked_tracks) > 0 and instances.count() > 0:
+        if len(liked_tracks) > 0 and len(instances) > 0:
 
             user_features = TrackRecommendation.calculate_features(liked_tracks)
 

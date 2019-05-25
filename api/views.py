@@ -82,13 +82,16 @@ class SearchView(generics.ListAPIView):
         pass
 
     def get_tracks_albums_performers(self, tracks, albums, performers):
-        tracks = tracks.values('id', rating=F('rating_trc'), name=F('name_trc'), image=F('alb_id__image_alb'),
-                               type=Value('track', CharField()))
-        albums = albums.values('id', rating=F('rating_alb'), name=F('name_alb'), image=F('image_alb'),
-                               type=Value('album', CharField()))
-        performers = performers.values('id', rating=F('rating_per'), name=F('name_per'), image=F('image_per'),
-                                       type=Value('performer', CharField()))
-        result = tracks.union(albums, performers)
+        tracks = list(tracks.values('id', 'duration', performer=F('alb_id__per_id__name_per'), rating=F('rating_trc'), name=F('name_trc'),
+                                    image=F('alb_id__image_alb'), type=Value('track', CharField())))
+        albums = list(albums.values('id', rating=F('rating_alb'), name=F('name_alb'), image=F('image_alb'),
+                               type=Value('album', CharField())))
+        performers = list(performers.values('id', rating=F('rating_per'), name=F('name_per'), image=F('image_per'),
+                                       type=Value('performer', CharField())))
+        # result = tracks.union(albums, performers)
+        tracks.extend(albums)
+        tracks.extend(performers)
+        result = tracks
         try:
             suggest = self.request.query_params['suggest']
             if suggest != 'false':
@@ -106,12 +109,13 @@ class SearchView(generics.ListAPIView):
             track = None
         except Track.DoesNotExist:
             raise ParseError('Track id is invalid')
+        user_id = auth.get_user(request)
         if track is not None:
             tracks = Track.objects.all()
             albums = Album.objects.all()
             performers = Performer.objects.all()
             result = self.get_tracks_albums_performers(tracks, albums, performers)
-            queryset = TrackRecommendation.calculate_recommendations([(track.id, 1)], result, result.count(),
+            queryset = TrackRecommendation.calculate_recommendations([(track.id, 1)], result, len(result),
                                                                      only_similar=True)
         else:
             try:
@@ -122,12 +126,16 @@ class SearchView(generics.ListAPIView):
             except MultiValueDictKeyError:
                 raise ParseError('query parameter must be specified')
             result = self.get_tracks_albums_performers(tracks, albums, performers)
-            user_id = auth.get_user(request)
+
             if type(user_id) == User:
                 liked_tracks = LikedTrack.objects.filter(user_id=user_id).values_list('trc_id', 'plays_amount')
-                queryset = TrackRecommendation.calculate_recommendations(liked_tracks, result, result.count())
+                queryset = TrackRecommendation.calculate_recommendations(liked_tracks, result, len(result))
             else:
-                queryset = list(result.order_by('-rating', 'name'))
+                queryset = sorted(result, key=lambda entry: entry['rating'], reverse=True)
+
+        for i, entry in enumerate(queryset):
+            if entry['type'] == 'track':
+                queryset[i]['is_liked'] = LikedTrackMethods.check_if_liked(user_id, entry['id'])
 
         page = self.paginate_queryset(queryset)
         if page is not None:
