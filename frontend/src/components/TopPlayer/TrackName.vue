@@ -39,7 +39,8 @@ export default {
     height: 64px;
 	top: 0px;
     right: 296px;
-    /*max-width: 300px;*/
+    width: 40%;
+    min-width: 300px;
     margin: auto;
 	position: absolute;
     
@@ -50,6 +51,7 @@ export default {
 	color: rgb(0, 0, 0);
     height: 32px;
     line-height: 32px;
+    white-space: nowrap;
     top: 0;
     margin: auto;
 }

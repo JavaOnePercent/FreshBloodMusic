@@ -44,13 +44,16 @@
                     <div v-if="track.img_trc" class="trc-logo"> 
                         <img :src="track.img_trc" alt="">
                     </div>
-                    <img v-else class="play" src="/static/mainapp/images/play-arrow.svg" alt="">
+                    <img v-else class="play" src="/static/mainapp/images/orange-arrow.svg" alt="">
                     <span class="track-name" > {{track.performer || name}} — {{track.name_trc}}</span>
                     <span class="time"> {{getCorrectTime(track.duration)}} </span>
                     <div class="trc-controll">
                         <span class="trc-controll-btn like" @click.stop="likeTrack(track, index)">
                             <img v-if="!track.is_liked && albumType !== 'liked'" src="/static/mainapp/images/empty-heart.svg" title="мне нравится">
                             <img v-else src="/static/mainapp/images/heart.svg" title="мне нравится">
+                        </span>
+                        <span class="trc-controll-btn like" @click.stop="gotoSimilar(track.id, track.name_trc)">
+                            <img src="/static/mainapp/images/similar.svg" title="показать похожие" >
                         </span>
                         <span class="trc-controll-btn add-to-playlist" @click.stop="current_trc=current_trc===index?null:index">
                             <img src="/static/mainapp/images/plus.svg" title="добавить в плейлист" >
@@ -103,7 +106,7 @@ export default {
                 wheelPropagation: true,
                 wheelSpeed: 0.2,
             },
-            albumName: '',
+            _albumName: this.albumName,
             name: '',
             albumGenre: '',
             albumStyle: '',
@@ -248,6 +251,7 @@ export default {
             return D.getDate() + ' ' + months[D.getMonth()] + ' ' + D.getFullYear()
         },
         playAlbum(tracks) {
+            console.log(tracks)
             for(var i = 1; i < tracks.length; i++)
             {
                 this.$bus.$emit('track-to-queue', tracks[i])
@@ -273,6 +277,7 @@ export default {
             return m + ':' + s
         },
         playClick: function(index) {
+            console.log(index)
             this.$bus.$emit('play-track', {
 				id: index
 			});
@@ -360,6 +365,13 @@ export default {
                 this.$bus.$emit('updateLiked', true)
                 this.$bus.$emit('likeNot', 'вам больше не нравится ' + this.albumName) //лайк
             }); 
+        },
+        gotoSimilar(id, name) {
+            this.$router.push('/similar')
+            this.$store.commit("updateSimilar", id)
+            this.$store.commit("updateSimilarName", name)
+            this.$bus.$emit('Similar', id)
+            this.$bus.$emit('SimilarName', name)
         }
     }
 }

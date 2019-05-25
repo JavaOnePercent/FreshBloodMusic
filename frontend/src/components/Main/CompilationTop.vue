@@ -253,13 +253,13 @@ export default {
           }
           this.$http.get(this.url, obj).then(function(response){
                 this.compilation = response.body.results;
-                for(var i = 0; i < this.compilation.length; i++)
-                {
-                    if(this.compilation[i].image_alb === null)
+                    for(var i = 0; i < this.compilation.length; i++)
                     {
-                     this.compilation[i].image_alb = "/static/mainapp/images/cat.jpg"
+                        if(this.compilation[i].image_alb === null)
+                        {
+                        this.compilation[i].image_alb = "/static/mainapp/images/cat.jpg"
+                        }
                     }
-                }
                 this.compilations = this.compilations.concat(this.compilation);
                 // console.log(this.compilations);
                 if(response.body.next != null)
@@ -683,7 +683,7 @@ export default {
     overflow-x:hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size:23px; 
+    font-size:17.5px; 
 }
 .hover-music-name
 {
@@ -699,7 +699,7 @@ export default {
     text-overflow: ellipsis;
     color: grey;
     display: block;
-    font-size:18px; 
+    font-size:13.5px; 
 }
 .cover-cont:hover .cover
 {
@@ -850,7 +850,7 @@ export default {
 
 .album-modal
 {
-    z-index: 9999;
+    z-index: 900;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -862,7 +862,7 @@ export default {
 .bg
 {
     bottom: 0px;
-    z-index: 9998;
+    z-index: 899;
     position: fixed;
     overflow-y: hidden;
     width: 100%;

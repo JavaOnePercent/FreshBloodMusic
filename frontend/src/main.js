@@ -12,6 +12,7 @@ import registration from './components/Registration.vue'
 import login from './components/Login.vue'
 
 import NewProfile from './components/NewProfile/NewProfile.vue'
+import Result from './components/Result/Result'
 
 Vue.use(VueCookie);
 
@@ -55,6 +56,9 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         username: '',
         myPerformerID: 0,
         currentTrack: null,
+        search: '',
+        similar: null,
+        similarName: ''
     },
     mutations: {
         currentTime (state, val) {
@@ -138,7 +142,16 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         },
         currentTrack(state, val) {
             state.currentTrack = val
-        }
+        },
+        updateSearchRec(state, val) {
+            state.search = val
+        },
+        updateSimilar(state, val) {
+            state.similar = val
+        },
+        updateSimilarName(state, val) {
+            state.similarName = val
+        },
     }
 })
 
@@ -149,6 +162,8 @@ const router = new VueRouter({
         { path: '/login', component: login },
         { path: '/performers/:id', name: 'performer', component: NewProfile },
         { path: '/settings', component: settings },
+        { path: '/search', component: Result},
+        { path: '/similar', component: Result},
         { path: '/', component: main },
     ],
     linkActiveClass: 'router-link-noob',

@@ -1,0 +1,139 @@
+.ResultConteiner
+{
+    position: relative;
+    top: 55px;
+    /* height: 100%; */
+    max-width: 1143px;
+    min-width: 775px;
+    position: relative;
+    padding-bottom: 65px;
+    margin: 0 auto;
+    padding-left: 15px;
+}
+.header
+{
+    position: relative;
+    top: 25px;
+    cursor: default;
+    padding-bottom:15px;
+}
+.header h1
+{
+    margin: 0px;
+    margin-right: 15px;
+    display:inline-block;
+}
+.header p
+{
+    margin: 0;
+    display: inline-block;
+    font-size: 27px;
+    letter-spacing: 2px;
+    color: rgb(95, 95, 95);
+}
+.cont
+{
+    position: relative;
+    display: flex;
+}
+.performers, .albums
+{
+    position: relative;
+    width: 76%;
+}
+.performer-cont, .album-cont
+{
+    display: flex;
+    flex-wrap: wrap;
+}
+h2
+{
+    cursor: default;
+    margin-left: 13.5px;
+}
+.performer, .album
+{
+    padding-top:10px; 
+    width: 210px;
+    height: 210px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}
+.performer:hover, .album:hover
+{
+    outline: 3px solid rgb(255, 181, 43);
+    cursor: pointer;
+    /* border: 2px solid rgb(255, 181, 43); */
+}
+.performer img, .album img, .performer .more, .album .more
+{
+    width: 183px;
+    height: 183px;
+    top: 5px;
+    margin: auto;
+    display: block;
+}
+.name
+{
+    text-align: center;
+    width: 100%;
+    top: 5px;
+    font-size: 18px;
+    display: block
+}
+.tracks
+{
+    max-width: 800px;
+}
+.album-modal
+{
+    z-index: 900;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    width: 650px;
+    max-height: 800px;
+}
+.bg
+{
+    bottom: 0px;
+    z-index: 899;
+    position: fixed;
+    overflow-y: hidden;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+.more
+{
+    background-color: rgba(192,192,192,0.6);
+    text-align: center;
+    display: flex !IMPORTANT;
+    width: 100%;
+}
+.more span
+{
+    display: block;
+    margin: auto;
+    position: relative;
+    font-size: 25px;
+    cursor: inherit;
+}
+.track
+{
+    width: 100%;
+    height: 45px;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 6px;
+}
+.track-more:hover
+{
+    cursor: pointer;
+    background-color: rgb(192,192,192);
+}

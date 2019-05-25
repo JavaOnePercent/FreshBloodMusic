@@ -1,7 +1,7 @@
 <template>
     <div class="searchConteiner">
         <input id="Search" v-model="search" class="search" type="text"  placeholder="Назваине трека, испольнителя" autocomplete="off"
-        @focus="GetHistory(); currentTip=-1; showTips=true" @blur="showTips=false" @input="GetTips"
+        @focus="GetHistory(), GetTips() ; currentTip=-1; showTips=true" @blur="showTips=false" @input="GetTips"
         @keydown.down="control($event,'down')" @keydown.up="control($event,'up')" @keydown.enter="control($event,'enter')"/>
         <img title="поиск" src="/static/mainapp/images/lupa.svg" @click="goTolocalStorage">
         <!-- <div v-if="showTips && history.length>0 "> -->
@@ -65,7 +65,6 @@ export default {
                     // document.getElementById('Search').blur()
                     return
                 }
-
                 this.search = mass[this.currentTip].name || mass[this.currentTip]
                 document.getElementById('Search').blur()
                 this.goTolocalStorage()
@@ -104,6 +103,9 @@ export default {
             mas.push(this.search)
             var serial = JSON.stringify(mas);
             localStorage.setItem("history", serial);
+            this.$router.push('/search')
+            this.$store.commit("updateSearchRec", this.search)
+            this.$bus.$emit('Search', this.search)
         },
         GetHistory() {
             this.history=[]
@@ -122,7 +124,7 @@ export default {
                 this.tips = []
                 return
             }
-            this.$http.get('../api/search?query=' + this.search + '&suggest=true').then(function(response){
+            this.$http.get('../api/search?query=' + this.search.toLowerCase() + '&suggest=true').then(function(response){
                 console.log(response.body)
                 this.tips = response.body.results
                 this.tips.reverse()
@@ -206,7 +208,7 @@ export default {
     .tips
     {
         height: auto;
-        max-height: 200px;
+        /* max-height: 200px; */
         top: 55px;
         /* position: absolute; */
         /* min-width: 100%; */

@@ -254,6 +254,7 @@
     line-height: 45px;
     float: right;
     color: rgb(45, 45, 45);
+    text-align: right;
 }
 .trc-controll
 {

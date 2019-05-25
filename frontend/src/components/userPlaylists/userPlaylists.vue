@@ -59,11 +59,15 @@ export default {
             });
         },
         getCoordinate() {
-            var obj = document.getElementById('inside');
-            var main = document.getElementById('father'); 
-            var luk = main.getElementsByClassName('currentTrc')
-            if (175 - luk[0].offsetTop > 0)
-                obj.style.top = '45px'
+            if(document.getElementById('father'))
+            {
+                var obj = document.getElementById('inside');
+                var main = document.getElementById('father'); 
+                var luk = main.getElementsByClassName('currentTrc')
+                if (175 - luk[0].offsetTop > 0)
+                    obj.style.top = '45px'
+            }
+            else document.getElementById('inside').style.top = '45px'
         },
         getTrcPlaylist() {
             var id = this.$store.state.myPerformerID;

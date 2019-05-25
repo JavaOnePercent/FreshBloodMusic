@@ -27,6 +27,7 @@ import topPlayer from './components/TopPlayer.vue'
 
 import NewProfile from './components/NewProfile/NewProfile.vue'
 import Notifications from './components/Notifications/Notifications.vue'
+import Result from './components/Result/Result'
 // import userPlaylists from './components/userPlaylists/userPlaylists.vue'
 
 export default {
@@ -45,6 +46,7 @@ export default {
         topPlayer,
         NewProfile,
         Notifications,
+        Result,
         // userPlaylists
     },
     created() {
