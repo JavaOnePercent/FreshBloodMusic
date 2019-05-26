@@ -49,7 +49,7 @@
         </div>
             <div v-if="showAlbum">
                 <div class="album-modal">
-                    <TrackList style="height: 80%; top:-15px; position: relative;" :albumType="'album'" :albumId="result.album[choseAlbum].id" :lable="'/media/' + result.album[choseAlbum].image"
+                    <TrackList @close="showAlbum=false" style="height: 80%; top:-15px; position: relative;" :albumType="'album'" :albumId="result.album[choseAlbum].id" :lable="'/media/' + result.album[choseAlbum].image"
                     :AlbumStatus='true' > </TrackList>
                 </div>
                 <div id='bg' class='bg' @click="showAlbum=false"></div>

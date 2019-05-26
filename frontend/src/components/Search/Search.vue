@@ -5,7 +5,7 @@
         @keydown.down="control($event,'down')" @keydown.up="control($event,'up')" @keydown.enter="control($event,'enter')"/>
         <img title="поиск" src="/static/mainapp/images/lupa.svg" @click="goTolocalStorage">
         <!-- <div v-if="showTips && history.length>0 "> -->
-        <div v-if="showTips && history.length>0 && tips.length === 0 " class="tips-cont">
+        <div v-if="showTips && history.length > 0 && tips.length === 0 " class="tips-cont">
             <div class="row">
                 <div v-if="showTips && history.length>0 && tips.length === 0 " class="tips">
                     <div :class="{'current':currentTip===index}" class="tip"  :key="index" v-for="(el, index) in filteredList"

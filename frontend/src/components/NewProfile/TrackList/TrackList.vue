@@ -52,7 +52,7 @@
                             <img v-if="!track.is_liked && albumType !== 'liked'" src="/static/mainapp/images/empty-heart.svg" title="мне нравится">
                             <img v-else src="/static/mainapp/images/heart.svg" title="мне нравится">
                         </span>
-                        <span class="trc-controll-btn like" @click.stop="gotoSimilar(track.id, track.name_trc)">
+                        <span class="trc-controll-btn like" @click.stop="gotoSimilar(track.id, track.name_trc); $emit('close')">
                             <img src="/static/mainapp/images/similar.svg" title="показать похожие" >
                         </span>
                         <span class="trc-controll-btn add-to-playlist" @click.stop="current_trc=current_trc===index?null:index">

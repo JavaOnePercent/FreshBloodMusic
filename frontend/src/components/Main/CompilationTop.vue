@@ -127,6 +127,8 @@ export default {
     },
     mounted(){
         document.body.addEventListener("scroll", this.onScroll, false);
+        this.showGenre('all');
+        this.getGengeAndStyles()
     },
     beforeDestroy () { 
         document.body.removeEventListener("scroll", this.onScroll, false);
@@ -313,10 +315,13 @@ export default {
             })
         }
     },
-    created: function() {
-        this.showGenre('all'),
-        this.getGengeAndStyles()
-    }
+    // created: function() {
+    //     this.showGenre('all'),
+    //     this.getGengeAndStyles()
+    // },
+    // watch: {
+    //     '$route': "showGenre('all')",
+    // },
 }
 </script>
 

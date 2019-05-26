@@ -204,14 +204,24 @@ export default {
 }
 .lable
 {
-    margin-right:10px; 
+    /* margin-right:10px; 
     float: left;
     position: relative;
     object-fit: cover;
     border-style: solid;
     border-color:black;
     width: 183px;
-    height: auto;
+    height: auto; */
+    position: relative;
+    padding: 0;
+	object-fit: cover;
+	display: block;
+    border-style: solid;
+    border-color:black;
+    width: 183px;
+    height: 183px;
+    float: left;
+    margin-right: 15px;
 }
 input
 {

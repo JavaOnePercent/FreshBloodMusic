@@ -9,6 +9,7 @@
                 </router-link>
                 <Search> </search>
                 <div class="management">
+                    <Radio> </Radio>
                     <div style="height:55px" v-if="username != ''">
                         <div class="drop-menu row" @mouseenter="menuShow=!menuShow" @mouseleave="menuShow=!menuShow" >
                             <div class="user">
@@ -23,12 +24,13 @@
                         </div>
                         <div style="width:55px; height:55px; display:inline-block; position: relative;" class="uploud-cont" @click='showMenu'>
                             <img title="загрузить музыку" class="uploadButton" src="/static/mainapp/images/download.svg" alt="loader">
-                        </div>  
+                        </div>
                     </div>
                     <div v-else>
                         <router-link to="/login">Войти</router-link>
                         <router-link to="/register">Регистрация</router-link>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -37,6 +39,7 @@
 
 <script>
 import Search from './Search/Search.vue'
+import Radio from './Radio/Radio'
 
 export default {
   name: 'header-container',
@@ -46,7 +49,8 @@ export default {
         }
     },
     components: {
-        Search
+        Search,
+        Radio
     },
     methods: {
         showMenu() {
@@ -127,7 +131,7 @@ export default {
 .management
 {
     text-align: center;
-    display: table-cell;
+    display: flex;
     vertical-align:middle;
     line-height: 55px;
     text-align: right;
