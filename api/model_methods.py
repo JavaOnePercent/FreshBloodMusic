@@ -294,11 +294,17 @@ class TrackRecommendation:
         return user_features
 
     @staticmethod
+    def calculate_random_features(tracks):
+        rand_id = random.randint(0, len(tracks) - 1)
+        return tracks[rand_id]
+
+    @staticmethod
     def calculate_recommendations(liked_tracks, instances, limit, only_similar=False):
         recommended_tracks = []
         if len(liked_tracks) > 0 and len(instances) > 0:
 
-            user_features = TrackRecommendation.calculate_features(liked_tracks)
+            # user_features = TrackRecommendation.calculate_features(liked_tracks)
+            user_features = TrackRecommendation.calculate_random_features(liked_tracks)
 
             features_list = []
 

@@ -162,16 +162,17 @@ class TrackOverview(generics.ListCreateAPIView):
             raise exc
 
     def get_queryset(self):
+        pass
+
+    def list(self, request, *args, **kwargs):
         try:
             filter = self.request.query_params['filter']
         except MultiValueDictKeyError:
             raise ParseError('Filter param must be set')
 
         if filter != 'popular':
-            TrackOverview.serializer_class = NoLinkTrackSerializer
-            TrackOverview.pagination_class = PostLimitOffsetPagination
-
-            request = self.request
+            # TrackOverview.serializer_class = NoLinkTrackSerializer
+            # TrackOverview.pagination_class = PostLimitOffsetPagination
 
             try:
                 sort = self.request.query_params['sort']
@@ -230,7 +231,14 @@ class TrackOverview(generics.ListCreateAPIView):
                     tracks.extend(id_tracks3)
                 else:
                     raise ParseError('Incorrect value of the sort parameter')
-            return tracks
+
+            page = self.paginate_queryset(tracks)
+            if page is not None:
+                serializer = NoLinkTrackSerializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = NoLinkTrackSerializer(tracks, many=True)
+            return Response(serializer.data)
 
         else:
             try:
@@ -238,17 +246,31 @@ class TrackOverview(generics.ListCreateAPIView):
                 interval = self.request.query_params['interval']
             except MultiValueDictKeyError:
                 raise ParseError('Filter by popularity requires limit and interval params')
-            TrackOverview.serializer_class = TopTrackSerializer
-            TrackOverview.pagination_class = None
+            # TrackOverview.serializer_class = TopTrackSerializer
+            # TrackOverview.pagination_class = None
             tracks = Track.objects.order_by('-rating_trc').filter(
                 date_trc__gte=date.today() - timedelta(days=int(interval)))[:int(limit)]
-            return tracks
+
+            serializer = TopTrackSerializer(tracks, many=True)
+
+            data = serializer.data
+            for datum in data:
+                is_liked = LikedTrackMethods.check_if_liked(auth.get_user(request), datum['id'])
+                datum.__setitem__('is_liked', is_liked)
+            return Response(data)
 
 
 class TrackDetail(APIView):
     def get_next(self, user):
         try:
-            recommendations = TrackRecommendation.get_recommendation(user, limit=1)
+            try:
+                genre = self.request.query_params['genre']
+                Genre.objects.get(pk=genre)
+            except MultiValueDictKeyError:
+                genre = None
+            except Genre.DoesNotExist:
+                raise ParseError('Genre with specified id doesnt exist')
+            recommendations = TrackRecommendation.get_recommendation(user, genre_id=genre, limit=1)
             if len(recommendations) != 0:
                 track = Track.objects.get(id=recommendations[0].id)
             else:
@@ -257,6 +279,12 @@ class TrackDetail(APIView):
             return track
         except Track.DoesNotExist:
             raise Http404
+
+    def handle_exception(self, exc):
+        if type(exc) == ParseError:
+            return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise exc
 
     def get_object(self, pk):
         try:
