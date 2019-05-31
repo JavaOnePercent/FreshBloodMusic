@@ -20,6 +20,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import ParseError
 from datetime import date
 from django.db.models import CharField, Value
+from django.db import connection
 
 
 @ensure_csrf_cookie
@@ -675,6 +676,42 @@ class PerformerDetail(APIView):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response('Specified performer doesnt belong to the user', status=status.HTTP_400_BAD_REQUEST)
+
+
+class StatisticsView(APIView):
+    def handle_exception(self, exc):
+        if type(exc) == ParseError:
+            return Response(exc.args[0], status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise exc
+
+    @staticmethod
+    def dictfetchall(cursor):
+        """Return all rows from a cursor as a dict"""
+        columns = [col[0] for col in cursor.description]
+        return [
+            dict(zip(columns, row))
+            for row in cursor.fetchall()
+        ]
+
+    def get(self, request):
+        try:
+            entity = request.query_params['entity']
+            entity_id = request.query_params['entity_id']
+        except MultiValueDictKeyError:
+            raise ParseError('entity and entity_id param must be specified')
+        try:
+            x = request.query_params['x']
+            y = request.query_params['y']
+            days = request.query_params['days']
+        except MultiValueDictKeyError:
+            raise ParseError('x, y and interval params must be specified')
+
+        with connection.cursor() as cursor:
+            cursor.callproc(entity + '_' + y + '_by_' + x, [entity_id, days])
+            res = self.dictfetchall(cursor)
+
+        return Response(res)
 
 
 @api_view(['PUT', 'GET'])

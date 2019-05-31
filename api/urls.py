@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^performers/(?P<pk>\d+)$', views.PerformerDetail.as_view()),
     url(r'^genre$', views.genre, name='genre'),
     url(r'^history$', views.history, name='history'),
+    url(r'^statistics$', views.StatisticsView.as_view()),
     # url(r'^report$', views.report, name='report'),
 
     url(r'^login', views.login, name='login'),
