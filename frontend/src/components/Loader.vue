@@ -11,7 +11,7 @@
             </div>
             <div class="track-name-loader-conteiner">
                 <label for="track-name-loader">Название*</label>
-                <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="40">
+                <input class="track-name-loader" type="text" name="track-name-loader" placeholder="" v-model='track_name_loader' maxlength="22">
             </div>
     
             <div class="track-janr-loader-conteiner">
@@ -27,10 +27,10 @@
                 </ul>
             </div>
     
-            <div class="description-conteiner">
+            <!-- <div class="description-conteiner">
                 <label for="track-name-loader">Описание</label>
-                <textarea type="text" name="description" maxlength="800"> </textarea>
-            </div>
+                <textarea type="text" name="description" maxlength="800" v-model="description"> </textarea>
+            </div> -->
     
     
             <input style="display: none" id="photo" ref="fileInput" class="add" @change="sync_photo" type="file" name="photo" accept="image/*,image/jpeg" > <!--если шо тот ref -->
@@ -39,9 +39,9 @@
                 <input v-focus v-on:keyup.enter="currentEdit=null" v-if="currentEdit===index" id="input" class="track" type="text" v-model='tracks.name' @change="track_Name" @blur="currentEdit=null" maxlength="30" > <!-- а тут менять длину по базе-->
                 <div v-else class="track" style="cursor: pointer"  @click="upgradeName(index)" >{{tracks.name}}</div>
                 <div class="Loaderplay" v-show="tracks.loading"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>
-                <img v-if="currentEdit===index" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
-                <img v-else class="edit" src="/static/mainapp/images/edit.png" @mousedown="upgradeName(index)">
-                <img class="del" src="/static/mainapp/images/xiomi.png" @click="deleteTrack(index)">
+                <img v-if="currentEdit===index" v-show="!tracks.loading" class="edit" src="/static/mainapp/images/forward.png" @mousedown="currentEdit=null">
+                <img v-else v-show="!tracks.loading" class="edit" src="/static/mainapp/images/edit.png" @mousedown="upgradeName(index)">
+                <img  v-show="!tracks.loading" class="del" src="/static/mainapp/images/xiomi.png" @click="deleteTrack(index)">
                 <hr class="HRloader">
             </div>
       
@@ -51,10 +51,12 @@
                     Добавить композиции
                 </label>
             </div>
-            <div id="error" class="error"><label  >{{errorMessage}} </label></div>
+            <div style='font-size: 20px;' id="error" class="error"><label  >{{errorMessage}} </label></div>
             <!--<div class="loading" v-if="loader"><span class="cssload-loader"><span class="cssload-loader-inner"></span></span></div>-->
-            <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "жанр" & !loader'  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
-            
+            <button v-if='this.track.length > 0 & track_name_loader != "" & janr != "Выбрать жанр" & !loader'  class="loader" name="loader" @click.prevent='send()'>Загрузить </button>
+            <span v-if='this.track.length > 0 & track_name_loader != "" & janr != "Выбрать жанр" & !loader' class="description-conteiner" style="font-size: 16px;"> После загрузки файлов их нельзя будет изменить! </span>
+            <br>
+            <span class="description-conteiner" style="font-size: 16px;"> Обратите внимание, что длина названия одного трека не должна превышать 50 символов </span>
 
         </form>
     </div>
@@ -97,6 +99,7 @@ export default {
             dropAll: null,
             menuItems: [],
             loader:false,
+            description: ''
         }
     },
     //если шо то сносить к чертям
@@ -139,7 +142,7 @@ export default {
             this.show=!this.show;
             if(this.menuItems.length === 0)
             {
-                this.$http.get('api/genre').then(response => {response.body.forEach(this.genresIterator)})
+                this.$http.get('/api/genre').then(response => {response.body.forEach(this.genresIterator)})
             }
         },
         
@@ -150,7 +153,7 @@ export default {
         genreClick(index) {
             this.menuIndexfunc(index);
             if(this.menuItems[index].children.length === 0)
-                this.$http.get('api/genre', {params: {id: this.menuItems[index].id}}).then(response => {response.body.forEach(this.stylesIterator)});
+                this.$http.get('/api/genre', {params: {id: this.menuItems[index].id}}).then(response => {response.body.forEach(this.stylesIterator)});
         },
       
         stylesIterator(item, i, arr) { 
@@ -180,8 +183,8 @@ export default {
         dragoverdrop (e){
             e.stopPropagation();
             e.preventDefault();
-            dropAll.style.pointerEvents="all"
-            vm.loaderStyle = 'track-upload'
+            // dropAll.style.pointerEvents="all"
+            // vm.loaderStyle = 'track-upload'
         },
 
         dragleaveAll(e){
@@ -205,7 +208,7 @@ export default {
             //vm.loaderStyle ='track-upload-drop'
         },
 
-         dragenterAll(e){
+        dragenterAll(e){
             e.stopPropagation();
             e.preventDefault();
             this.dragging++;
@@ -237,7 +240,15 @@ export default {
             this.loaderStyle='track-upload'
             var dt = e.dataTransfer;
             var files = dt.files;
+            console.log(files)
+            console.log(document.getElementById("add").files)
             document.getElementById("add").files =  files;
+
+            console.log(document.getElementById("add").files)
+            document.getElementById("add").onchange
+            this.loadFile(files)
+            // this.sync_track(e)
+            // this.track = files
             this.dragoverdrop(e)
         },
 
@@ -281,16 +292,50 @@ export default {
         },
 
         sync_track: function(e)  {
+            console.log(e)
             e.preventDefault();
-            for(var i=0;i<e.target.files.length;i++) //пробегаем по файлам
+            this.loadFile(e.target.files)
+            // for(var i=0;i<e.target.files.length;i++) //пробегаем по файлам
+            // {
+            //     if(this.track.length < 20 )  //проверяем количество файлов в массиве 
+            //     {
+            //         if(e.target.files[i].name.split('.').pop() =="mp3" ) //проверяем формат файла
+            //         {
+            //             this.errorMessage = ''
+            //             //console.log(e.target.files[i].type)
+
+            //             var file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "").substr(0, 50),"file": e.target.files[i]};
+            //             //e.target.reset();
+            //             //e.target.files[i] = null;
+            //             //console.log(e.target.files[i].name)
+            //             //file=e.target.files[i];
+            //             this.track.push(file);
+            //             //console.log(this.track.length)
+            //         } 
+            //         else 
+            //         {
+            //             this.errorMessage = 'формат музыки только mp3'  //хотя скорее всего эта ошибка не нужна
+            //         }
+            //     } 
+            //     else
+            //     {
+            //         this.errorMessage = "был превышен лимит";
+            //         break
+            //     }
+            // }
+            this.$refs.add.value  =  ""; 
+        },
+        loadFile(files) {
+        for(var i=0;i<files.length;i++) //пробегаем по файлам
             {
                 if(this.track.length < 20 )  //проверяем количество файлов в массиве 
                 {
-                    if(e.target.files[i].name.split('.').pop() =="mp3" ) //проверяем формат файла
+                    if(files[i].name.split('.').pop() =="mp3" ) //проверяем формат файла
                     {
                         this.errorMessage = ''
                         //console.log(e.target.files[i].type)
-                        var file= {"name":e.target.files[i].name.replace(/\.[^.]+$/, "") ,"file": e.target.files[i]};
+
+                        var file= {"name":files[i].name.replace(/\.[^.]+$/, "").substr(0, 50),"file": files[i]};
                         //e.target.reset();
                         //e.target.files[i] = null;
                         //console.log(e.target.files[i].name)
@@ -309,7 +354,6 @@ export default {
                     break
                 }
             }
-            this.$refs.add.value  =  ""; 
         },
 
         track_Name: function(e){
@@ -317,8 +361,8 @@ export default {
             if(this.track[this.currentEdit].name.length<1)
             {
             //console.log(this.trackName);
-            this.errorMessage = "название трека не может быть пустым";
-            this.track[this.currentEdit].name = this.trackName;
+                this.errorMessage = "название трека не может быть пустым";
+                this.track[this.currentEdit].name = this.trackName;
             }
             //console.log(this.track[this.currentEdit].name.length)
         },
@@ -337,6 +381,7 @@ export default {
             }*/
             data.append('name', this.track_name_loader)
             data.append('gen_id', this.genreID)
+            data.append('description', this.description)
 
             //console.log('track_name_loader, track, photo=', track_name_loader, track, photo);
             if (track_name_loader && track) {
@@ -634,6 +679,11 @@ background-color: rgb(129, 129, 129);
 	position: absolute;
 	height: 35px;
 	width: 625px;
+    font-size: 17px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
 }
 .edit
 {
@@ -674,7 +724,7 @@ background-color: rgb(129, 129, 129);
 	margin-bottom: -25px;
 	overflow: hidden;
 	padding: 0;
-	width: 350px;
+	width: 450px;
 	height: 30px;
 	left:370px;
 	bottom: -130px; 

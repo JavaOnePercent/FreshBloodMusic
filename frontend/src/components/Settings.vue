@@ -7,7 +7,7 @@
                     <hr>
                     <div class="N-name str">
                         <label class="line">Ваше имя:</label>
-                        <input v-model="name" class="" type="text" name="N-name" maxlength="40"/>
+                        <input v-model="name" class="" type="text" name="N-name" maxlength="30"/>
                     </div>
                     <div class="N-Lable str nastr-row" style="padding:15px 0">
                         <label class="line">Аватар:</label>
@@ -17,14 +17,9 @@
                     </div> 
                     <div class="N-Description str">
                         <label class="line">О себе:</label>
-                        <textarea v-model="description" class="" type="text" name="N-Description" maxlength="800">
+                        <textarea v-model="description" class="" type="text" name="N-Description" maxlength="250">
                         </textarea>
                     </div>              
-                </div>
-        
-                <div style="display:none" class="N-vk block nastr-row">
-                    <label class="line">Привязка акканута к ВК:</label>
-                    ну а тут можно просто ссылку требовать в инпут 
                 </div>
         
                 <div style="display:none" class="N-style block nastr-row">
@@ -143,9 +138,10 @@ export default {
             data.append('label', this.label);
             data.append('description', this.description);
             var self = this
-            this.$http.put('../api/performers/' + this.id, data, {headers: {'X-CSRFToken': this.$root.csrftoken}}).then(function(response){
+            this.$http.put('../api/performers/' + this.id, data).then(function(response){
                 this.$store.commit('performerLogo', '');
                 self.$router.push('performers/' + self.myPerformerID)
+                this.$bus.$emit('likeNot', 'Изменения сохранены')
             });
         }
     },
@@ -208,20 +204,36 @@ export default {
 }
 .lable
 {
-    margin-right:10px; 
+    /* margin-right:10px; 
     float: left;
     position: relative;
     object-fit: cover;
     border-style: solid;
     border-color:black;
-    width: 250px;
-    height: auto;
+    width: 183px;
+    height: auto; */
+    position: relative;
+    padding: 0;
+	object-fit: cover;
+	display: block;
+    border-style: solid;
+    border-color:black;
+    width: 183px;
+    height: 183px;
+    float: left;
+    margin-right: 15px;
 }
 input
 {
     padding: 5px;
     width: 500px;
     height: 15px;
+    font-size: 18px;
+    border: 1px solid black;
+}
+input:hover, textarea:hover
+{
+    border: 1px solid black;
 }
 input[type=file]
 {
@@ -246,6 +258,7 @@ input[type=file]
 .imit:hover
 {
     background-color: rgba(27, 223, 223, 0.5);
+    border: 1px solid black;
 }
 textarea
 {
@@ -256,6 +269,7 @@ textarea
     resize: vertical;
     max-height: 250px;
     min-height: 60px;
+    font-size: 18px;
 } 
 .line
 {
@@ -306,5 +320,9 @@ textarea
 {
     /* background-color: rgb(177, 177, 177); */
     background-color: rgb(141, 111, 185);
+}
+*:focus
+{
+    outline:none;
 }
 </style>

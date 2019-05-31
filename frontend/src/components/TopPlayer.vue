@@ -83,6 +83,7 @@ export default {
         });
         this.$bus.$on('play-track', event => {
             //this.playNow(event.id);
+            console.log('event', event)
             this.playNow(event.id);
             
         });
@@ -259,10 +260,12 @@ export default {
             }
         },
         playNow(id) {
+            console.log('id', id)
             if(this.current.id !== id)
                 this.$http.get('../api/tracks/' + id, {
                     responseType: 'json'
                 }).then(response => {
+                    console.log(response.body)
                     //this.$store.commit('pushHistoryTracks', this.track.current)
                     this.$store.commit('unshiftQueueTracks', response.data)
 

@@ -1,0 +1,10 @@
+django
+djangorestframework
+pillow
+pydub
+pymysql
+tensorflow
+keras
+kapre
+librosa
+nmslib

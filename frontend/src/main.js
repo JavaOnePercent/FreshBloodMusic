@@ -11,6 +11,9 @@ import main from './components/Main.vue'
 import registration from './components/Registration.vue'
 import login from './components/Login.vue'
 
+import NewProfile from './components/NewProfile/NewProfile.vue'
+import Result from './components/Result/Result'
+
 Vue.use(VueCookie);
 
 Vue.use(VueRouter)
@@ -52,7 +55,10 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         historyTracks: [],
         username: '',
         myPerformerID: 0,
-        currentTrack: null
+        currentTrack: null,
+        search: '',
+        similar: null,
+        similarName: ''
     },
     mutations: {
         currentTime (state, val) {
@@ -136,7 +142,16 @@ const store = new Vuex.Store({ //глобальное хранилище vuex
         },
         currentTrack(state, val) {
             state.currentTrack = val
-        }
+        },
+        updateSearchRec(state, val) {
+            state.search = val
+        },
+        updateSimilar(state, val) {
+            state.similar = val
+        },
+        updateSimilarName(state, val) {
+            state.similarName = val
+        },
     }
 })
 
@@ -145,8 +160,10 @@ const router = new VueRouter({
     routes: [
         { path: '/register', component: registration },
         { path: '/login', component: login },
-        { path: '/performers/:id', name: 'performer', component: profile },
+        { path: '/performers/:id', name: 'performer', component: NewProfile },
         { path: '/settings', component: settings },
+        { path: '/search', component: Result},
+        { path: '/similar', component: Result},
         { path: '/', component: main },
     ],
     linkActiveClass: 'router-link-noob',
@@ -171,3 +188,12 @@ new Vue({
     }
 
 }).$mount('#app')
+Vue.directive('click-outside', {
+    bind(el, binding) {
+        el.addEventListener('click', e => e.stopPropagation());
+        document.body.addEventListener('click', binding.value);
+    },
+    unbind(el, binding) {
+        document.body.removeEventListener('click', binding.value);
+    }
+});

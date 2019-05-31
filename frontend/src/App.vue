@@ -1,12 +1,18 @@
 <template>
-    <div id="app">
+    <div class="app" id="app">
         <header-container></header-container>
         <div v-if="showLoader" class="modal" id="myModal" >
             <div class="modal-content">
                 <loader></loader>
             </div>
         </div>
-        <router-view @login="loadFromHistory" ></router-view>
+        <!-- <user-playlists> </user-playlists> -->
+        <div style="position: relative; top: calc(50% - 55px);" class="loading" v-if="loading">
+        <div class="Loaderplay"><span class="cssload-main"><span class="cssload-main-inner"></span></span></div>
+        <h2> Подождите, нам надо подготовиться. </h2>
+        </div>
+        <Notifications> </Notifications>
+        <router-view v-if="!loading" @login="loadFromHistory" ></router-view>
         <top-player></top-player>
     </div>
 </template>
@@ -19,17 +25,33 @@ import mainCompilation from './components/Main.vue'
 import loader from './components/Loader.vue'
 import topPlayer from './components/TopPlayer.vue'
 
+import NewProfile from './components/NewProfile/NewProfile.vue'
+import Notifications from './components/Notifications/Notifications.vue'
+import Result from './components/Result/Result'
+// import userPlaylists from './components/userPlaylists/userPlaylists.vue'
+
 export default {
     name: 'app',
+      data() {
+        return {
+            loading: true,
+        }
+    },
     components: {
         headerContainer,
         profile,
         settings,
         mainCompilation,
         loader,
-        topPlayer
+        topPlayer,
+        NewProfile,
+        Notifications,
+        Result,
+        // userPlaylists
     },
     created() {
+        this.loading = true,
+        console.log(this.$store.state)
         var self = this
         this.$http.get('../api/login').then(function(response){
             self.$store.commit("username", response.data.username)
@@ -60,13 +82,16 @@ export default {
             }
             else
                 this.$bus.$emit('set-current-track', null)
-        }, error => {this.$bus.$emit('set-current-track', null)});
+            this.loading = false
+        }, error => {this.$bus.$emit('set-current-track', null)
+                        this.loading = false
+        });
         }
     }
 }
 </script>
 
-<style>
+<style >
 html, body
 {
     /*font-family:"Rex Bold";*/
@@ -83,7 +108,11 @@ html, body
 html {
     overflow: hidden;
 }
- .modal
+.app
+{
+    height: 100%;
+}
+.modal
  {
     pointer-events: all;
     position: fixed;
@@ -103,5 +132,274 @@ html {
  }
 .modal::-webkit-scrollbar {
     display: none;
+}
+/* стили скроллбара */
+.ps__thumb-y {
+    background-color: rgb(255, 181, 43) !important; 
+    border-radius: 6px;
+    position: absolute;
+}
+.ps__rail-y {  
+    background-color: rgba(255, 181, 43, 0) !important;
+}
+/* стили скроллбара */
+.loading
+{
+    width: 100%;
+}
+.loading h2
+{
+    margin: 0 auto;
+    text-align: center;
+    display: block;
+    cursor: default;
+}
+
+.cssload-main {
+    top: 25px;
+	display: block;
+    margin:0 auto;
+    margin-bottom: 30px;
+	width: 25px;
+	height: 25px;
+	position: relative;
+	border: 5px solid rgb(0,0,0);
+	animation: cssload-main 2.3s infinite ease;
+    -o-animation: cssload-main 2.3s infinite ease;
+    -ms-animation: cssload-main 2.3s infinite ease;
+    -webkit-animation: cssload-main 2.3s infinite ease;
+    -moz-animation: cssload-main 2.3s infinite ease;
+}
+
+.cssload-main-inner {
+	vertical-align: top;
+	display: inline-block;
+	width: 100%;
+	background-color: rgb(70, 70, 70);
+	animation: cssload-main-inner 2.3s infinite ease-in;
+		-o-animation: cssload-main-inner 2.3s infinite ease-in;
+		-ms-animation: cssload-main-inner 2.3s infinite ease-in;
+		-webkit-animation: cssload-main-inner 2.3s infinite ease-in;
+		-moz-animation: cssload-main-inner 2.3s infinite ease-in;
+}
+
+@keyframes cssload-main {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-o-keyframes cssload-main {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-ms-keyframes cssload-main {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-webkit-keyframes cssload-main {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-moz-keyframes cssload-main {
+	0% {
+		transform: rotate(0deg);
+	}
+	
+	25% {
+		transform: rotate(180deg);
+	}
+	
+	50% {
+		transform: rotate(180deg);
+	}
+	
+	75% {
+		transform: rotate(360deg);
+	}
+	
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes cssload-main-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-o-keyframes cssload-main-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-ms-keyframes cssload-main-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-webkit-keyframes cssload-main-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
+}
+
+@-moz-keyframes cssload-main-inner {
+	0% {
+		height: 0%;
+	}
+	
+	25% {
+		height: 0%;
+	}
+	
+	50% {
+		height: 100%;
+	}
+	
+	75% {
+		height: 100%;
+	}
+	
+	100% {
+		height: 0%;
+	}
 }
 </style>
