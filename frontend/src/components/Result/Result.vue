@@ -8,6 +8,9 @@
             <h1> Похожее на</h1>
             <p> {{similarName}} </p>
         </div>
+        <div v-if="error">
+            <h2> {{error}} </h2>
+        </div>
         <div v-if="result.performer.length > 0" class="performers">
             <h2> Исполнители </h2>
             <div class="performer-cont">
@@ -78,7 +81,8 @@ export default {
                 track: ''
             },
             choseAlbum: null,
-            showAlbum: false
+            showAlbum: false,
+            error: ''
         }
     },
     components: {
@@ -108,6 +112,7 @@ export default {
             else 
                 url = '../api/search?track=' + this.similar
             this.$http.get(url).then(function(response){
+                this.error = ''
                 this.result = { 
                     performer: [],
                     album: [],
@@ -141,6 +146,18 @@ export default {
                 console.log(response.body)
                 // this.result = response.body
                 // this.tips.reverse()
+            },function(error){
+                this.result = { 
+                    performer: [],
+                    album: [],
+                    track: []
+                }
+                this.nextPageUrl = {
+                    performer: '',
+                    album: '',
+                    track: ''
+                }
+                this.error = 'Ничего не найдено'
             });
         },
         gotoPerformer(id) {

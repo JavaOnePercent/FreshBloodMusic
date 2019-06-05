@@ -28,7 +28,9 @@ import topPlayer from './components/TopPlayer.vue'
 import NewProfile from './components/NewProfile/NewProfile.vue'
 import Notifications from './components/Notifications/Notifications.vue'
 import Result from './components/Result/Result'
+import Statistic from './components/Statistic/Statistic'
 // import userPlaylists from './components/userPlaylists/userPlaylists.vue'
+
 
 export default {
     name: 'app',
@@ -47,6 +49,7 @@ export default {
         NewProfile,
         Notifications,
         Result,
+        Statistic
         // userPlaylists
     },
     created() {
@@ -102,8 +105,9 @@ html, body
     padding: 0;
     font-family: Arial,Helvetica,sans-serif;
     position: fixed;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow: auto;
+    /* overflow-y: scroll;
+    overflow-x: hidden; */
 }
 html {
     overflow: hidden;

@@ -88,4 +88,5 @@
     height: 400px;
     height: 100%;
     width: 350px;
+    max-height: calc(100vh - 55px);
 }

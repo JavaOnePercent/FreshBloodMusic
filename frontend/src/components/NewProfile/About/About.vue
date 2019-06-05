@@ -12,10 +12,12 @@
         </div>
 
         <div class="controll">
-            <router-link to="/settings" v-if="this.$route.params.id == this.$store.state.myPerformerID">
-                <div class="controll-btn settings"> Настройки </div>
+            <router-link class="controll-btn" to="/settings" v-if="this.$route.params.id == this.$store.state.myPerformerID">
+                <div > Настройки </div>
             </router-link>
-            <div class="controll-btn"> Статистика </div>
+            <router-link class="controll-btn" to="/statistic" v-if="this.$route.params.id == this.$store.state.myPerformerID">
+                <div > Статистика </div>
+            </router-link>
             <div class="controll-btn"> Уведомления </div>
         </div>
     </div>
