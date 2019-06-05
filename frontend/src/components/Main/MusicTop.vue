@@ -18,16 +18,21 @@
             </div>
         </transition>
         <transition :name="animation" mode="out-in">
-            <div class="infotrack" v-show="!showDiv" v-if="infotracks[1]">
+            <div class="infotrack" v-show="!showDiv" v-if="infotracks[1]!== undefined">
                 <img class="img" :src="infotracks[1].image_alb" alt="обложка">
                 <div class="text">
                     <span>Лучший трек этой недели</span>
-                    <p>{{ infotracks[1].name_per}} <br> {{ infotracks[1].name_trc}}</p>
-                    <div class="play btn" @click="playClick(infotracks[1].id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
-                    <div class="turn btn" @click="toQueueClick(infotracks[1].id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
-                    <p>Понравилась: {{ infotracks[1].rating_trc}} пользователям</p>
-                    <P>Жанр: {{ infotracks[1].name_gnr}} / {{ infotracks[1].name_stl}}</p>
+                    <div>
+                        <p>{{ infotracks[1].name_per}} <br> {{ infotracks[1].name_trc}}</p>
+                        <div class="play btn" @click="playClick(infotracks[1].id)"><img title="Воспроизвести" class="playIm"  src="/static/mainapp/images/Wplay.svg" alt="play"></div>
+                        <div class="turn btn" @click="toQueueClick(infotracks[1].id)"><img title="В очередь" class="turnIm" src="/static/mainapp/images/Wplaylist.svg" alt="turn"></div>
+                        <p>Понравилась: {{ infotracks[1].rating_trc}} пользователям</p>
+                        <P>Жанр: {{ infotracks[1].name_gnr}} / {{ infotracks[1].name_stl}}</p>
+                    </div>
                 </div>
+            </div>
+            <div class="infotrack" v-show="!showDiv" v-else>
+                <h2>Кажется, на это неделе никто не загрузил музыку</h2>
             </div>
         </transition>
     </div>
@@ -98,10 +103,10 @@ export default {
     },
     created: function() {
         this.autoFlip = setInterval(this.updatePosts, 7000);
-        this.$http.get('api/tracks', {params: {filter: 'popular', limit: 1, interval: 31}}).then(function(response){
+        this.$http.get('../api/tracks', {params: {filter: 'popular', limit: 1, interval: 31}}).then(function(response){
                 this.$set(this.infotracks,0,response.data[0]);
             })
-        this.$http.get('api/tracks', {params: {filter: 'popular', limit: 1, interval: 7}}).then(function(response){
+        this.$http.get('../api/tracks', {params: {filter: 'popular', limit: 1, interval: 7}}).then(function(response){
                 this.$set(this.infotracks,1,response.data[0]);
             })
     }

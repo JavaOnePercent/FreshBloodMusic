@@ -1,13 +1,24 @@
-<template>
-<div>
-    <div class="RadioConteiner">
+<template >
+<div v-outside="changeShowRadio">
+    <div  class="RadioConteiner" @click="showRadio = !showRadio">
         <img title="Радио" src="/static/mainapp/images/radio.svg">
     </div>
-    <div v-if="showRadio" class="RadioWave-cont">
+    <div  v-if="showRadio" class="RadioWave-cont">
         <div class="row">
-            <div v-if="showTips && history.length>0 && tips.length === 0 " class="RadioWave">
-                <!--Сюда вставить радио волны -->
-            </div>
+            <h3 style="width:200px; margin: 5px; height: 40px"> Радио волны </h3>
+            <vue-custom-scrollbar id='father' v-if="showRadio" class="RadioWave"  :settings="settings">
+                    <div class="wave">
+                        <span>
+                            Специально для вас
+                        </span>
+                    </div>
+                    <!--Сюда вставить радио волны -->
+                    <div class="wave" :key="index" v-for="(gener, index) in geners">
+                        <span>
+                            {{gener.name_gnr}}
+                        </span>
+                    </div>
+            </vue-custom-scrollbar>
         </div>
     </div>
 </div>
@@ -15,13 +26,48 @@
 </template>
 
 <script>
+import vueCustomScrollbar from 'vue-custom-scrollbar'
 export default {
     name: 'radio',
     data() {
         return {
-            showRadio: true
+            showRadio: false,
+            geners: [],
+            settings: {
+                maxScrollbarLength: 60,
+                wheelPropagation: true,
+                wheelSpeed: 0.2,
+            },
         }
     },
+    components: {
+        vueCustomScrollbar
+    },
+    directives: {
+        outside: {
+            bind(el, binding) {
+                el.addEventListener('click', e => e.stopPropagation());
+                document.body.addEventListener('click', binding.value);
+            },
+            unbind(el, binding) {
+                document.body.removeEventListener('click', binding.value);
+            }
+        }
+    },
+    created: function() {
+        this.getGeners()
+    },
+    methods: {
+        changeShowRadio() {
+            this.showRadio = false
+        },
+        getGeners() {
+            this.$http.get('../api/genre').then(function(response){
+                console.log(response.data)
+                this.geners = response.data
+            });
+        },
+    }
 }
 </script>
 
@@ -105,8 +151,8 @@ export default {
     display: block;
     max-width: 1280px;
     min-width: 915px;
-    left: 245px;
-    transform: translateX(0%);
+    /* left: 245px; */
+    /* transform: translateX(0%); */
     /* right: 0;
     left: 0; */
 }
@@ -124,12 +170,62 @@ export default {
 .RadioWave
 {
     height: auto;
-    max-height: 200px;
-    top: 55px;
-    /* position: absolute; */
+    position: relative;
+    max-height: 600px;
     /* min-width: 100%; */
     width: auto;
-    max-width: 500px;
+    /* max-width: 500px; */
     z-index: 1;
+}
+.RadioWave
+{
+    padding-top:15px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.wave:last-child
+{
+    margin-right: 15px;
+}
+.wave
+{
+    width: 168px;
+    /* line-height: 168px; */
+    text-align: center;
+    height: 168px;
+    font-size: 19.5px;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    line-height: 25px;
+    position: relative;
+}
+.wave 
+{
+    display: table;
+    background-color: rgba(192,192,192,0.3);
+}
+.wave span 
+{
+    display: table-cell;
+    vertical-align: middle;
+}
+.wave:hover{
+    cursor: pointer;
+    background-color: rgba(255, 181, 43, 0.3)
+}
+.scroll-area {
+    margin: auto;
+    width: 100%;
+    height: 400px;
+    height: 100%;
+    height: calc(100% - 198px);
+    background-color: white;
+    top: 15px;
+    position: relative;
+    padding-top:3px; 
+}
+.current {
+    cursor: default;
+    background-color: rgba(255, 181, 43, 0.3)
 }
 </style>

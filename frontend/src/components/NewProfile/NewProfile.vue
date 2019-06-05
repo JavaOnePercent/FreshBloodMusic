@@ -1,19 +1,21 @@
 <template>
-    <div v-if="!error" style="width:100%; height:calc(100% - 55px); background-color: rgb(215, 215, 240);top:55px; position: relative">
+    <div v-if="!error" style="width:100%; height:auto; min-height: calc(100vh - 55px); background-color: rgb(215, 215, 240);top:55px; position: relative; box-sizing: border-box;">
         <div class="ProfileConteiner">
-            <div style="width: 350px; background-color: rgba(255, 255, 255,0.6);"> 
-                <UserAlbums @changeAlbum="albumId=$event" @changeAlbumLable="albumLable=$event"
-                @changeAlbumName="albumName=$event" @changeAlbumGenre="albumGenre=$event" @changeAlbumDate="albumDate=$event"
-                @changeAlbumStyle='albumStyle=$event' @changeAlbumType='albumType=$event'
-                :deleted='deleted' @changeAlbumStatus='AlbumStatus=!$event' :playlist_created='playlist_created'
-                @playlist_created='playlist_created=$event'> </UserAlbums>
-            </div>
-            <div class="rightColumn">
-                <About :logo="logo" :name="name" :description="description"> </About>
-                <TrackList  v-if="albumType !== 'AddPlaylist'" style="height: calc(100% - 275px); padding-left:15px" :albumType="albumType" :albumId="albumId" :lable="albumLable" :albumName='albumName'
-                :albumGenre='albumGenre' :albumStyle='albumStyle' :albumDate='albumDate' :name='name'
-                @changeDeleted='deleted=$event' :AlbumStatus='AlbumStatus'> </TrackList>
-                <CreatePlayList @playlist_created='playlist_created=$event' v-else> </CreatePlayList>
+            <div class="row">
+                <div style="width: 350px; background-color: rgba(255, 255, 255,0.6); left:15px; position: absolute; height: calc(100vh - 55px); min-height: 100%"> 
+                    <UserAlbums @changeAlbum="albumId=$event" @changeAlbumLable="albumLable=$event"
+                    @changeAlbumName="albumName=$event" @changeAlbumGenre="albumGenre=$event" @changeAlbumDate="albumDate=$event"
+                    @changeAlbumStyle='albumStyle=$event' @changeAlbumType='albumType=$event'
+                    :deleted='deleted' @changeAlbumStatus='AlbumStatus=!$event' :playlist_created='playlist_created'
+                    @playlist_created='playlist_created=$event'> </UserAlbums>
+                </div>
+                <div class="rightColumn">
+                    <About :logo="logo" :name="name" :description="description"> </About>
+                    <TrackList  v-if="albumType !== 'AddPlaylist'" style="padding-left:15px" :albumType="albumType" :albumId="albumId" :lable="albumLable" :albumName='albumName'
+                    :albumGenre='albumGenre' :albumStyle='albumStyle' :albumDate='albumDate' :name='name'
+                    @changeDeleted='deleted=$event' :AlbumStatus='AlbumStatus'> </TrackList>
+                    <CreatePlayList @playlist_created='playlist_created=$event' v-else> </CreatePlayList>
+                </div>
             </div>
         </div>
     </div>
@@ -94,22 +96,40 @@ export default {
 .ProfileConteiner
 {
     height: 100%;
-    max-width: 1143px;
-    min-width: 775px;
+    width: 100%;
+    /* max-width: 1143px;
+    min-width: 775px; */
     position: relative;
     /* top: 55px; */
+    /* margin: 0 auto; */
+    /* display: flex;
+    justify-content: center; */
+}
+.row
+{
+    position: relative;
     margin: 0 auto;
-    display: flex;
-    justify-content: center;
+    display: block;
+    height: 100%;
+    max-width: 1280px;
+    min-width: 915px;
+    /* left: 245px; */
+    /* display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center; */
 }
 .rightColumn
 {
     height: auto;
-    display: flex;
+    /* display: flex; */
     /* width: 793px; */
+    position: relative;
+    left:365px;
+    overflow: hidden;
     padding-bottom: 55px;
     width: 60%;
-    flex-direction: column;
+    /* flex-direction: column; */
 }
 .error h1
 {

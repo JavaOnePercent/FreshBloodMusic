@@ -1,6 +1,6 @@
 <template>
 
-<div style="height: calc(100% - 55px);">
+<div style="max-height: calc(100vh - 55px);">
 <vue-custom-scrollbar class="scroll-area"  :settings="settings">
     
     <div class="userAlbumsConteiner">
@@ -30,9 +30,9 @@
                 <span class="album-name"> <span style="font-size: 12px; color: rgb(95, 95, 95)">Альбом</span> <br> {{albumLike.title}} </span>
             </div>
         </div>
-        <span class="category-name"> Плейлисты </span>
+        <span v-if="playlists.length != 0" class="category-name"> Плейлисты </span>
         <div class="music">
-            <div :class='{chousen:albumId==="AddPlaylist"}' class="album" @click='openAlbum("AddPlaylist")'>
+            <div v-if="this.$route.params.id == this.$store.state.myPerformerID" :class='{chousen:albumId==="AddPlaylist"}' class="album" @click='openAlbum("AddPlaylist")'>
                 <img class="addPlaylist" src="/static/mainapp/images/plus.svg">
                 <span class="album-name"> Создать плейлист </span>
             </div>
@@ -99,13 +99,13 @@ export default {
             this.getAlbumsLikes()
         },
         getAlbums() {
-            var id = this.$route.params.id;
+            var id = this.$route.params.id; // берём id адресс из пути url
             var self = this
-            this.$http.get('../api/albums?performer=' + id).then(function(response){
+            this.$http.get('../api/albums?performer=' + id).then(function(response){ //Запос к апи сервера
                 self.albums = []
                 response.body.map(function(item){
-                    var obj = {album: item, isDeleted: false}
-                    self.albums.push(obj)
+                    var obj = {album: item, isDeleted: false} //форимируем из ответа объект необходимого формата
+                    self.albums.push(obj)  //записываем информацию об альбоме 
                 });
                 if (self.albums.length >0)
                 this.openAlbum('album', this.albums[0].album.id, this.albums[0].album.image_alb, this.albums[0].album.name_alb, 0,
