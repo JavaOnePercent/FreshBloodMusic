@@ -20,7 +20,7 @@ class NoLinkTrackSerializer(serializers.ModelSerializer):  # сериалайз�
 
     class Meta:
         model = Track
-        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'id_per', 'rating_trc', 'duration', 'alb_id')
+        fields = ('id', 'name_trc', 'image_alb', 'name_per', 'id_per', 'audio_trc', 'rating_trc', 'duration', 'alb_id')
 
 
 class TopTrackSerializer(serializers.ModelSerializer):  # сериалайзер трека без ссылки на аудио
@@ -142,12 +142,14 @@ class FullPerformerSerializer(serializers.ModelSerializer):
 class LikedTrackSerializer(serializers.ModelSerializer):
     image_alb = serializers.FileField(source='trc_id.alb_id.image_alb')  # картинка альбома
     name_per = serializers.ReadOnlyField(source='trc_id.alb_id.per_id.name_per')  # имя исполнителя
+    per_id = serializers.ReadOnlyField(source='trc_id.alb_id.per_id.id')
     name_trc = serializers.ReadOnlyField(source='trc_id.name_trc')  # имя трека
     duration = serializers.ReadOnlyField(source='trc_id.duration')
+    audio_trc = serializers.FileField(source='trc_id.audio_trc')
 
     class Meta:
         model = LikedTrack
-        fields = ('name_trc', 'name_per', 'image_alb', 'trc_id', 'duration')
+        fields = ('trc_id', 'per_id', 'name_trc', 'name_per', 'image_alb', 'trc_id', 'duration', 'audio_trc')
 
 
 class TrackHistorySerializer(serializers.ModelSerializer):

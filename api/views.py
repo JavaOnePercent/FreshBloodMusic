@@ -3,6 +3,7 @@ from datetime import date, timedelta
 
 from django.contrib.auth.models import User
 from django.contrib import auth
+import base64
 from django.utils.datastructures import MultiValueDictKeyError
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.views import APIView
@@ -83,7 +84,7 @@ class SearchView(generics.ListAPIView):
         pass
 
     def get_tracks_albums_performers(self, tracks, albums, performers):
-        tracks = list(tracks.values('id', 'duration', performer=F('alb_id__per_id__name_per'), rating=F('rating_trc'), name=F('name_trc'),
+        tracks = list(tracks.values('id', 'duration', per_id=F('alb_id__per_id__id'), performer=F('alb_id__per_id__name_per'), audio=F('audio_trc'), rating=F('rating_trc'), name=F('name_trc'),
                                     image=F('alb_id__image_alb'), type=Value('track', CharField())))
         albums = list(albums.values('id', rating=F('rating_alb'), name=F('name_alb'), image=F('image_alb'),
                                type=Value('album', CharField())))
@@ -471,7 +472,12 @@ class PlaylistsList(APIView):
     def post(self, request):
         title = request.POST["title"]
         try:
-            image = request.FILES["image"]
+            if 'image' in request.POST:
+                image_base64 = request.POST['image']
+                image = base64.b64decode(image_base64)
+            else:
+                image = request.FILES["image"]
+                image = image.read()
         except MultiValueDictKeyError:
             image = None
         save_playlist(get_performer(request), title, image)
