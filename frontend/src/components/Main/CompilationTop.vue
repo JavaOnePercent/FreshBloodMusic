@@ -172,7 +172,6 @@ export default {
         {
             console.log(document.getElementById(value))
             document.getElementById(value).scrollLeft += 300;
-            console.log('вонючий гей', document.getElementById(value).offsetWidth - 300 )
             this.needStyleScroll(value)
         },
         toPerformerPage(id) {
@@ -213,7 +212,7 @@ export default {
             this.filter = filter
           //if(genre != null || style != null)
           //{
-            this.url = 'api/tracks';
+            this.url = '../api/tracks';
             this.compilations = [];
             // this.choseGenr= filter;
             if(genre !== null) {
@@ -294,7 +293,7 @@ export default {
 			});
         },
         getGengeAndStyles: function (message = null) {
-            this.$http.get('api/genre', {params: {id: message}}).then(function(response){
+            this.$http.get('../api/genre', {params: {id: message}}).then(function(response){
                 // console.log(response.data)
                 if(message == null) {
                     this.genres = response.data;

@@ -43,9 +43,10 @@ export default {
         }
     },
     watch: {
-        showDiv(sD) {
-            setTimeout(this.carousel, 500, sD);
-        }
+        // showDiv(currInd) {
+        //     console.log('a')
+        //     setTimeout(this.carousel, 6000);
+        // }
     },
     methods: {
         shuffle(arr){
@@ -58,7 +59,7 @@ export default {
             }
             return arr;
         },
-        carousel(sD) {
+        carousel() {
             // if(sD)
             //     if(this.compositors[0] === this.performers[this.performers.length - 1])
             //         this.compositors[1] = this.performers[0]
@@ -76,15 +77,16 @@ export default {
             if((this.performers.length-1)===this.currInd)
                 this.currInd = 0
             else
-            this.currInd++
+                this.currInd++
         },
         updatePosts: function () {
             if(!this.isTimeout)
             {
                 this.isTimeout = true
                 var self = this
-                setTimeout(function() { self.isTimeout=false }, 200);
-                this.showDiv=!this.showDiv
+                setTimeout(function() { self.isTimeout=false }, 2500);
+                // this.showDiv=!this.showDiv
+                this.carousel()
                 this.animation = "animation";
             }
         },
@@ -93,16 +95,32 @@ export default {
             {
                 this.isTimeout = true;
                 if(e === 'next')
+                {
+                    this.next()
                     this.animation = "animation";
+                }
                 else if(e === 'prev')
+                {
+                    this.prev()
                     this.animation = "animation1";
+                }
                 var self = this
-                setTimeout(function() { self.isTimeout=false }, 800);
+                setTimeout(function() { self.isTimeout=false }, 700);
                 //this.animation = "";
                 this.showDiv = !this.showDiv
                 clearInterval(this.autoFlip)
-                this.autoFlip = setInterval(this.updatePosts, 6000);
+                this.autoFlip = setInterval(this.updatePosts, 3500);
             }
+        },
+        prev() {
+            if (this.currInd != 0)
+                this.currInd--
+            else  this.currInd = this.performers.length-1
+        },
+        next() {
+            if (this.currInd >= 0 && this.currInd !== (this.performers.length-1))
+                this.currInd++
+            else  this.currInd = 0
         },
         mouseEnter() {
             this.isHovered = true
@@ -111,7 +129,7 @@ export default {
             this.isHovered = false
         },
         showBest() {
-            this.$http.get('api/performers').then(response => {
+            this.$http.get('../api/performers').then(response => {
                 console.log('performers', response.data)
                 
                 this.performers = this.shuffle(response.data)

@@ -13,6 +13,8 @@ import login from './components/Login.vue'
 
 import NewProfile from './components/NewProfile/NewProfile.vue'
 import Result from './components/Result/Result'
+import Statistic from './components/Statistic/Statistic'
+
 
 Vue.use(VueCookie);
 
@@ -164,6 +166,7 @@ const router = new VueRouter({
         { path: '/settings', component: settings },
         { path: '/search', component: Result},
         { path: '/similar', component: Result},
+        { path: '/statistic', component: Statistic},
         { path: '/', component: main },
     ],
     linkActiveClass: 'router-link-noob',

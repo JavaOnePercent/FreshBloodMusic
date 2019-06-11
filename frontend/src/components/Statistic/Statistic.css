@@ -1,0 +1,209 @@
+.statisticConteiner
+{
+    position: relative;
+    top: 65px;
+    padding-bottom: 65px;
+    padding-left: 15px;
+}
+.statisticConteiner h2
+{
+    margin: 0px;
+    margin-bottom: 15px;
+    cursor: default;
+    display: block;
+    position: relative;
+}
+h2 img
+{
+    width: 30px;
+    top:6px;
+    position: relative;
+    opacity: 0.5;
+}
+h2 img:hover
+{
+    opacity: 1;
+    cursor: pointer;
+}
+.row
+{
+    position: relative;
+    margin: 0 auto;
+    display: block;
+    height: 100%;
+    max-width: 1280px;
+    min-width: 915px;
+    /* left: 245px; */
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.controll
+{
+    display: flex;
+    top: 15px;
+    position: relative;
+    z-index: 100;
+}
+.controll label
+{
+    top: -14px;
+    left: 5px;
+    position: relative;
+}
+.dayBtn
+{
+    width: auto;
+    margin: 5px 5px;
+    padding: 5px 7px;
+    font-size: 21px;
+    background-color: rgba(192,192,192,0.3);
+}
+.dayBtn:hover, .dropdown:hover
+{
+    cursor: pointer;
+    background-color: rgba(255, 181, 43, 0.3)
+}
+.current {
+    cursor: default;
+    background-color: rgb(255, 181, 43)
+}
+
+.dropdown
+{
+    width: 270px;
+    margin: 5px 5px;
+    height: 25px;
+    padding: 5px 7px;
+    font-size: 21px;
+    left: -95px;
+    position: relative;
+    /* border: 1px solid rgba(0,0,0,0.3); */
+    cursor: pointer;
+    /* color: #757575; */
+    text-align: left;
+    /* background-color: white; */
+    background-color: rgb(255, 181, 43)
+}
+
+.dropdown_ul
+{
+    border: 0.5px solid rgba(0,0,0,0.1);
+    transition: .4s;
+    top: 45px;
+    left: 0;
+    height: auto;
+    max-height: 150px;
+    overflow: auto;
+	z-index: 90;
+	width: 430px;
+	position: absolute;
+	padding: 0;
+    margin: 0;
+    list-style-type: none;
+    /* color: black; */
+    /* background-color: rgba(255,255,255,0.7); */
+    color: rgb(88, 88, 88);
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+}
+
+.dropdown_ul li
+{
+    width: auto;
+    /* background-color: white; */
+    background-color: rgb(235,235,235);
+	cursor: pointer;
+	border-top:none;
+	text-align: center;
+	line-height: 30px;
+	height: 30px;
+}
+
+.dropdown_ul li:hover
+{
+    /* background-color: #eeeeee; */
+    background-color: rgb(205,205,205);
+}
+
+.arrow
+{
+	float: right;
+	height: 25px;
+	width: 25px;
+	/* margin-top: 8px;
+	margin-right: 10px; */
+    transition: all 0.1s;
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+}
+.album
+{
+    width: 250px;
+    height: 260px;
+    margin-bottom: 15px;
+    position: relative;
+    /* box-sizing: border-box; */
+}
+.album img
+{
+    width: 230px;
+    height: 230px;
+    margin: auto;
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+}
+.album-name
+{
+    margin: auto;
+    position: absolute;
+    top: 237px;
+    text-align: center;
+    width: 100%;
+    font-size: 19px;
+    cursor: inherit;
+}
+.album:not([class*="chousen"]):hover
+{
+    outline: 3px solid rgba(255, 181, 43, 0.5);
+    cursor: pointer;
+    /* border: 2px solid rgb(255, 181, 43); */
+}
+.chousen
+{
+    outline: 3px solid rgb(255, 181, 43);
+    cursor: default;
+}
+.trc
+{
+    display: table;
+    background-color: rgba(192,192,192,0.3);
+    width: 168px;
+    text-align: center;
+    height: 168px;
+    font-size: 19.5px;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    line-height: 25px;
+    position: relative;
+}
+.trc span
+{
+    cursor: default;
+    display: table-cell;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.trc:hover
+{
+    cursor: pointer;
+    background-color: rgba(255, 181, 43, 0.3)
+}

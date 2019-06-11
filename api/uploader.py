@@ -49,7 +49,7 @@ def save_playlist(user, title, image):  # сохранение альбома с
     os.mkdir(path + directory)
     if image is not None:
         directory += 'logo.jpg'
-        compress_image(image.read(), directory)
+        compress_image(image, directory)
         # image_alb.set_name('logo.jpg')
         field_file = FieldFile(playlist, Playlist.image.field, directory)
         playlist.image = field_file

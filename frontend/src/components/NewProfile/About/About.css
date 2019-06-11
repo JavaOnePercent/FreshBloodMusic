@@ -37,6 +37,9 @@
         text-align: center;
         line-height: 39.6px;
         cursor: pointer;
+        color: black;
+        text-decoration: none;
+        display: block
     }
 }
 @media (min-width: 988px)
@@ -71,6 +74,9 @@
         line-height: 39.6px;
         cursor: pointer;
         width: 254.333px;
+        color: black;
+        text-decoration: none;
+        display: block
     }
 }
 span {
@@ -78,7 +84,7 @@ span {
 }
 .aboutConteiner
 {
-    height: 260px;
+    height: auto;
     padding-left: 15px;
     padding-top: 15px;
     box-sizing: border-box;
@@ -109,11 +115,6 @@ span {
     letter-spacing: 1px;
     color: rgb(95, 95, 95);
     font-size: 18px;
-}
-.settings
-{
-    color: black;
-    text-decoration: none
 }
 .controll-btn:hover
 {
